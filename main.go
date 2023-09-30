@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"net/http"
 )
 
 
 func main() {
 	port := 8080
-
+	// Convert the integer port to a string.
+	portStr := strconv.Itoa(port)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// Set the Content-Type header to indicate that we are sending HTML.
 		w.Header().Set("Content-Type", "text/html")
@@ -21,5 +23,5 @@ func main() {
 	http.HandleFunc("/hello-world", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hello World"))
 	})
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+portStr, nil)
 }
