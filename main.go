@@ -7,6 +7,10 @@ import (
 	"os"
 	"io"
     "github.com/gorilla/mux"
+    "firstgoprog/api" // Replace "firstgoprog" with your actual module name.
+	"database/sql"
+    _ "github.com/go-sql-driver/mysql"
+
 )
 
 
@@ -16,6 +20,9 @@ func main() {
 	portStr := strconv.Itoa(port)
 
 	r := mux.NewRouter()
+
+    // Use the functions from the 'api' package to define routes.
+	api.InitRoutes(r)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
@@ -69,10 +76,16 @@ func main() {
 		// 	return
 		// }
 	})
-	
+	db, err := sql.Open("mysql", "root:daddy@(127.0.0.1:3306)/?parseTime=true")
+    if err != nil {
+        // log.Fatal(err)
+		fmt.Print("error connecting to db")
+    }
+    if err := db.Ping(); err != nil {
+	fmt.Printf("Error %d...\n", err)
+    }
+
 	fmt.Printf("Server is listening on port %d...\n", port)
-	r.HandleFunc("/hello-world", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello World"))
-	})
+	
 	http.ListenAndServe(":"+portStr, r)
 }
