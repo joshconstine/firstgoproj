@@ -101,6 +101,7 @@ func main() {
 	// 		return
 	// 	}
 	// })
+	
 	r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		htmlFile, err := os.Open("public/recipes.html")
@@ -116,6 +117,21 @@ func main() {
 			http.Error(w, "Unable to copy HTML content to response", http.StatusInternalServerError)
 			return
 		}
+	})	
+	r.HandleFunc("/add-ingredient", func(w http.ResponseWriter, r *http.Request) {
+			// Retrieve the form data
+			ingredient := r.FormValue("ingredient")
+		
+		
+		// Perform the SQL INSERT query to add the ingredient to the database
+		_, err = db.Exec("INSERT INTO ingredients (name) VALUES (?)", ingredient)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	
+		// Redirect back to the home page
+		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 	})
 	r.HandleFunc("/recipes/{id}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

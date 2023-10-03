@@ -14,5 +14,10 @@
             <li class="done">{{.Name}}</li>
     {{end}}
 </ul>
+<form action="/add-ingredient" method="post">
+    <label for="ingredient">Add new Ingredient</label>
+    <input type="text" id="ingredient" name="ingredient" placeholder="Ingredient" required/>
+    <button type="submit">+</button>
+</form>
 </body>
 </html>
