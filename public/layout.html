@@ -9,6 +9,14 @@
 
 </head>
 <body class="bg-red-200 max-w-3xl flex items-center w-3xl flex-col gap-4">
+    <div class="navbar bg-base-100">
+        <div class="navbar-start">
+          
+              <a href="/" class="bg-slate-200 rounded-lg p-2">ingredients</a>
+            
+             <a href="/recipes" class="bg-slate-200 rounded-lg p-2">recipes</a> 
+        </div>
+      </div>
     <h1>{{.PageTitle}}</h1>
     <form action="/add-ingredient" method="post">
         <label for="ingredient">Add new Ingredient</label>

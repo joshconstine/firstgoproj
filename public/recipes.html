@@ -4,13 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-</head>
-<body>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.8.3/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <h1>
-        Recipes
-    </h1>
-    <a href="/">recipes</a>
-    
-</body>
-</html>
+</head>
+<body class="bg-red-200 max-w-3xl flex items-center w-3xl flex-col gap-4">
+    <div class="navbar bg-base-100">
+        <div class="navbar-start">
+          
+              <a href="/" class="bg-slate-200 rounded-lg p-2">ingredients</a>
+            
+             <a href="/recipes" class="bg-slate-200 rounded-lg p-2">recipes</a> 
+        </div>
+      </div>
+    <h1>{{.PageTitle}}</h1>
+    <form action="/add-recipe" method="post">
+        <label for="recipeName">Add new recipe</label>
+        <input type="text" id="recipeName" name="recipeName" placeholder="recipe name" required/>
+        <button type="submit">+</button>
+    </form>
+    <div>
+    </body>
+    </html>
