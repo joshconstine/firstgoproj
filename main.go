@@ -144,8 +144,8 @@ func getSingleRecipeWithIngredients(db *sql.DB, id string) (RecipeWithIngredient
 	 var result RecipeWithIngredients
 
 	 // Query the recipe information based on the provided id
-	 err := db.QueryRow("SELECT name, description FROM recipes WHERE recipe_id = ?", id).
-		 Scan(&result.Name, &result.Description)
+	 err := db.QueryRow("SELECT name, description, recipe_id FROM recipes WHERE recipe_id = ?", id).
+		 Scan(&result.Name, &result.Description, &result.Recipe_id)
 	 if err != nil {
 		 return result, err
 	 }
@@ -310,7 +310,6 @@ r.HandleFunc("/delete-recipe", func(w http.ResponseWriter, r *http.Request) {
 		
 		id := r.FormValue("id")
 
-		//  fmt.Println(id)
 		// Perform the SQL INSERT query to add the ingredient to the database
 		stmt, err := db.Prepare("DELETE FROM recipes WHERE recipe_id = ?")
     if err != nil {
