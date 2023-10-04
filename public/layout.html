@@ -7,17 +7,41 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body class="bg-red-200 max-w-3xl flex items-center w-3xl flex-col gap-16">
+<body class="bg-red-200 max-w-3xl flex items-center w-3xl flex-col gap-4">
     <h1>{{.PageTitle}}</h1>
-<ul>
-    {{range .Ingredients}}
-            <li class="done">{{.Name}}</li>
-    {{end}}
-</ul>
-<form action="/add-ingredient" method="post">
-    <label for="ingredient">Add new Ingredient</label>
-    <input type="text" id="ingredient" name="ingredient" placeholder="Ingredient" required/>
-    <button type="submit">+</button>
-</form>
+    <form action="/add-ingredient" method="post">
+        <label for="ingredient">Add new Ingredient</label>
+        <input type="text" id="ingredient" name="ingredient" placeholder="Ingredient" required/>
+        <button type="submit">+</button>
+    </form>
+    <div>
+<h2>Delete  Ingredients</h2>
+        <ul>
+            {{range .Ingredients}}
+            <li >
+                <form  action="/delete-ingredient" method="post">
+                    <label for="ingredient">{{.Name}}</label>
+                    <input id="id" name="id" value="{{.Ingredient_id}}" hidden></input>
+                    <button type="submit" class="bg-red-500 p-1 rounded-lg">delete</button>
+                </form>
+            </li>
+            {{end}}
+        </ul>
+    </div>
+    <div>
+<h2> Update Ingredients</h2>
+        <ul class="flex-col flex gap-2">
+            {{range .Ingredients}}
+            <li >
+                <form  action="/update-ingredient" method="put">
+                    <input name="ingredientName" value="{{.Name}}"/>
+
+                    <input id="id" name="id" value="{{.Ingredient_id}}" hidden></input>
+                    <button type="submit" class="bg-green-500">SAVE</button>
+                </form>
+            </li>
+            {{end}}
+        </ul>
+    </div>
 </body>
 </html>
