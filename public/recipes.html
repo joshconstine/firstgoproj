@@ -23,18 +23,27 @@
         <input type="text" id="recipeName" name="recipeName" placeholder="recipe name" class="join-item input input-primary" required/>
         <button type="submit" class="join-item btn btn-primary">+</button>
     </div>
-    <textarea type="text" id="recipeDescription" name="recipeDescription" placeholder="description" class="tetarea textarea-primary"></textarea>
+    <textarea type="text" id="recipeDescription" name="recipeDescription" placeholder="description" class="tetarea textarea-primary"></textarea> 
+     <ul class="flex-col flex gap-2">
+        {{range .Ingredients}}
+        <li>
+            <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}"/>
+            <label for="{{.Ingredient_id}}">{{.Name}}</label>
+        </li>
+        {{end}}
+        </ul>
     </form>    <div>
 <h2>Recipes</h2>
         <ul class="flex-col flex gap-2">
             {{range .Recipes}}
             <li >
-                <form  action="/delete-recipe" method="post" class="flex items-center gap-2">
+                <!-- <form  action="/delete-recipe" method="post" class="flex items-center gap-2">
                     <label for="recipe">{{.Name}}</label>
                     <input id="id" name="id" value="{{.Recipe_id}}" hidden></input>
                     <textarea disabled placeholder="{{.Description}}"></textarea>
                     <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
-                </form>
+                </form> -->
+                <a href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
             </li>
             {{end}}
         </ul>

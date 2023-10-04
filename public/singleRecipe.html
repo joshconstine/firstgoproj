@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.8.3/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body class=" max-w-3xl flex  w-3xl flex-col gap-4">
+    <div class="navbar bg-base-100">
+        <div class="navbar-start">
+          
+              <a href="/" class="bg-slate-200 rounded-lg p-2">ingredients</a>
+            
+             <a href="/recipes" class="bg-slate-200 rounded-lg p-2">recipes</a> 
+        </div>
+    </div>
+    <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>  
+      <form  action="/delete-recipe" method="post" class="flex items-center gap-2">
+                    <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
+                    <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
+                </form>
+    <h2>Description</h2>
+    <p class="text-sm">{{.Recipe.Description}}</p>
+   <h2>Ingredients</h2>
+   <ul class="flex-col flex gap-2">
+    {{if .Recipe.Ingredients}}
+        {{range .Recipe.Ingredients}}
+        <li>
+            {{.Name}}
+        </li>
+        {{end}}
+    {{else}}
+        <li>No ingredients</li>
+    {{end}}
+</ul>
+    <div>
+    </body>
+    </html>

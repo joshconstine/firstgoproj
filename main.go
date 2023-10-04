@@ -36,6 +36,12 @@ type Recipe struct {
 	Name  string
 	Description string
 }
+type RecipeWithIngredients struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Ingredients []Ingredient
+}
 type IngredientPageData struct {
 	PageTitle string
     Ingredients []Ingredient
@@ -43,6 +49,11 @@ type IngredientPageData struct {
 type RecipesPageData struct {
 	PageTitle string
     Recipes []Recipe
+    Ingredients []Ingredient
+}
+type SingleRecipePageData struct {
+	PageTitle string
+    Recipe RecipeWithIngredients
 }
 
 // func seed()  {	
@@ -82,6 +93,86 @@ type RecipesPageData struct {
 // fmt.Println("Tables created successfully")
 // return 
 // }
+
+
+func getAllIngredients(db *sql.DB)  []Ingredient {
+	rows, err := db.Query(`SELECT * FROM ingredients`)
+        if err != nil {
+			log.Fatal(err)
+        }
+        defer rows.Close()
+		
+        var ingredients []Ingredient
+        for rows.Next() {
+			var i Ingredient
+			
+            err := rows.Scan(&i.Ingredient_id, &i.Name)
+            if err != nil {
+				log.Fatal(err)
+            }
+            ingredients = append(ingredients, i)
+        }
+        if err := rows.Err(); err != nil {
+			log.Fatal(err)
+        }
+		return ingredients
+}
+func getAllRecipes(db *sql.DB) []Recipe {
+	rows, err := db.Query(`SELECT * FROM recipes`)
+        if err != nil {
+			log.Fatal(err)
+        }
+        defer rows.Close()
+		
+        var recipes []Recipe
+        for rows.Next() {
+			var r Recipe
+			
+            err := rows.Scan(&r.Recipe_id, &r.Name,&r.Description)
+            if err != nil {
+				log.Fatal(err)
+            }
+            recipes = append(recipes, r)
+        }
+        if err := rows.Err(); err != nil {
+			log.Fatal(err)
+        }
+		return recipes
+}
+func getSingleRecipeWithIngredients(db *sql.DB, id string) (RecipeWithIngredients, error) {
+	 // Define a variable to hold the result
+	 var result RecipeWithIngredients
+
+	 // Query the recipe information based on the provided id
+	 err := db.QueryRow("SELECT name, description FROM recipes WHERE recipe_id = ?", id).
+		 Scan(&result.Name, &result.Description)
+	 if err != nil {
+		 return result, err
+	 }
+ 
+	 // Query the associated ingredients for the recipe
+	 rows, err := db.Query("SELECT i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", id)
+	 if err != nil {
+		 return result, err
+	 }
+	 defer rows.Close()
+ 
+	 // Loop through the rows of ingredients and add them to the result
+	 for rows.Next() {
+		 var ingredientName string
+		 err := rows.Scan(&ingredientName)
+		 if err != nil {
+			 return result, err
+		 }
+		 result.Ingredients = append(result.Ingredients, Ingredient{Name: ingredientName})
+	 }
+ 
+	 // Check for errors during rows iteration
+	 if err := rows.Err(); err != nil {
+		 return result, err
+	 }
+	 return result, nil
+}
 func main() {
 	port := 8080
 	// Convert the integer port to a string.
@@ -103,25 +194,9 @@ func main() {
 	
     r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("public/layout.html"))
-		rows, err := db.Query(`SELECT * FROM ingredients`)
-        if err != nil {
-			log.Fatal(err)
-        }
-        defer rows.Close()
-		
-        var ingredients []Ingredient
-        for rows.Next() {
-			var i Ingredient
-			
-            err := rows.Scan(&i.Ingredient_id, &i.Name)
-            if err != nil {
-				log.Fatal(err)
-            }
-            ingredients = append(ingredients, i)
-        }
-        if err := rows.Err(); err != nil {
-			log.Fatal(err)
-        }
+	
+        ingredients := getAllIngredients(db)
+      
 		
 		data := IngredientPageData{
 			PageTitle: "My ingredients list",
@@ -130,52 +205,6 @@ func main() {
 
         tmpl.Execute(w, data)
     })
-	// r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// 	w.Header().Set("Content-Type", "text/html")
-		// 	htmlFile, err := os.Open("public/index.html")
-		// 	if err != nil {
-			// 		http.Error(w, "Unable to read HTML file", http.StatusInternalServerError)
-			// 		return
-			// 	}
-			// 	defer htmlFile.Close()
-			
-			// 	// Copy the HTML content to the response writer.
-			// 	_, err = io.Copy(w, htmlFile)
-			// 	if err != nil {
-				// 		http.Error(w, "Unable to copy HTML content to response", http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// })
-	
-	r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		rows, err := db.Query(`SELECT * FROM recipes`)
-        if err != nil {
-			log.Fatal(err)
-        }
-        defer rows.Close()
-		
-        var recipes []Recipe
-        for rows.Next() {
-			var r Recipe
-			
-            err := rows.Scan(&r.Recipe_id, &r.Name,&r.Description)
-            if err != nil {
-				log.Fatal(err)
-            }
-            recipes = append(recipes, r)
-        }
-        if err := rows.Err(); err != nil {
-			log.Fatal(err)
-        }
-		
-		data := RecipesPageData{
-			PageTitle: "Recipes",
-            Recipes: recipes,
-        }
-
-        tmpl.Execute(w, data)
-	})	
 	r.HandleFunc("/add-ingredient", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			ingredient := r.FormValue("ingredient")
@@ -225,26 +254,63 @@ func main() {
 		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 	})
 
-//RECIPES
+//RECIPES	
+r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
+	
+		recipes := getAllRecipes(db)
+        ingredients := getAllIngredients(db)
+	
+		data := RecipesPageData{
+			PageTitle: "Recipes",
+            Recipes: recipes,
+            Ingredients: ingredients,
+        }
+
+        tmpl.Execute(w, data)
+	})	
 	r.HandleFunc("/add-recipe", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			recipeName := r.FormValue("recipeName")
 			recipeDescription := r.FormValue("recipeDescription")
-		
-		
+			// Retrieve the selected ingredients
+			ingredientIDs := r.Form["ingredients"]
+
+
+
 		// Perform the SQL INSERT query to add the ingredient to the database
 		_, err = db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipeName, recipeDescription )
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		// Retrieve the auto-generated recipe_id for the newly inserted recipe
+		var recipeID int
+		err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&recipeID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	
+ // Insert the selected ingredients into the recipe_ingredients table
+ for _, ingredientID := range ingredientIDs {
+	_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id) VALUES (?, ?)", recipeID, ingredientID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+
+
 		// Redirect back to the home page
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
 	})
 r.HandleFunc("/delete-recipe", func(w http.ResponseWriter, r *http.Request) {
 		
 		id := r.FormValue("id")
+
+		//  fmt.Println(id)
 		// Perform the SQL INSERT query to add the ingredient to the database
 		stmt, err := db.Prepare("DELETE FROM recipes WHERE recipe_id = ?")
     if err != nil {
@@ -260,27 +326,24 @@ r.HandleFunc("/delete-recipe", func(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
 	})
-
-
 	r.HandleFunc("/recipes/{id}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
         id := vars["id"]
-		fmt.Fprintf(w, "You've requested the recipe: %s\n", id)
+			tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
+	
+		recipe, err := getSingleRecipeWithIngredients(db, id)
+		if err != nil {
+			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
+		}		
 
-		// w.Header().Set("Content-Type", "text/html")
-		// htmlFile, err := os.Open("public/recipes.html")
-		// if err != nil {
-		// 	http.Error(w, "Unable to read HTML file", http.StatusInternalServerError)
-		// 	return
-		// }
-		// defer htmlFile.Close()
 
-		// // Copy the HTML content to the response writer.
-		// _, err = io.Copy(w, htmlFile)
-		// if err != nil {
-		// 	http.Error(w, "Unable to copy HTML content to response", http.StatusInternalServerError)
-		// 	return
-		// }
+		data := SingleRecipePageData{
+			PageTitle: recipe.Name,
+            Recipe: recipe,
+            
+        }
+
+        tmpl.Execute(w, data)
 	})
 
 	
