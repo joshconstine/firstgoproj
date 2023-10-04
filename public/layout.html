@@ -24,15 +24,16 @@
             <button type="submit" class="btn join-item btn-primary">+</button>
         </div>
     </form>
+    <div class="flex gap-16">
     <div>
 <h2>Delete  Ingredients</h2>
-        <ul>
+        <ul class="flex-col flex gap-2">
             {{range .Ingredients}}
             <li >
                 <form  action="/delete-ingredient" method="post">
                     <label for="ingredient">{{.Name}}</label>
                     <input id="id" name="id" value="{{.Ingredient_id}}" hidden></input>
-                    <button type="submit" class="btn btn-primary  p-1 rounded-lg">delete</button>
+                    <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
                 </form>
             </li>
             {{end}}
@@ -47,11 +48,12 @@
                     <input name="ingredientName" value="{{.Name}}" class="input input-primary"/>
 
                     <input id="id" name="id" value="{{.Ingredient_id}}" hidden></input>
-                    <button type="submit" class="btn btn-secondary">SAVE</button>
+                    <button type="submit" class="btn btn-primary">SAVE</button>
                 </form>
             </li>
             {{end}}
         </ul>
+    </div>
     </div>
 </body>
 </html>
