@@ -34,6 +34,7 @@ type Ingredient struct {
 type Recipe struct {
 	Recipe_id int
 	Name  string
+	Description string
 }
 type IngredientPageData struct {
 	PageTitle string
@@ -148,25 +149,25 @@ func main() {
 	
 	r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		// rows, err := db.Query(`SELECT * FROM ingredients`)
-        // if err != nil {
-		// 	log.Fatal(err)
-        // }
-        // defer rows.Close()
+		rows, err := db.Query(`SELECT * FROM recipes`)
+        if err != nil {
+			log.Fatal(err)
+        }
+        defer rows.Close()
 		
         var recipes []Recipe
-        // for rows.Next() {
-		// 	var i Ingredient
+        for rows.Next() {
+			var r Recipe
 			
-        //     err := rows.Scan(&i.Ingredient_id, &i.Name)
-        //     if err != nil {
-		// 		log.Fatal(err)
-        //     }
-        //     ingredients = append(ingredients, i)
-        // }
-        // if err := rows.Err(); err != nil {
-		// 	log.Fatal(err)
-        // }
+            err := rows.Scan(&r.Recipe_id, &r.Name,&r.Description)
+            if err != nil {
+				log.Fatal(err)
+            }
+            recipes = append(recipes, r)
+        }
+        if err := rows.Err(); err != nil {
+			log.Fatal(err)
+        }
 		
 		data := RecipesPageData{
 			PageTitle: "Recipes",
@@ -241,7 +242,24 @@ func main() {
 		// Redirect back to the home page
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
 	})
+r.HandleFunc("/delete-recipe", func(w http.ResponseWriter, r *http.Request) {
+		
+		id := r.FormValue("id")
+		// Perform the SQL INSERT query to add the ingredient to the database
+		stmt, err := db.Prepare("DELETE FROM recipes WHERE recipe_id = ?")
+    if err != nil {
+        // return err
+    }
+    defer stmt.Close()
 
+    // Execute the SQL statement
+    _, err = stmt.Exec(id)
+    if err != nil {
+        // return err
+    }
+
+		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
+	})
 
 
 	r.HandleFunc("/recipes/{id}", func(w http.ResponseWriter, r *http.Request) {
