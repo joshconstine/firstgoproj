@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"net/http"
-	"os"
-	"io"
+	
     "github.com/gorilla/mux"
     "firstgoprog/api" // Replace "firstgoprog" with your actual module name.
 	"database/sql"
@@ -32,11 +31,56 @@ type Ingredient struct {
 	Ingredient_id int
 	Name  string
 }
+type Recipe struct {
+	Recipe_id int
+	Name  string
+}
 type IngredientPageData struct {
 	PageTitle string
     Ingredients []Ingredient
 }
+type RecipesPageData struct {
+	PageTitle string
+    Recipes []Recipe
+}
 
+// func seed()  {	
+// 	db, err := sql.Open("mysql", "root:daddy@(127.0.0.1:3306)/food?parseTime=true")
+//     if err != nil {
+// 		// log.Fatal(err)
+// 		fmt.Print("error connecting to db")
+//     }
+//     if err := db.Ping(); err != nil {
+// 		fmt.Printf("Error %d...\n", err)
+//     }
+// 	query := `CREATE TABLE ingredients (
+// 		ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
+// 		name VARCHAR(255) NOT NULL
+// 	);
+
+// 	CREATE TABLE recipes (
+// 		recipe_id INT AUTO_INCREMENT PRIMARY KEY,
+// 		name VARCHAR(255) NOT NULL,
+// 		description TEXT
+// 	);
+
+// 	CREATE TABLE recipe_ingredients (
+// 		recipe_id INT,
+// 		ingredient_id INT,
+// 		PRIMARY KEY (recipe_id, ingredient_id),
+// 		FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id),
+// 		FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id)
+// 	);`
+
+// _, erro := db.Exec(query)
+// if erro != nil {
+// 	return 
+// 	fmt.Printf("err %s", erro)
+// }
+
+// fmt.Println("Tables created successfully")
+// return 
+// }
 func main() {
 	port := 8080
 	// Convert the integer port to a string.
@@ -103,20 +147,33 @@ func main() {
 	// })
 	
 	r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html")
-		htmlFile, err := os.Open("public/recipes.html")
-		if err != nil {
-			http.Error(w, "Unable to read HTML file", http.StatusInternalServerError)
-			return
-		}
-		defer htmlFile.Close()
+		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
+		// rows, err := db.Query(`SELECT * FROM ingredients`)
+        // if err != nil {
+		// 	log.Fatal(err)
+        // }
+        // defer rows.Close()
+		
+        var recipes []Recipe
+        // for rows.Next() {
+		// 	var i Ingredient
+			
+        //     err := rows.Scan(&i.Ingredient_id, &i.Name)
+        //     if err != nil {
+		// 		log.Fatal(err)
+        //     }
+        //     ingredients = append(ingredients, i)
+        // }
+        // if err := rows.Err(); err != nil {
+		// 	log.Fatal(err)
+        // }
+		
+		data := RecipesPageData{
+			PageTitle: "Recipes",
+            Recipes: recipes,
+        }
 
-		// Copy the HTML content to the response writer.
-		_, err = io.Copy(w, htmlFile)
-		if err != nil {
-			http.Error(w, "Unable to copy HTML content to response", http.StatusInternalServerError)
-			return
-		}
+        tmpl.Execute(w, data)
 	})	
 	r.HandleFunc("/add-ingredient", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
@@ -166,6 +223,27 @@ func main() {
 		// Redirect back to the page or provide a response
 		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 	})
+
+//RECIPES
+	r.HandleFunc("/add-recipe", func(w http.ResponseWriter, r *http.Request) {
+			// Retrieve the form data
+			recipeName := r.FormValue("recipeName")
+			recipeDescription := r.FormValue("recipeDescription")
+		
+		
+		// Perform the SQL INSERT query to add the ingredient to the database
+		_, err = db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipeName, recipeDescription )
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	
+		// Redirect back to the home page
+		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
+	})
+
+
+
 	r.HandleFunc("/recipes/{id}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
         id := vars["id"]

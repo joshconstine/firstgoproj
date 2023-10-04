@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body class="bg-red-200 max-w-3xl flex items-center w-3xl flex-col gap-4">
+<body class=" max-w-3xl flex items-center w-3xl flex-col gap-4">
     <div class="navbar bg-base-100">
         <div class="navbar-start">
           
@@ -18,10 +18,12 @@
         </div>
       </div>
     <h1>{{.PageTitle}}</h1>
-    <form action="/add-recipe" method="post">
-        <label for="recipeName">Add new recipe</label>
-        <input type="text" id="recipeName" name="recipeName" placeholder="recipe name" required/>
-        <button type="submit">+</button>
+    <form action="/add-recipe" method="post" class="flex flex-col gap-4">
+        <div class="join">
+        <input type="text" id="recipeName" name="recipeName" placeholder="recipe name" class="join-item input input-primary" required/>
+        <button type="submit" class="join-item btn btn-primary">+</button>
+    </div>
+    <textarea type="text" id="recipeDescription" name="recipeDescription" placeholder="description" class="tetarea textarea-primary"></textarea>
     </form>
     <div>
     </body>
