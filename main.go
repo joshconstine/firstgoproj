@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"strconv"
 	"net/http"
-	
     "github.com/gorilla/mux"
     "firstgoprog/api" // Replace "firstgoprog" with your actual module name.
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
 	"log"
 	"html/template"
+	"github.com/twilio/twilio-go"
+	twapi "github.com/twilio/twilio-go/rest/api/v2010"
 )
 
 
@@ -242,8 +243,8 @@ func main() {
     if err != nil {
         // return err
     }
-
-		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
+	fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
+	
 	})
 	r.HandleFunc("/update-ingredient", func(w http.ResponseWriter, r *http.Request) {
 		
@@ -375,7 +376,7 @@ r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 		// Retrieve the selected ingredients
 
 // Log the selected ingredient IDs
-fmt.Println("", recipeName)
+		fmt.Println("", recipeName)
 
 		// Iterate through the selected recipe IDs
 		for _, recipeID := range recipeIds {
@@ -425,7 +426,39 @@ fmt.Println("", recipeName)
 
         tmpl.Execute(w, data)
 	})
-	
+	r.HandleFunc("/send-list", func(w http.ResponseWriter, r *http.Request) {
+			// Retrieve the form data
+			phoneNumber := r.FormValue("phone")
+			accountSid :=	"AC729653ba85434ab1e60023fb3d38d604"
+					authToken := "893b3fe93856e4413c6b5e10f0fb7bd6"
+			fullPhoneNumber := "+1" + phoneNumber
+			fmt.Print(accountSid)
+			client := twilio.NewRestClientWithParams(twilio.ClientParams{
+				Username: accountSid,
+				Password: authToken,
+			})
+			
+
+			params := &twapi.CreateMessageParams{}
+			params.SetFrom("+18888415616")
+			params.SetBody("Hi there")
+			params.SetTo(fullPhoneNumber)
+		
+			resp, err := client.Api.CreateMessage(params)
+			if err != nil {
+				fmt.Println(err.Error())
+			} else {
+				if resp.Sid != nil {
+					fmt.Println(*resp.Sid)
+				} else {
+					fmt.Println(resp.Sid)
+				}
+			}
+
+
+		// Redirect back to the home page
+    fmt.Fprintf(w, "List send to : %+v\n", phoneNumber)
+	})
 
 	fmt.Printf("Server is listening on port %d...\n", port)
 	
