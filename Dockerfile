@@ -5,6 +5,9 @@ FROM golang:1.19
 # Set destination for COPY
 WORKDIR /app
 
+# Install MySQL client tools
+RUN apt-get update && apt-get install -y default-mysql-client
+
 # Download Go modules
 COPY  ./ ./
 RUN go mod download

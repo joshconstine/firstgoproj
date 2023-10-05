@@ -1,0 +1,20 @@
+version: '3'
+services:
+  app:
+    image: first-go-project:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+    entrypoint: /app/entrypoint.sh  # Specify the entry point script
+    env_file: 
+      - .env  # Add this line to specify the .env file
+  db:
+    image: mysql:5.7.43
+    environment:
+      MYSQL_ROOT_PASSWORD: daddy
+      MYSQL_DATABASE: food-db
+    ports:
+      - "3306:3306"

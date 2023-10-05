@@ -194,7 +194,7 @@ func main() {
 	
 	r := mux.NewRouter()
 	
-	db, err := sql.Open("mysql", "root:daddy@(127.0.0.1:3306)/food?parseTime=true")
+	db, err := sql.Open("mysql", "root:daddy@(db:3306)/food?parseTime=true")
     if err != nil {
 		// log.Fatal(err)
 		fmt.Print("error connecting to db")
