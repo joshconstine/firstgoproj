@@ -8,15 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body class=" max-w-3xl flex items-center w-3xl flex-col gap-4">
-    <div class="navbar bg-base-100">
-        <div class="navbar-start">
-          
-              <a href="/" class="bg-slate-200 rounded-lg p-2">ingredients</a>
-            
-             <a href="/recipes" class="bg-slate-200 rounded-lg p-2">recipes</a> 
-             <a href="/list" class="bg-slate-200 rounded-lg p-2">make a list</a> 
-        </div>
+<body class=" max-w-3xl flex items-center w-3xl flex-col gap-2">
+    <div class="navbar bg-primary flex gap-2">
+              <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
+             <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a> 
+             <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a> 
+             <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a> 
       </div>
     <h1>{{.PageTitle}}</h1>
     <form action="/add-ingredient" method="post">
@@ -25,26 +22,15 @@
             <button type="submit" class="btn join-item btn-primary">+</button>
         </div>
     </form>
-    <div class="flex gap-16">
+
     <div>
-<h2>Delete  Ingredients</h2>
         <ul class="flex-col flex gap-2">
             {{range .Ingredients}}
-            <li >
+            <li class="flex gap-1">
                 <form  action="/delete-ingredient" method="post">
-                    <label for="ingredient">{{.Name}}</label>
                     <input id="id" name="id" value="{{.Ingredient_id}}" hidden></input>
                     <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
                 </form>
-            </li>
-            {{end}}
-        </ul>
-    </div>
-    <div>
-<h2> Update Ingredients</h2>
-        <ul class="flex-col flex gap-2">
-            {{range .Ingredients}}
-            <li >
                 <form  action="/update-ingredient" method="put">
                     <input name="ingredientName" value="{{.Name}}" class="input input-primary"/>
 
@@ -54,7 +40,6 @@
             </li>
             {{end}}
         </ul>
-    </div>
     </div>
 </body>
 </html>

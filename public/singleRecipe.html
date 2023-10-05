@@ -10,14 +10,12 @@
 
 </head>
 <body class=" max-w-3xl flex  w-3xl flex-col gap-4">
-    <div class="navbar bg-base-100">
-        <div class="navbar-start">
-          
-              <a href="/" class="bg-slate-200 rounded-lg p-2">ingredients</a>
-            
-             <a href="/recipes" class="bg-slate-200 rounded-lg p-2">recipes</a> 
-             <a href="/list" class="bg-slate-200 rounded-lg p-2">make a list</a> 
-        </div>
+   <div class="navbar bg-primary flex gap-2">
+              <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
+             <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a> 
+             <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a> 
+             <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a> 
+      </div>
     </div>
     <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>  
       <form  action="/delete-recipe" method="post" class="flex items-center gap-2">

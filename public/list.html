@@ -11,35 +11,22 @@
 
 </head>
 <body class=" max-w-3xl flex items-center w-3xl flex-col gap-4">
-    <div class="navbar bg-base-100">
-        <div class="navbar-start">
-          
-              <a href="/" class="bg-slate-200 rounded-lg p-2">ingredients</a>
-            
-             <a href="/recipes" class="bg-slate-200 rounded-lg p-2">recipes</a> 
-             <a href="/list" class="bg-slate-200 rounded-lg p-2">make a list</a> 
-        </div>
+      <div class="navbar bg-primary flex gap-2">
+              <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
+             <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a> 
+             <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a> 
+             <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a> 
       </div>
     <h1>{{.PageTitle}}</h1>
    <form action="/send-list" method="post">
     <div class="join">
         <input type="phone" placeholder="999-222-3333" name="phone" class="join-item input input-primary"/>
-        <textarea   name="list" class="textarea textarea-primary">
-            {{range .Ingredients}}
-            {{.Name}}
-            {{end}}
+        <textarea   name="list" class="textarea textarea-primary join-item" rows="20">{{range .Ingredients}}{{.Name}}
+{{end}}
         </textarea>
         <button type="submit " class="btn btn-primary join-item">send </button>
     </div>
    </form>
-     <ul class="flex-col flex gap-2">
-        {{range .Ingredients}}
-        <li>
-           {{.Name}}
-        </li>
-        {{end}}
-        </ul>
-    </form>    
-    <div>
+    
     </body>
     </html>

@@ -54,6 +54,10 @@ type RecipesPageData struct {
     Recipes []Recipe
     Ingredients []Ingredient
 }
+type CreateRecipePageData struct {
+	PageTitle string
+    Ingredients []Ingredient
+}
 type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredients
@@ -209,7 +213,7 @@ func main() {
       
 		
 		data := IngredientPageData{
-			PageTitle: "My ingredients list",
+			PageTitle: "Ingredients list",
             Ingredients: ingredients,
         }
 
@@ -312,7 +316,20 @@ r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
         }
 
         tmpl.Execute(w, data)
-	})	
+	})	 
+	   r.HandleFunc("/create-recipe", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
+	
+        ingredients := getAllIngredients(db)
+      
+		
+		data := CreateRecipePageData{
+			PageTitle: "Create Recipe",
+            Ingredients: ingredients,
+        }
+
+        tmpl.Execute(w, data)
+    })
 	r.HandleFunc("/add-recipe", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			recipeName := r.FormValue("recipeName")
@@ -348,7 +365,8 @@ r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
 
 
 		// Redirect back to the home page
-		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
+
 	})
 r.HandleFunc("/delete-recipe", func(w http.ResponseWriter, r *http.Request) {
 		

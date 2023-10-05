@@ -8,38 +8,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body class=" max-w-3xl flex items-center w-3xl flex-col gap-4">
-    <div class="navbar bg-base-100">
-        <div class="navbar-start">
-          
-              <a href="/" class="bg-slate-200 rounded-lg p-2">ingredients</a>
+<body class=" max-w-3xl flex items-center w-3xl flex-col gap-2">
+    <div class="navbar bg-primary flex gap-2">
+              <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
             
-             <a href="/recipes" class="bg-slate-200 rounded-lg p-2">recipes</a> 
-             <a href="/list" class="bg-slate-200 rounded-lg p-2">make a list</a> 
-        </div>
+             <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a> 
+             <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a> 
+             <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a> 
       </div>
     <h1>{{.PageTitle}}</h1>
-    <form action="/add-recipe" method="post" class="flex flex-col gap-4">
-        <div class="join">
-        <input type="text" id="recipeName" name="recipeName" placeholder="recipe name" class="join-item input input-primary" required/>
-        <button type="submit" class="join-item btn btn-primary">+</button>
-    </div>
-    <textarea type="text" id="recipeDescription" name="recipeDescription" placeholder="description" class="tetarea textarea-primary"></textarea> 
-     <ul class="flex-col flex gap-2">
-        {{range .Ingredients}}
-        <li>
-            <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}"/>
-            <label for="{{.Ingredient_id}}">{{.Name}}</label>
-        </li>
-        {{end}}
-        </ul>
-    </form>    <div>
-<h2>Recipes</h2>
-        <ul class="flex-col flex gap-2">
+<div>
+        <ul class="flex flex-wrap flex gap-2">
             {{range .Recipes}}
             <li >
-            
-                <a href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
+                <div class="border-2 rounded-lg shadow-lg hover:scale-110">
+
+                    <a  href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
+                </div>
             </li>
             {{end}}
         </ul>
