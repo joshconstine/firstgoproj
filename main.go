@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"net/http"
     "github.com/gorilla/mux"
     "firstgoprog/api" // Replace "firstgoprog" with your actual module name.
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
+    _ "github.com/joho/godotenv/autoload"
 	"log"
 	"html/template"
 	"github.com/twilio/twilio-go"
@@ -463,10 +465,9 @@ r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 	r.HandleFunc("/send-list", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			phoneNumber := r.FormValue("phone")
-			accountSid :=	"AC729653ba85434ab1e60023fb3d38d604"
-					authToken := "893b3fe93856e4413c6b5e10f0fb7bd6"
+			accountSid :=	os.Getenv("TWILIO_ACCOUNT_SID")
+			authToken := os.Getenv("TWILIO_AUTH_TOKEN")
 			fullPhoneNumber := "+1" + phoneNumber
-			fmt.Print(accountSid)
 			client := twilio.NewRestClientWithParams(twilio.ClientParams{
 				Username: accountSid,
 				Password: authToken,
