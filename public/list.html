@@ -24,6 +24,11 @@
    <form action="/send-list" method="post">
     <div class="join">
         <input type="phone" placeholder="999-222-3333" name="phone" class="join-item input input-primary"/>
+        <textarea   name="list" class="textarea textarea-primary">
+            {{range .Ingredients}}
+            {{.Name}}
+            {{end}}
+        </textarea>
         <button type="submit " class="btn btn-primary join-item">send </button>
     </div>
    </form>

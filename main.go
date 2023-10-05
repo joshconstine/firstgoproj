@@ -465,6 +465,7 @@ r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 	r.HandleFunc("/send-list", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			phoneNumber := r.FormValue("phone")
+			list := r.FormValue("list")
 			accountSid :=	os.Getenv("TWILIO_ACCOUNT_SID")
 			authToken := os.Getenv("TWILIO_AUTH_TOKEN")
 			fullPhoneNumber := "+1" + phoneNumber
@@ -476,7 +477,7 @@ r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 
 			params := &twapi.CreateMessageParams{}
 			params.SetFrom("+18888415616")
-			params.SetBody("Hi there")
+			params.SetBody(list)
 			params.SetTo(fullPhoneNumber)
 		
 			resp, err := client.Api.CreateMessage(params)
@@ -484,9 +485,9 @@ r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err.Error())
 			} else {
 				if resp.Sid != nil {
-					fmt.Println(*resp.Sid)
+					// fmt.Println(*resp.Sid)
 				} else {
-					fmt.Println(resp.Sid)
+					// fmt.Println(resp.Sid)
 				}
 			}
 
