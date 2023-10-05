@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +9,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
+
 <body class=" max-w-3xl flex items-center w-3xl flex-col gap-2">
     <div class="navbar bg-primary flex gap-2">
-              <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
-            
-             <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a> 
-             <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a> 
-             <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a> 
-      </div>
+        <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
+
+        <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a>
+        <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a>
+        <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a>
+    </div>
     <h1>{{.PageTitle}}</h1>
-<div>
+    <div>
         <ul class="flex flex-wrap flex gap-2">
             {{range .Recipes}}
-            <li >
+            <li>
                 <div class="border-2 rounded-lg shadow-lg hover:scale-110">
 
-                    <a  href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
+                    <a href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
                 </div>
             </li>
             {{end}}
         </ul>
     </div>
     <div>
-    </body>
-    </html>
+</body>
+
+</html>

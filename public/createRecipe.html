@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,42 +9,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
+
 <body class=" max-w-3xl flex items-center w-3xl flex-col gap-2">
     <div class="navbar bg-primary flex gap-2">
-              <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
-             <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a> 
-             <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a> 
-             <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a> 
-      </div>
-      <form action="/add-recipe" method="post" class="flex flex-col gap-4">
+        <a href="/" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
+        <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a>
+        <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a>
+        <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a>
+    </div>
+    <form action="/add-recipe" method="post" class="flex flex-col gap-4">
         <div class="flex gap-4">
             <div class="flex flex-col gap-2">
 
-    <div class="flex gap-2 items-center">
+                <div class="flex gap-2 items-center">
 
-        <h1>{{.PageTitle}}</h1>
-        <button type="submit" class="join-item btn btn-success">save</button>
-    </div>
-        <input type="text" id="recipeName" name="recipeName" placeholder="recipe name" class="join-item input input-primary" required/>
-    <textarea type="text" id="recipeDescription" name="recipeDescription" placeholder="description" class="tetarea textarea-primary"></textarea> 
-</div>
+                    <h1>{{.PageTitle}}</h1>
+                    <button type="submit" class="join-item btn btn-success">save</button>
+                </div>
+                <input type="text" id="recipeName" name="recipeName" placeholder="recipe name"
+                    class="join-item input input-primary" required />
+                <textarea type="text" id="recipeDescription" name="recipeDescription" placeholder="description"
+                    class="tetarea textarea-primary"></textarea>
+            </div>
             <div class="flex flex-col gap-2">
                 <div>
                     <span>select ingredients</span>
-                    <a href="/"  class="btn btn-success">+</a>
+                    <a href="/" class="btn btn-success">+</a>
                 </div>
-     <ul class="flex-col flex gap-2">
-        {{range .Ingredients}}
-        <li>
-            <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}"/>
-            <label for="{{.Ingredient_id}}">{{.Name}}</label>
-        </li>
-        {{end}}
-    </ul>
-    
-    </div>    
-    </div>    
-    </form>   
+                <ul class="flex-col flex gap-2">
+                    {{range .Ingredients}}
+                    <li>
+                        <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}" />
+                        <label for="{{.Ingredient_id}}">{{.Name}}</label>
+                    </li>
+                    {{end}}
+                </ul>
+
+            </div>
+        </div>
+    </form>
     <div>
-    </body>
-    </html>
+</body>
+
+</html>
