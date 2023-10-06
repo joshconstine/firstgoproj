@@ -24,12 +24,25 @@ func main() {
     if err != nil {
         panic(err)
     }
+    // Create the ingredient TYPE table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS ingredient_type (
+          ingredient_type_id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(255) NOT NULL
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
+
 
     // Create the ingredients table
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS ingredients (
             ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL
+            name VARCHAR(255) NOT NULL,
+            ingredient_type_id INT,
+            FOREIGN KEY (ingredient_type_id) REFERENCES ingredient_type(ingredient_type_id)
         );
     `)
     if err != nil {

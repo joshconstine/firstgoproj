@@ -9,8 +9,9 @@ services:
     depends_on:
       - db
     entrypoint: /app/entrypoint.sh  # Specify the entry point script
-    env_file: 
-      - .env  # Add this line to specify the .env file
+    environment:
+      TWILIO_AUTH_TOKEN: 893b3fe93856e4413c6b5e10f0fb7bd6
+      TWILIO_ACCOUNT_SID: AC729653ba85434ab1e60023fb3d38d604
   db:
     image: mysql:5.7.43
     environment:
