@@ -123,7 +123,7 @@ func CreateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	
 		// Redirect back to the home page
-		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/ingredients";</script>`)
 }
 func UpdateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		ingredientID := r.FormValue("id")
@@ -137,7 +137,7 @@ func UpdateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	
 		// Redirect back to the page or provide a response
-		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/ingredients";</script>`)
 }
 func DeleteIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		id := r.FormValue("id")
@@ -187,5 +187,5 @@ func DeleteIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	
 		// Redirect back to the home page
-		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/ingredients";</script>`)
 }

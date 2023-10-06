@@ -13,6 +13,9 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
 	apiRouter := r.PathPrefix("/api").Subrouter()
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        http.ServeFile(w, r, "public/index.html") 
+    }).Methods("GET")		
+    r.HandleFunc("/ingredients", func(w http.ResponseWriter, r *http.Request) {
         GetIngredientsTemplate(w, r, db)
     }).Methods("GET")	
 	r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {

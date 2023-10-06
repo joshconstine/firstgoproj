@@ -5,11 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.8.3/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
 
-<body>
-    <h1>food app</h1>
-    <a href="/recipes">recipes</a>
+<body class="  flex items-center w-3xl flex-col gap-2">
+    <div class="navbar bg-primary flex gap-2">
+        <a href="/ingredients" class="bg-slate-200 rounded-sm p-1">Ingredients</a>
+
+        <a href="/recipes" class="bg-slate-200 rounded-sm p-1">Recipes</a>
+        <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a>
+        <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a>
+    </div>
+    <h1>Listafy</h1>
+    <div>
 </body>
 
 </html>
