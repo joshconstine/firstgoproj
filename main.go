@@ -69,11 +69,7 @@ type RecipesPageData struct {
     Recipes []Recipe
     Ingredients []Ingredient
 }
-type CreateRecipePageData struct {
-	PageTitle string
-    Ingredients []Ingredient
-	MappedIngredients map[string][]IngredientAndType
-}
+
 type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredients
@@ -334,21 +330,7 @@ func main() {
 		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 	})
 
-   r.HandleFunc("/create-recipe", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
-	
-        ingredients := getAllIngredients(db)
-      
-		ingredientTypeMap := getAllIngredientsWithTypes(db)
-		
-		data := CreateRecipePageData{
-			PageTitle: "Create Recipe",
-            Ingredients: ingredients,
-			MappedIngredients: ingredientTypeMap,
-        }
-
-        tmpl.Execute(w, data)
-    })
+ 
 r.HandleFunc("/delete-recipe", func(w http.ResponseWriter, r *http.Request) {
 		
 		id := r.FormValue("id")

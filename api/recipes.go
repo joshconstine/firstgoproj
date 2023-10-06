@@ -19,6 +19,11 @@ type RecipesPageData struct {
     Recipes []Recipe
     Ingredients []Ingredient
 }
+type CreateRecipePageData struct {
+	PageTitle string
+    Ingredients []Ingredient
+	MappedIngredients map[string][]IngredientAndType
+}
 func getAllRecipes(db *sql.DB) []Recipe {
 	rows, err := db.Query(`SELECT * FROM recipes`)
         if err != nil {
@@ -63,8 +68,10 @@ func getAllIngredients(db *sql.DB)  []Ingredient {
         }
 		return ingredients
 }
-// GetRecipes is a sample handler for listing all recipes.
-func GetRecipes(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+//HTML TEMPLATES
+
+func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
    tmpl := template.Must(template.ParseFiles("public/recipes.html"))
 		recipes := getAllRecipes(db)
         ingredients := getAllIngredients(db)
@@ -76,22 +83,36 @@ func GetRecipes(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
         tmpl.Execute(w, data)
 }
+
+
+func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+  tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
+	
+        ingredients := getAllIngredients(db)
+      
+		ingredientTypeMap := getAllIngredientsWithTypes(db)
+		
+		data := CreateRecipePageData{
+			PageTitle: "Create Recipe",
+            Ingredients: ingredients,
+			MappedIngredients: ingredientTypeMap,
+        }
+
+        tmpl.Execute(w, data)
+}
+
+
+// DB Transactions
 func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-  	// Retrieve the form data
 			recipeName := r.FormValue("recipeName")
 			recipeDescription := r.FormValue("recipeDescription")
-			// Retrieve the selected ingredients
 			ingredientIDs := r.Form["ingredients"]
 
-
-
-		// Perform the SQL INSERT query to add the ingredient to the database
 		_, err := db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipeName, recipeDescription )
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		// Retrieve the auto-generated recipe_id for the newly inserted recipe
 		var recipeID int
 		err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&recipeID)
 		if err != nil {
@@ -99,7 +120,6 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			return
 		}
 	
- // Insert the selected ingredients into the recipe_ingredients table
  for _, ingredientID := range ingredientIDs {
 	_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id) VALUES (?, ?)", recipeID, ingredientID)
 	if err != nil {
@@ -107,21 +127,7 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 }
-
-
-
-		// Redirect back to the home page
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
 }
 
 
-// // GetRecipe is a sample handler for retrieving a recipe by ID.
-// func GetRecipe(w http.ResponseWriter, r *http.Request) {
-//     vars := mux.Vars(r)
-//     recipeID := vars["id"]
-//     // Implement logic to retrieve a recipe by ID.
-//     // Respond with the requested recipe.
-//     // Example:
-//     recipe := Recipe{ID: recipeID, Title: "Recipe " + recipeID}
-//     fmt.Fprintf(w, "Recipe: %+v\n", recipe)
-// }
