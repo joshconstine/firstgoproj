@@ -72,6 +72,7 @@ type RecipesPageData struct {
 type CreateRecipePageData struct {
 	PageTitle string
     Ingredients []Ingredient
+	MappedIngredients map[string][]IngredientAndType
 }
 type SingleRecipePageData struct {
 	PageTitle string
@@ -108,6 +109,33 @@ func getAllIngredients(db *sql.DB)  []Ingredient {
 			log.Fatal(err)
         }
 		return ingredients
+}
+func getAllIngredientsWithTypes(db *sql.DB)  map[string][]IngredientAndType {
+	  rows, err := db.Query(`
+		  SELECT i.ingredient_id, i.name, i.ingredient_type_id, t.name AS ingredient_type_name
+		  FROM ingredients i
+		  JOIN ingredient_type t ON i.ingredient_type_id = t.ingredient_type_id
+	  `)
+	  if err != nil {
+		  panic(err.Error())
+	  }
+	  defer rows.Close()
+  
+	  // Map to store ingredients grouped by ingredient type
+	  ingredientTypeMap := make(map[string][]IngredientAndType)
+  
+	  for rows.Next() {
+		  var ingredient IngredientAndType
+  
+		  err := rows.Scan(&ingredient.Ingredient_id, &ingredient.Name, &ingredient.Ingredient_type_id, &ingredient.Ingredient_type_name)
+		  if err != nil {
+			  panic(err.Error())
+		  }
+  
+		  // Append the ingredient to the corresponding ingredient type
+		  ingredientTypeMap[ingredient.Ingredient_type_name] = append(ingredientTypeMap[ingredient.Ingredient_type_name], ingredient)
+	  }
+	  return ingredientTypeMap
 }
 func getAllRecipes(db *sql.DB) []Recipe {
 	rows, err := db.Query(`SELECT * FROM recipes`)
@@ -210,31 +238,7 @@ func main() {
 	
         ingredients := getAllIngredients(db)
         ingredientTypes := getAllIngredientTypes(db)
-		  // Query for ingredients and ingredient types
-		  rows, err := db.Query(`
-		  SELECT i.ingredient_id, i.name, i.ingredient_type_id, t.name AS ingredient_type_name
-		  FROM ingredients i
-		  JOIN ingredient_type t ON i.ingredient_type_id = t.ingredient_type_id
-	  `)
-	  if err != nil {
-		  panic(err.Error())
-	  }
-	  defer rows.Close()
-  
-	  // Map to store ingredients grouped by ingredient type
-	  ingredientTypeMap := make(map[string][]IngredientAndType)
-  
-	  for rows.Next() {
-		  var ingredient IngredientAndType
-  
-		  err := rows.Scan(&ingredient.Ingredient_id, &ingredient.Name, &ingredient.Ingredient_type_id, &ingredient.Ingredient_type_name)
-		  if err != nil {
-			  panic(err.Error())
-		  }
-  
-		  // Append the ingredient to the corresponding ingredient type
-		  ingredientTypeMap[ingredient.Ingredient_type_name] = append(ingredientTypeMap[ingredient.Ingredient_type_name], ingredient)
-	  }
+		ingredientTypeMap := getAllIngredientsWithTypes(db)
   
 		
 		data := IngredientPageData{
@@ -336,7 +340,6 @@ r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
 	
 		recipes := getAllRecipes(db)
         ingredients := getAllIngredients(db)
-	
 		data := RecipesPageData{
 			PageTitle: "Recipes",
             Recipes: recipes,
@@ -350,10 +353,12 @@ r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
 	
         ingredients := getAllIngredients(db)
       
+		ingredientTypeMap := getAllIngredientsWithTypes(db)
 		
 		data := CreateRecipePageData{
 			PageTitle: "Create Recipe",
             Ingredients: ingredients,
+			MappedIngredients: ingredientTypeMap,
         }
 
         tmpl.Execute(w, data)
