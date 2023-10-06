@@ -36,7 +36,39 @@ type SingleRecipePageData struct {
     Recipe RecipeWithIngredients
 }
 
+//HTML TEMPLATES
 
+func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+   tmpl := template.Must(template.ParseFiles("public/recipes.html"))
+		recipes := getAllRecipes(db)
+        ingredients := getAllIngredients(db)
+		data := RecipesPageData{
+			PageTitle: "Recipes",
+            Recipes: recipes,
+            Ingredients: ingredients,
+        }
+
+        tmpl.Execute(w, data)
+}
+
+
+func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+  tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
+	
+        ingredients := getAllIngredients(db)
+      
+		ingredientTypeMap := getAllIngredientsWithTypes(db)
+		
+		data := CreateRecipePageData{
+			PageTitle: "Create Recipe",
+            Ingredients: ingredients,
+			MappedIngredients: ingredientTypeMap,
+        }
+
+        tmpl.Execute(w, data)
+}
+
+// DB Transactions
 func getAllRecipes(db *sql.DB) []Recipe {
 	rows, err := db.Query(`SELECT * FROM recipes`)
         if err != nil {
@@ -116,40 +148,8 @@ func getAllIngredients(db *sql.DB)  []Ingredient {
 		return ingredients
 }
 
-//HTML TEMPLATES
-
-func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-   tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		recipes := getAllRecipes(db)
-        ingredients := getAllIngredients(db)
-		data := RecipesPageData{
-			PageTitle: "Recipes",
-            Recipes: recipes,
-            Ingredients: ingredients,
-        }
-
-        tmpl.Execute(w, data)
-}
 
 
-func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-  tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
-	
-        ingredients := getAllIngredients(db)
-      
-		ingredientTypeMap := getAllIngredientsWithTypes(db)
-		
-		data := CreateRecipePageData{
-			PageTitle: "Create Recipe",
-            Ingredients: ingredients,
-			MappedIngredients: ingredientTypeMap,
-        }
-
-        tmpl.Execute(w, data)
-}
-
-
-// DB Transactions
 func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			recipeName := r.FormValue("recipeName")
 			recipeDescription := r.FormValue("recipeDescription")

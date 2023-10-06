@@ -62,10 +62,7 @@ type IngredientPageData struct {
 
 
 
-type CreateListPageData struct {
-	PageTitle string
-    Recipes []Recipe
-}
+
 type ListPageData struct {
 	PageTitle string
     Ingredients []Ingredient
@@ -290,18 +287,7 @@ func main() {
 
 //List
 
-r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("public/makeList.html"))
-	
-		recipes := getAllRecipes(db)
-	
-		data := CreateListPageData{
-			PageTitle: "Make a List",
-            Recipes: recipes,
-        }
 
-        tmpl.Execute(w, data)
-	})	
 	
 	r.HandleFunc("/generate-list", func(w http.ResponseWriter, r *http.Request) {
 		// REcipe ids only reads if there is another form value? am i an idot
