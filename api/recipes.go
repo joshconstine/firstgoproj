@@ -129,5 +129,23 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
 }
+func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+			
+		id := r.FormValue("id")
 
+		// Perform the SQL INSERT query to add the ingredient to the database
+		stmt, err := db.Prepare("DELETE FROM recipes WHERE recipe_id = ?")
+    if err != nil {
+        // return err
+    }
+    defer stmt.Close()
+
+    // Execute the SQL statement
+    _, err = stmt.Exec(id)
+    if err != nil {
+        // return err
+    }
+
+		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
+}
 
