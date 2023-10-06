@@ -1,12 +1,15 @@
 package api
 
 import (
+	"os"
 	"fmt"
 	"strconv"
     "net/http"
     "database/sql"
 	"html/template"
     _ "github.com/go-sql-driver/mysql"
+	"github.com/twilio/twilio-go"
+	twapi "github.com/twilio/twilio-go/rest/api/v2010"
 )
 type CreateListPageData struct {
 	PageTitle string
@@ -93,3 +96,40 @@ func GetGenerateListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
 
         tmpl.Execute(w, data)
 	}
+	
+
+	//DB transactions
+
+func SendList(w http.ResponseWriter, r *http.Request) {
+			// Retrieve the form data
+			phoneNumber := r.FormValue("phone")
+			list := r.FormValue("list")
+			accountSid :=	os.Getenv("TWILIO_ACCOUNT_SID")
+			authToken := os.Getenv("TWILIO_AUTH_TOKEN")
+			fullPhoneNumber := "+1" + phoneNumber
+			client := twilio.NewRestClientWithParams(twilio.ClientParams{
+				Username: accountSid,
+				Password: authToken,
+			})
+			
+
+			params := &twapi.CreateMessageParams{}
+			params.SetFrom("+18888415616")
+			params.SetBody(list)
+			params.SetTo(fullPhoneNumber)
+		
+			resp, err := client.Api.CreateMessage(params)
+			if err != nil {
+				fmt.Println(err.Error())
+			} else {
+				if resp.Sid != nil {
+					// fmt.Println(*resp.Sid)
+				} else {
+					// fmt.Println(resp.Sid)
+				}
+			}
+
+
+		// Redirect back to the home page
+    fmt.Fprintf(w, "List send to : %+v\n", phoneNumber)
+}

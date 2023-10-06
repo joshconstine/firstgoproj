@@ -40,6 +40,9 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
 	apiRouter.HandleFunc("/recipes/delete", func(w http.ResponseWriter, r *http.Request) {
         DeleteRecipe(w, r, db)
     }).Methods("POST")
+	apiRouter.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+        SendList(w, r)
+    }).Methods("POST")
 	// apiRouter.HandleFunc("/recipes/{id}", GetRecipe).Methods("GET")
 	// apiRouter.HandleFunc("/recipes/create", CreateRecipe).Methods("POST")
 }
