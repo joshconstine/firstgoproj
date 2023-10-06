@@ -125,6 +125,20 @@ func CreateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		// Redirect back to the home page
 		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 }
+func UpdateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+		ingredientID := r.FormValue("id")
+		updatedName := r.FormValue("ingredientName")
+	
+		// Prepare and execute the SQL UPDATE statement
+		_, err := db.Exec("UPDATE ingredients SET name = ? WHERE ingredient_id = ?", updatedName, ingredientID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	
+		// Redirect back to the page or provide a response
+		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
+}
 func DeleteIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		id := r.FormValue("id")
 		// Start a transaction

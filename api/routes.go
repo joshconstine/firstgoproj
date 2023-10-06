@@ -39,6 +39,10 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
     apiRouter.HandleFunc("/ingredients/delete", func(w http.ResponseWriter, r *http.Request) {
         DeleteIngredient(w, r, db)
     }).Methods("POST")
+    apiRouter.HandleFunc("/ingredients/update", func(w http.ResponseWriter, r *http.Request) {
+        UpdateIngredient(w, r, db)
+    }).Methods("POST")
+
 
 	apiRouter.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
         CreateRecipe(w, r, db)
