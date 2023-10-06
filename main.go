@@ -62,7 +62,7 @@ type IngredientPageData struct {
 	PageTitle string
     Ingredients []Ingredient
 	IngredientTypes []IngredientType
-	MappedIngredients map[{int, string}][]IngredientAndType
+	MappedIngredients map[string][]IngredientAndType
 }
 type RecipesPageData struct {
 	PageTitle string
@@ -222,7 +222,7 @@ func main() {
 	  defer rows.Close()
   
 	  // Map to store ingredients grouped by ingredient type
-	  ingredientTypeMap := make(map[int][]IngredientAndType)
+	  ingredientTypeMap := make(map[string][]IngredientAndType)
   
 	  for rows.Next() {
 		  var ingredient IngredientAndType
@@ -233,7 +233,7 @@ func main() {
 		  }
   
 		  // Append the ingredient to the corresponding ingredient type
-		  ingredientTypeMap[ingredient.Ingredient_type_id] = append(ingredientTypeMap[ingredient.Ingredient_type_id], ingredient)
+		  ingredientTypeMap[ingredient.Ingredient_type_name] = append(ingredientTypeMap[ingredient.Ingredient_type_name], ingredient)
 	  }
   
 		
