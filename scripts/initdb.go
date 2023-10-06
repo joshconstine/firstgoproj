@@ -75,5 +75,31 @@ func main() {
         panic(err)
     }
 
+    // Seed the ingredient types
+    _, err = db.Exec(`
+    INSERT INTO ingredient_type (name)
+    VALUES
+        ('Vegetable'),
+        ('Fruit'),
+        ('Spice'),
+        ('Dairy'),
+        ('Meet'),
+        ('Grain'),
+        ('Snack'),
+        ('Baking');
+    `)
+    if err != nil {
+        panic(err)
+    } 
+      // Seed the ingredient types
+    _, err = db.Exec(`
+    INSERT INTO ingredients (name, ingredient_type_id)
+    VALUES
+        ('Apple', '2'),
+        ('Pear', '2');
+    `)
+    if err != nil {
+        panic(err)
+    }
     fmt.Println("Database initialization completed.")
 }

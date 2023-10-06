@@ -30,9 +30,15 @@ type TodoPageData struct {
     Todos     []Todo
 }
 
+
+type IngredientType struct {
+	Ingredient_type_id int
+	name string
+}
 type Ingredient struct {
 	Ingredient_id int
 	Name  string
+	Ingredient_type_id int
 }
 type Recipe struct {
 	Recipe_id int
@@ -120,7 +126,7 @@ func getAllIngredients(db *sql.DB)  []Ingredient {
         for rows.Next() {
 			var i Ingredient
 			
-            err := rows.Scan(&i.Ingredient_id, &i.Name)
+            err := rows.Scan(&i.Ingredient_id, &i.Name, &i.Ingredient_type_id)
             if err != nil {
 				log.Fatal(err)
             }
