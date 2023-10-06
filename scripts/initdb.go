@@ -96,7 +96,21 @@ func main() {
     INSERT INTO ingredients (name, ingredient_type_id)
     VALUES
         ('Apple', '2'),
-        ('Pear', '2');
+        ('Pear', '2'),
+        ('Carrot', '1'),
+        ('Broccoli', '1'),
+        ('Cinnamon', '3'),
+        ('Nutmeg', '3'),
+        ('Milk', '4'),
+        ('Cheese', '4'),
+        ('Chicken', '5'),
+        ('Beef', '5'),
+        ('Rice', '6'),
+        ('Wheat', '6'),
+        ('Potato Chips', '7'),
+        ('Chocolate Bar', '7'),
+        ('Flour', '8'),
+        ('Sugar', '8');
     `)
     if err != nil {
         panic(err)

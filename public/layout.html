@@ -22,6 +22,12 @@
         <div class=" join">
             <input type="text" id="ingredient" name="ingredient" placeholder="Add Ingredient" required
                 class="input input-primary join-item" />
+            <select id="ingredient_type select select-primary" name="ingredient_type" required
+                class="join-item select select-primary">
+                {{range .IngredientTypes}}
+                <option value="{{.Ingredient_type_id}}" class="option option-primary" label="{{.Name}}"></option>
+                {{end}}
+            </select>
             <button type="submit" class="btn join-item btn-primary">+</button>
         </div>
     </form>

@@ -33,7 +33,7 @@ type TodoPageData struct {
 
 type IngredientType struct {
 	Ingredient_type_id int
-	name string
+	Name string
 }
 type Ingredient struct {
 	Ingredient_id int
@@ -54,6 +54,7 @@ type RecipeWithIngredients struct {
 type IngredientPageData struct {
 	PageTitle string
     Ingredients []Ingredient
+	IngredientTypes []IngredientType
 }
 type RecipesPageData struct {
 	PageTitle string
@@ -159,6 +160,28 @@ func getAllRecipes(db *sql.DB) []Recipe {
         }
 		return recipes
 }
+func getAllIngredientTypes(db *sql.DB) []IngredientType {
+	rows, err := db.Query(`SELECT * FROM ingredient_type`)
+        if err != nil {
+			log.Fatal(err)
+        }
+        defer rows.Close()
+		
+        var ingredient_types []IngredientType
+        for rows.Next() {
+			var r IngredientType
+			
+            err := rows.Scan(&r.Ingredient_type_id, &r.Name)
+            if err != nil {
+				log.Fatal(err)
+            }
+            ingredient_types = append(ingredient_types, r)
+        }
+        if err := rows.Err(); err != nil {
+			log.Fatal(err)
+        }
+		return ingredient_types
+}
 func getSingleRecipeWithIngredients(db *sql.DB, id string) (RecipeWithIngredients, error) {
 	 // Define a variable to hold the result
 	 var result RecipeWithIngredients
@@ -211,16 +234,17 @@ func main() {
     // Use the functions from the 'api' package to define routes.
 	api.InitRoutes(r)
 	
-	
     r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("public/layout.html"))
 	
         ingredients := getAllIngredients(db)
+        ingredientTypes := getAllIngredientTypes(db)
       
 		
 		data := IngredientPageData{
 			PageTitle: "Ingredients list",
             Ingredients: ingredients,
+			IngredientTypes: ingredientTypes,
         }
 
         tmpl.Execute(w, data)
@@ -228,10 +252,11 @@ func main() {
 	r.HandleFunc("/add-ingredient", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			ingredient := r.FormValue("ingredient")
+			ingredientType := r.FormValue("ingredient_type")
 		
 		
 		// Perform the SQL INSERT query to add the ingredient to the database
-		_, err = db.Exec("INSERT INTO ingredients (name) VALUES (?)", ingredient)
+		_, err = db.Exec("INSERT INTO ingredients (name, ingredient_type_id) VALUES (?, ?)", ingredient, ingredientType)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
