@@ -7,6 +7,7 @@ import (
     "database/sql"
 	"html/template"
     _ "github.com/go-sql-driver/mysql"
+    "github.com/gorilla/mux"
 )
 
 type Recipe struct {
@@ -24,6 +25,18 @@ type CreateRecipePageData struct {
     Ingredients []Ingredient
 	MappedIngredients map[string][]IngredientAndType
 }
+type RecipeWithIngredients struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Ingredients []Ingredient
+}
+type SingleRecipePageData struct {
+	PageTitle string
+    Recipe RecipeWithIngredients
+}
+
+
 func getAllRecipes(db *sql.DB) []Recipe {
 	rows, err := db.Query(`SELECT * FROM recipes`)
         if err != nil {
@@ -45,6 +58,40 @@ func getAllRecipes(db *sql.DB) []Recipe {
 			log.Fatal(err)
         }
 		return recipes
+}
+func getSingleRecipeWithIngredients(db *sql.DB, id string) (RecipeWithIngredients, error) {
+	 // Define a variable to hold the result
+	 var result RecipeWithIngredients
+
+	 // Query the recipe information based on the provided id
+	 err := db.QueryRow("SELECT name, description, recipe_id FROM recipes WHERE recipe_id = ?", id).
+		 Scan(&result.Name, &result.Description, &result.Recipe_id)
+	 if err != nil {
+		 return result, err
+	 }
+ 
+	 // Query the associated ingredients for the recipe
+	 rows, err := db.Query("SELECT i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", id)
+	 if err != nil {
+		 return result, err
+	 }
+	 defer rows.Close()
+ 
+	 // Loop through the rows of ingredients and add them to the result
+	 for rows.Next() {
+		 var ingredientName string
+		 err := rows.Scan(&ingredientName)
+		 if err != nil {
+			 return result, err
+		 }
+		 result.Ingredients = append(result.Ingredients, Ingredient{Name: ingredientName})
+	 }
+ 
+	 // Check for errors during rows iteration
+	 if err := rows.Err(); err != nil {
+		 return result, err
+	 }
+	 return result, nil
 }
 func getAllIngredients(db *sql.DB)  []Ingredient {
 	rows, err := db.Query(`SELECT * FROM ingredients`)
@@ -147,5 +194,25 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
     }
 
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
+}
+
+func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	vars := mux.Vars(r)
+        id := vars["id"]
+			tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
+	
+		recipe, err := getSingleRecipeWithIngredients(db, id)
+		if err != nil {
+			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
+		}		
+
+
+		data := SingleRecipePageData{
+			PageTitle: recipe.Name,
+            Recipe: recipe,
+            
+        }
+
+        tmpl.Execute(w, data)
 }
 

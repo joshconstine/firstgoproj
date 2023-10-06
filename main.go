@@ -52,28 +52,16 @@ type Recipe struct {
 	Name  string
 	Description string
 }
-type RecipeWithIngredients struct {
-	Recipe_id int
-	Name  string
-	Description string
-	Ingredients []Ingredient
-}
+
 type IngredientPageData struct {
 	PageTitle string
     Ingredients []Ingredient
 	IngredientTypes []IngredientType
 	MappedIngredients map[string][]IngredientAndType
 }
-type RecipesPageData struct {
-	PageTitle string
-    Recipes []Recipe
-    Ingredients []Ingredient
-}
 
-type SingleRecipePageData struct {
-	PageTitle string
-    Recipe RecipeWithIngredients
-}
+
+
 type CreateListPageData struct {
 	PageTitle string
     Recipes []Recipe
@@ -177,40 +165,7 @@ func getAllIngredientTypes(db *sql.DB) []IngredientType {
         }
 		return ingredient_types
 }
-func getSingleRecipeWithIngredients(db *sql.DB, id string) (RecipeWithIngredients, error) {
-	 // Define a variable to hold the result
-	 var result RecipeWithIngredients
 
-	 // Query the recipe information based on the provided id
-	 err := db.QueryRow("SELECT name, description, recipe_id FROM recipes WHERE recipe_id = ?", id).
-		 Scan(&result.Name, &result.Description, &result.Recipe_id)
-	 if err != nil {
-		 return result, err
-	 }
- 
-	 // Query the associated ingredients for the recipe
-	 rows, err := db.Query("SELECT i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", id)
-	 if err != nil {
-		 return result, err
-	 }
-	 defer rows.Close()
- 
-	 // Loop through the rows of ingredients and add them to the result
-	 for rows.Next() {
-		 var ingredientName string
-		 err := rows.Scan(&ingredientName)
-		 if err != nil {
-			 return result, err
-		 }
-		 result.Ingredients = append(result.Ingredients, Ingredient{Name: ingredientName})
-	 }
- 
-	 // Check for errors during rows iteration
-	 if err := rows.Err(); err != nil {
-		 return result, err
-	 }
-	 return result, nil
-}
 func main() {
 	port := 8080
 	// Convert the integer port to a string.
@@ -332,25 +287,7 @@ func main() {
 
  
 
-	r.HandleFunc("/recipes/{id}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-        id := vars["id"]
-			tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
-	
-		recipe, err := getSingleRecipeWithIngredients(db, id)
-		if err != nil {
-			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
-		}		
 
-
-		data := SingleRecipePageData{
-			PageTitle: recipe.Name,
-            Recipe: recipe,
-            
-        }
-
-        tmpl.Execute(w, data)
-	})
 //List
 
 r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
