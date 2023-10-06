@@ -12,7 +12,6 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
 	// Create a subrouter for the "/api" path.
 	apiRouter := r.PathPrefix("/api").Subrouter()
 
-	// Define routes for recipe handling.	
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         GetIngredientsTemplate(w, r, db)
     }).Methods("GET")	
@@ -34,8 +33,12 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
     }).Methods("POST")	
 
 
-
-
+    apiRouter.HandleFunc("/ingredients", func(w http.ResponseWriter, r *http.Request) {
+        CreateIngredient(w, r, db)
+    }).Methods("POST")
+    apiRouter.HandleFunc("/ingredients/delete", func(w http.ResponseWriter, r *http.Request) {
+        DeleteIngredient(w, r, db)
+    }).Methods("POST")
 
 	apiRouter.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
         CreateRecipe(w, r, db)
@@ -46,6 +49,4 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
 	apiRouter.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
         SendList(w, r)
     }).Methods("POST")
-	// apiRouter.HandleFunc("/recipes/{id}", GetRecipe).Methods("GET")
-	// apiRouter.HandleFunc("/recipes/create", CreateRecipe).Methods("POST")
 }
