@@ -26,6 +26,13 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
         GetListTemplate(w, r, db)
     }).Methods("GET")	
+	r.HandleFunc("/generate-list", func(w http.ResponseWriter, r *http.Request) {
+        GetGenerateListTemplate(w, r, db)
+    }).Methods("POST")	
+
+
+
+
 
 	apiRouter.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
         CreateRecipe(w, r, db)
