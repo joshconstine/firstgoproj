@@ -231,7 +231,7 @@ func main() {
 		fmt.Printf("Error %d...\n", err)
     }
     // Use the functions from the 'api' package to define routes.
-	api.InitRoutes(r)
+	api.InitRoutes(r, db)
 	
     r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("public/layout.html"))
@@ -334,21 +334,7 @@ func main() {
 		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 	})
 
-//RECIPES	
-r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-	
-		recipes := getAllRecipes(db)
-        ingredients := getAllIngredients(db)
-		data := RecipesPageData{
-			PageTitle: "Recipes",
-            Recipes: recipes,
-            Ingredients: ingredients,
-        }
-
-        tmpl.Execute(w, data)
-	})	 
-	   r.HandleFunc("/create-recipe", func(w http.ResponseWriter, r *http.Request) {
+   r.HandleFunc("/create-recipe", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
 	
         ingredients := getAllIngredients(db)
@@ -363,44 +349,6 @@ r.HandleFunc("/recipes", func(w http.ResponseWriter, r *http.Request) {
 
         tmpl.Execute(w, data)
     })
-	r.HandleFunc("/add-recipe", func(w http.ResponseWriter, r *http.Request) {
-			// Retrieve the form data
-			recipeName := r.FormValue("recipeName")
-			recipeDescription := r.FormValue("recipeDescription")
-			// Retrieve the selected ingredients
-			ingredientIDs := r.Form["ingredients"]
-
-
-
-		// Perform the SQL INSERT query to add the ingredient to the database
-		_, err = db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipeName, recipeDescription )
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		// Retrieve the auto-generated recipe_id for the newly inserted recipe
-		var recipeID int
-		err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&recipeID)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	
- // Insert the selected ingredients into the recipe_ingredients table
- for _, ingredientID := range ingredientIDs {
-	_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id) VALUES (?, ?)", recipeID, ingredientID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-
-
-		// Redirect back to the home page
-		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
-
-	})
 r.HandleFunc("/delete-recipe", func(w http.ResponseWriter, r *http.Request) {
 		
 		id := r.FormValue("id")
