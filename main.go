@@ -40,6 +40,13 @@ type Ingredient struct {
 	Name  string
 	Ingredient_type_id int
 }
+type IngredientAndType struct {
+	Ingredient_id int
+	Name  string
+	Ingredient_type_id int
+	Ingredient_type_name string
+
+}
 type Recipe struct {
 	Recipe_id int
 	Name  string
@@ -55,6 +62,7 @@ type IngredientPageData struct {
 	PageTitle string
     Ingredients []Ingredient
 	IngredientTypes []IngredientType
+	MappedIngredients map[{int, string}][]IngredientAndType
 }
 type RecipesPageData struct {
 	PageTitle string
@@ -202,12 +210,38 @@ func main() {
 	
         ingredients := getAllIngredients(db)
         ingredientTypes := getAllIngredientTypes(db)
-      
+		  // Query for ingredients and ingredient types
+		  rows, err := db.Query(`
+		  SELECT i.ingredient_id, i.name, i.ingredient_type_id, t.name AS ingredient_type_name
+		  FROM ingredients i
+		  JOIN ingredient_type t ON i.ingredient_type_id = t.ingredient_type_id
+	  `)
+	  if err != nil {
+		  panic(err.Error())
+	  }
+	  defer rows.Close()
+  
+	  // Map to store ingredients grouped by ingredient type
+	  ingredientTypeMap := make(map[int][]IngredientAndType)
+  
+	  for rows.Next() {
+		  var ingredient IngredientAndType
+  
+		  err := rows.Scan(&ingredient.Ingredient_id, &ingredient.Name, &ingredient.Ingredient_type_id, &ingredient.Ingredient_type_name)
+		  if err != nil {
+			  panic(err.Error())
+		  }
+  
+		  // Append the ingredient to the corresponding ingredient type
+		  ingredientTypeMap[ingredient.Ingredient_type_id] = append(ingredientTypeMap[ingredient.Ingredient_type_id], ingredient)
+	  }
+  
 		
 		data := IngredientPageData{
 			PageTitle: "Ingredients list",
             Ingredients: ingredients,
 			IngredientTypes: ingredientTypes,
+			MappedIngredients: ingredientTypeMap,
         }
 
         tmpl.Execute(w, data)

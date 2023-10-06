@@ -49,6 +49,14 @@
             </li>
             {{end}}
         </ul>
+        <ul class="flex-col flex gap-2">
+            {{range .MappedIngredients}}
+            {{range .}}
+            <li>{{.Name}}</li>
+            <li>{{.Ingredient_type_name}}</li>
+            {{end}}
+            {{end}}
+        </ul>
     </div>
 </body>
 
