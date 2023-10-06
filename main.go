@@ -9,9 +9,6 @@ import (
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
     _ "github.com/joho/godotenv/autoload"
-	"log"
-	"html/template"
-
 )
 
 
@@ -51,112 +48,9 @@ type Recipe struct {
 	Description string
 }
 
-type IngredientPageData struct {
-	PageTitle string
-    Ingredients []Ingredient
-	IngredientTypes []IngredientType
-	MappedIngredients map[string][]IngredientAndType
-}
 
 
 
-
-
-
-
-func getAllIngredients(db *sql.DB)  []Ingredient {
-	rows, err := db.Query(`SELECT * FROM ingredients`)
-        if err != nil {
-			log.Fatal(err)
-        }
-        defer rows.Close()
-		
-        var ingredients []Ingredient
-        for rows.Next() {
-			var i Ingredient
-			
-            err := rows.Scan(&i.Ingredient_id, &i.Name, &i.Ingredient_type_id)
-            if err != nil {
-				log.Fatal(err)
-            }
-            ingredients = append(ingredients, i)
-        }
-        if err := rows.Err(); err != nil {
-			log.Fatal(err)
-        }
-		return ingredients
-}
-func getAllIngredientsWithTypes(db *sql.DB)  map[string][]IngredientAndType {
-	  rows, err := db.Query(`
-		  SELECT i.ingredient_id, i.name, i.ingredient_type_id, t.name AS ingredient_type_name
-		  FROM ingredients i
-		  JOIN ingredient_type t ON i.ingredient_type_id = t.ingredient_type_id
-	  `)
-	  if err != nil {
-		  panic(err.Error())
-	  }
-	  defer rows.Close()
-  
-	  // Map to store ingredients grouped by ingredient type
-	  ingredientTypeMap := make(map[string][]IngredientAndType)
-  
-	  for rows.Next() {
-		  var ingredient IngredientAndType
-  
-		  err := rows.Scan(&ingredient.Ingredient_id, &ingredient.Name, &ingredient.Ingredient_type_id, &ingredient.Ingredient_type_name)
-		  if err != nil {
-			  panic(err.Error())
-		  }
-  
-		  // Append the ingredient to the corresponding ingredient type
-		  ingredientTypeMap[ingredient.Ingredient_type_name] = append(ingredientTypeMap[ingredient.Ingredient_type_name], ingredient)
-	  }
-	  return ingredientTypeMap
-}
-func getAllRecipes(db *sql.DB) []Recipe {
-	rows, err := db.Query(`SELECT * FROM recipes`)
-        if err != nil {
-			log.Fatal(err)
-        }
-        defer rows.Close()
-		
-        var recipes []Recipe
-        for rows.Next() {
-			var r Recipe
-			
-            err := rows.Scan(&r.Recipe_id, &r.Name,&r.Description)
-            if err != nil {
-				log.Fatal(err)
-            }
-            recipes = append(recipes, r)
-        }
-        if err := rows.Err(); err != nil {
-			log.Fatal(err)
-        }
-		return recipes
-}
-func getAllIngredientTypes(db *sql.DB) []IngredientType {
-	rows, err := db.Query(`SELECT * FROM ingredient_type`)
-        if err != nil {
-			log.Fatal(err)
-        }
-        defer rows.Close()
-		
-        var ingredient_types []IngredientType
-        for rows.Next() {
-			var r IngredientType
-			
-            err := rows.Scan(&r.Ingredient_type_id, &r.Name)
-            if err != nil {
-				log.Fatal(err)
-            }
-            ingredient_types = append(ingredient_types, r)
-        }
-        if err := rows.Err(); err != nil {
-			log.Fatal(err)
-        }
-		return ingredient_types
-}
 
 func main() {
 	port := 8080
@@ -176,23 +70,7 @@ func main() {
     // Use the functions from the 'api' package to define routes.
 	api.InitRoutes(r, db)
 	
-    r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("public/layout.html"))
-	
-        ingredients := getAllIngredients(db)
-        ingredientTypes := getAllIngredientTypes(db)
-		ingredientTypeMap := getAllIngredientsWithTypes(db)
-  
-		
-		data := IngredientPageData{
-			PageTitle: "Ingredients list",
-            Ingredients: ingredients,
-			IngredientTypes: ingredientTypes,
-			MappedIngredients: ingredientTypeMap,
-        }
-
-        tmpl.Execute(w, data)
-    })
+ 
 	r.HandleFunc("/add-ingredient", func(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			ingredient := r.FormValue("ingredient")
@@ -276,17 +154,8 @@ func main() {
 		// Redirect back to the page or provide a response
 		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 	})
-
- 
-
-
-//List
-
-
 	
-	
-
 	fmt.Printf("Server is listening on port %d...\n", port)
-	
+
 	http.ListenAndServe(":"+portStr, r)
 }
