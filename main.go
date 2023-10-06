@@ -77,43 +77,6 @@ type ListPageData struct {
 	PageTitle string
     Ingredients []Ingredient
 }
-// func seed()  {	
-// 	db, err := sql.Open("mysql", "root:daddy@(127.0.0.1:3306)/food?parseTime=true")
-//     if err != nil {
-// 		// log.Fatal(err)
-// 		fmt.Print("error connecting to db")
-//     }
-//     if err := db.Ping(); err != nil {
-// 		fmt.Printf("Error %d...\n", err)
-//     }
-// 	query := `CREATE TABLE ingredients (
-// 		ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
-// 		name VARCHAR(255) NOT NULL
-// 	);
-
-// 	CREATE TABLE recipes (
-// 		recipe_id INT AUTO_INCREMENT PRIMARY KEY,
-// 		name VARCHAR(255) NOT NULL,
-// 		description TEXT
-// 	);
-
-// 	CREATE TABLE recipe_ingredients (
-// 		recipe_id INT,
-// 		ingredient_id INT,
-// 		PRIMARY KEY (recipe_id, ingredient_id),
-// 		FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id),
-// 		FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id)
-// 	);`
-
-// _, erro := db.Exec(query)
-// if erro != nil {
-// 	return 
-// 	fmt.Printf("err %s", erro)
-// }
-
-// fmt.Println("Tables created successfully")
-// return 
-// }
 
 
 func getAllIngredients(db *sql.DB)  []Ingredient {
