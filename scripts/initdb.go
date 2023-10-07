@@ -74,6 +74,20 @@ func main() {
     if err != nil {
         panic(err)
     }
+    // Create the recipe_photos table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS recipe_photos (
+            recipe_id INT,
+            photo_url VARCHAR(255),
+            PRIMARY KEY (recipe_id, photo_url),
+            FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
+
+
 
     // Seed the ingredient types
     _, err = db.Exec(`
