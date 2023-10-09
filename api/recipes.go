@@ -8,7 +8,7 @@ import (
     _ "github.com/go-sql-driver/mysql"
     "github.com/gorilla/mux" 
 	 "github.com/aws/aws-sdk-go/aws"
-
+	"strconv"
     "github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"os"
 	"io"
@@ -347,6 +347,27 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 
 	log.Printf("new location in create recipe file %+v\n", newPhotoLocation)
+		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
+}
+func UploadNewPhoto(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+			recipeIDStr := r.FormValue("id")
+
+    uploader := NewUploader()
+	newPhotoLocation, err := UploadHandler(w, r, uploader)
+	if err == nil {
+		_, err = db.Exec("INSERT INTO recipe_photos (recipe_id, photo_url) VALUES (?, ?)", recipeIDStr, newPhotoLocation)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+		recipeID, err := strconv.Atoi(recipeIDStr) // Convert the string to an integer
+		if err != nil {
+			// Handle the error if the conversion fails
+			http.Error(w, "Invalid recipe ID", http.StatusBadRequest)
+			return
+		}
+
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
 }
 func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {

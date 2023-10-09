@@ -32,7 +32,6 @@ func NewUploader() *s3manager.Uploader {
 func InitRoutes(r *mux.Router, db *sql.DB) {
 	// Create a subrouter for the "/api" path.
 	apiRouter := r.PathPrefix("/api").Subrouter()
-    uploader := NewUploader()
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "public/index.html") 
     }).Methods("GET")		
@@ -79,7 +78,7 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
     }).Methods("POST")
 
 
-    r.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
-        UploadHandler(w, r, uploader)
+    r.HandleFunc("/recipes/add-photo", func(w http.ResponseWriter, r *http.Request) {
+        UploadNewPhoto(w, r, db)
     }).Methods("POST")	
 }
