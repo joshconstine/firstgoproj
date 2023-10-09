@@ -90,17 +90,17 @@ func fileToBytes(file multipart.File) ([]byte, error) {
 
 
 
-func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.Uploader) {
+func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.Uploader) (string, error) {
 	err := r.ParseMultipartForm(10 * 1024 * 1024) // 10 MB limit
 	if err != nil {
 		http.Error(w, "Failed to parse multipart form", http.StatusInternalServerError)
-		return
+		return "", err
 	}
 
 	file, header, err := r.FormFile("photo")
 	if err != nil {
 		http.Error(w, "Failed to get file from form", http.StatusInternalServerError)
-		return
+		return "", err
 	}
 	defer file.Close()
 
@@ -113,7 +113,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.U
 	newFile, err := os.Create(newFilePath)
 	if err != nil {
 		http.Error(w, "Failed to create a new file", http.StatusInternalServerError)
-		return
+		return "nil", err
 	}
 	defer newFile.Close()
 
@@ -122,7 +122,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.U
 	_, err = io.Copy(newFile, file)
 	if err != nil {
 		http.Error(w, "Failed to copy the file", http.StatusInternalServerError)
-		return
+		return "nil", err
 	}
 	log.Println("uploading so S3")
 
@@ -142,7 +142,7 @@ fileBytes, err := fileToBytes(file)
 if err != nil {
     // Handle the error
 		http.Error(w, "Failed to read photo to bytes", http.StatusInternalServerError)
-	return
+		return "" , err
 }
 
 
@@ -161,7 +161,8 @@ if err != nil {
 
 	log.Printf("Create file location %+v\n", createdFileLocation)
 	// Respond with the unique filename or other relevant information
-	fmt.Fprintf(w, "File uploaded successfully with filename: %s", newFilename)
+	// fmt.Fprintf(w, "File uploaded successfully with filename: %s", newFilename)
+	return createdFileLocation, nil
 }
 // DB Transactions
 func getAllRecipes(db *sql.DB) []Recipe {
@@ -269,6 +270,10 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 }
+
+    uploader := NewUploader()
+		newPhotoLocation, err := UploadHandler(w, r, uploader)
+	log.Printf("new location in create recipe file %+v\n", newPhotoLocation)
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
 }
 func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
