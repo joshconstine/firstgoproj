@@ -24,7 +24,11 @@
         <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
     </form>
     <h2>Description</h2>
-    <img src="https://foodly-bucket.s3.us-west-1.amazonaws.com/stk-san-diego-feature.jpg" alt='nice pic here' />
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="photo" accept="image/*">
+        <button type="submit">Upload Photo</button>
+    </form>
+
     <p class="text-sm">{{.Recipe.Description}}</p>
     <h2>Ingredients</h2>
     <ul class="flex-col flex gap-2">
