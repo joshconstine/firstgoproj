@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"strconv"
 	"context"
+    "mime/multipart"
 
 	"net/http"
     "github.com/gorilla/mux"
@@ -24,7 +25,14 @@ import (
     "github.com/aws/aws-sdk-go/aws/session"
     "github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
-
+func fileToBytes(file multipart.File) ([]byte, error) {
+	fileBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return fileBytes, nil
+}
 
 func NewUploader() *s3manager.Uploader {
 	ACCESS_KEY:= "AKIAX6ZNEPNPAR6OXRRO"
@@ -69,6 +77,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.U
 	}
 	defer newFile.Close()
 
+	// Reset the file pointer to the beginning before copying
 	// Copy the uploaded file to the new file
 	_, err = io.Copy(newFile, file)
 	if err != nil {
@@ -79,21 +88,22 @@ func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.U
 
 	// file, err := ioutil.ReadFile(newFilePath)
 	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+		// 	log.Fatal(err)
+		// }
+		
+		
+		BUCKET_NAME := "foodly-bucket"
+		// BUCKET_URL := "https://foodly-bucket.s3.us-west-1.amazonaws.com"
+		// NEXT_PUBLIC_BUCKET_URL := "https://foodly-bucket.s3.us-west-1.amazonaws.com"
 
-
-BUCKET_NAME := "foodly-bucket"
-// BUCKET_URL := "https://foodly-bucket.s3.us-west-1.amazonaws.com"
-// NEXT_PUBLIC_BUCKET_URL := "https://foodly-bucket.s3.us-west-1.amazonaws.com"
-
-//** try with copy
-fileBytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Failed to read file to bytes", http.StatusInternalServerError)
-
-		return 
-	}
+		
+		file.Seek(0, 0)
+fileBytes, err := fileToBytes(file)
+if err != nil {
+    // Handle the error
+		http.Error(w, "Failed to read photo to bytes", http.StatusInternalServerError)
+	return
+}
 
 
 
@@ -106,7 +116,10 @@ fileBytes, err := ioutil.ReadAll(file)
 	res, err := uploader.UploadWithContext(context.Background(), upInput)
 	log.Printf("res %+v\n", res)
 	log.Printf("err %+v\n", err)
+	 
+	 createdFileLocation := res.Location
 
+	log.Printf("Create file location %+v\n", createdFileLocation)
 	// Respond with the unique filename or other relevant information
 	fmt.Fprintf(w, "File uploaded successfully with filename: %s", newFilename)
 }
