@@ -10,8 +10,6 @@ import (
 	 "github.com/aws/aws-sdk-go/aws"
 	"strconv"
     "github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"os"
-	"io"
 	"log"
 	"io/ioutil"
 	"path/filepath"
@@ -86,6 +84,7 @@ func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
         tmpl.Execute(w, data)
 }
 //S3 transaction
+//turns type multipart.File into a byte array
 func fileToBytes(file multipart.File) ([]byte, error) {
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -116,21 +115,21 @@ func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.U
 	newFilename := uuid.New().String() + fileExt
 
 	// Create a new file in the "public/static" directory with the unique filename
-	newFilePath := filepath.Join("public/static/images", newFilename)
-	newFile, err := os.Create(newFilePath)
-	if err != nil {
-		http.Error(w, "Failed to create a new file", http.StatusInternalServerError)
-		return "nil", err
-	}
-	defer newFile.Close()
+	newFilePath := filepath.Join("listify/recipes", newFilename)
+	// newFile, err := os.Create(newFilePath)
+	// if err != nil {
+	// 	http.Error(w, "Failed to create a new file", http.StatusInternalServerError)
+	// 	return "nil", err
+	// }
+	// defer newFile.Close()
 
-	// Reset the file pointer to the beginning before copying
-	// Copy the uploaded file to the new file
-	_, err = io.Copy(newFile, file)
-	if err != nil {
-		http.Error(w, "Failed to copy the file", http.StatusInternalServerError)
-		return "nil", err
-	}
+	// // Reset the file pointer to the beginning before copying
+	// // Copy the uploaded file to the new file
+	// _, err = io.Copy(newFile, file)
+	// if err != nil {
+	// 	http.Error(w, "Failed to copy the file", http.StatusInternalServerError)
+	// 	return "nil", err
+	// }
 	log.Println("uploading so S3")
 
 	// file, err := ioutil.ReadFile(newFilePath)

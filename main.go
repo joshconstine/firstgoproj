@@ -36,8 +36,6 @@ func main() {
     if err := db.Ping(); err != nil {
 		fmt.Printf("Error %d...\n", err)
     }
-	staticDir := "/images/"
-	r.PathPrefix(staticDir).Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir("./public/images"))))
 
 	// Your other application routes go here...
     // Use the functions from the 'api' package to define routes.
