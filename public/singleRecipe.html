@@ -23,8 +23,17 @@
         <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
         <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
     </form>
-    <img src="https://foodly-bucket.s3.us-west-1.amazonaws.com/public/static/images/810f133b-17dd-496e-b2af-4c41e134cb82.jpeg"
-        alt="photo" />
+    <ul class="flex-col flex gap-2">
+        {{if .Recipe.Photos}}
+        {{range .Recipe.Photos}}
+        <li>
+            <img src="{{.}}" alt="photo" />
+        </li>
+        {{end}}
+        {{else}}
+        <li>No photos</li>
+        {{end}}
+    </ul>
     <h2>Description</h2>
     <form action="/upload" method="post" enctype="multipart/form-data">
         <input type="file" name="photo" accept="image/*">
