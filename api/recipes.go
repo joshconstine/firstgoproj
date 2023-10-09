@@ -272,7 +272,17 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
     uploader := NewUploader()
-		newPhotoLocation, err := UploadHandler(w, r, uploader)
+	newPhotoLocation, err := UploadHandler(w, r, uploader)
+	if err == nil {
+		_, err = db.Exec("INSERT INTO recipe_photos (recipe_id, photo_url) VALUES (?, ?)", recipeID, newPhotoLocation)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+
+
 	log.Printf("new location in create recipe file %+v\n", newPhotoLocation)
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes/%d";</script>`, recipeID)
 }
