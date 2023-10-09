@@ -17,23 +17,22 @@
         <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a>
         <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a>
     </div>
-    <form action="api/recipes" method="post" class="flex flex-col gap-4" enctype="multipart/form-data">
-        <div class="flex gap-4">
-            <div class="flex flex-col gap-2">
-
-                <div class="flex gap-2 items-center">
-
-                    <h1>{{.PageTitle}}</h1>
-                    <button type="submit" class="join-item btn btn-success">save</button>
-                </div>
-                <input type="text" id="recipeName" name="recipeName" placeholder="recipe name"
-                    class="join-item input input-primary" required />
-                <textarea type="text" id="recipeDescription" name="recipeDescription" placeholder="description"
-                    class="tetarea textarea-primary"></textarea>
-            </div>
-
-            <input type="file" name="photo" accept="image/*">
+    <h1>{{.PageTitle}}</h1>
+    <form action="/api/ingredients" method="post">
+        <div class=" join">
+            <input type="text" id="ingredient" name="ingredient" placeholder="Add Ingredient" required
+                class="input input-primary join-item" />
+            <select id="ingredient_type select select-primary" name="ingredient_type" required
+                class="join-item select select-primary">
+                {{range .IngredientTypes}}
+                <option value="{{.Ingredient_type_id}}" class="option option-primary" label="{{.Name}}"></option>
+                {{end}}
+            </select>
+            <button type="submit" class="btn join-item btn-primary">+</button>
         </div>
+    </form>
+
+    <div>
         <div class="flex flex gap-16">
             {{range $ingredientName, $ingredientTypes := .MappedIngredients}}
             <div>
@@ -42,8 +41,7 @@
                 <ul class="flex-col flex gap-2">
                     {{range $ingredientTypes}}
                     <li>
-                        <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}" />
-                        <label for="{{.Ingredient_id}}">{{.Name}}</label>
+                        {{ .Name}}
                     </li>
                     {{end}}
                 </ul>
@@ -51,8 +49,7 @@
             {{end}}
 
         </div>
-    </form>
-    <div>
+    </div>
 </body>
 
 </html>
