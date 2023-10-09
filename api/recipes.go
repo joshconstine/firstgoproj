@@ -3,11 +3,22 @@ package api
 import (
     "net/http"
     "fmt"
-	"log"	
     "database/sql"
 	"html/template"
     _ "github.com/go-sql-driver/mysql"
-    "github.com/gorilla/mux"
+    "github.com/gorilla/mux" 
+	 "github.com/aws/aws-sdk-go/aws"
+
+    "github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"os"
+	"io"
+	"log"
+	"io/ioutil"
+	"path/filepath"
+	"bytes"
+	"github.com/google/uuid"
+	"context"
+    "mime/multipart"
 )
 
 type Recipe struct {
@@ -67,7 +78,91 @@ func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
 
         tmpl.Execute(w, data)
 }
+//S3 transaction
+func fileToBytes(file multipart.File) ([]byte, error) {
+	fileBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return fileBytes, nil
+}
 
+
+
+func UploadHandler(w http.ResponseWriter, r *http.Request, uploader *s3manager.Uploader) {
+	err := r.ParseMultipartForm(10 * 1024 * 1024) // 10 MB limit
+	if err != nil {
+		http.Error(w, "Failed to parse multipart form", http.StatusInternalServerError)
+		return
+	}
+
+	file, header, err := r.FormFile("photo")
+	if err != nil {
+		http.Error(w, "Failed to get file from form", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	// Generate a unique filename using a UUID
+	fileExt := filepath.Ext(header.Filename)
+	newFilename := uuid.New().String() + fileExt
+
+	// Create a new file in the "public/static" directory with the unique filename
+	newFilePath := filepath.Join("public/static/images", newFilename)
+	newFile, err := os.Create(newFilePath)
+	if err != nil {
+		http.Error(w, "Failed to create a new file", http.StatusInternalServerError)
+		return
+	}
+	defer newFile.Close()
+
+	// Reset the file pointer to the beginning before copying
+	// Copy the uploaded file to the new file
+	_, err = io.Copy(newFile, file)
+	if err != nil {
+		http.Error(w, "Failed to copy the file", http.StatusInternalServerError)
+		return
+	}
+	log.Println("uploading so S3")
+
+	// file, err := ioutil.ReadFile(newFilePath)
+	// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		
+		
+		BUCKET_NAME := "foodly-bucket"
+		// BUCKET_URL := "https://foodly-bucket.s3.us-west-1.amazonaws.com"
+		// NEXT_PUBLIC_BUCKET_URL := "https://foodly-bucket.s3.us-west-1.amazonaws.com"
+
+		
+		file.Seek(0, 0)
+fileBytes, err := fileToBytes(file)
+if err != nil {
+    // Handle the error
+		http.Error(w, "Failed to read photo to bytes", http.StatusInternalServerError)
+	return
+}
+
+
+
+	upInput := &s3manager.UploadInput{
+		Bucket:      aws.String(BUCKET_NAME), // bucket's name
+		Key:         aws.String(newFilePath),        // files destination location
+		Body:        bytes.NewReader(fileBytes),                   // content of the file
+		ContentType: aws.String(fileExt),                 // content type
+	}
+	res, err := uploader.UploadWithContext(context.Background(), upInput)
+	log.Printf("res %+v\n", res)
+	log.Printf("err %+v\n", err)
+	 
+	 createdFileLocation := res.Location
+
+	log.Printf("Create file location %+v\n", createdFileLocation)
+	// Respond with the unique filename or other relevant information
+	fmt.Fprintf(w, "File uploaded successfully with filename: %s", newFilename)
+}
 // DB Transactions
 func getAllRecipes(db *sql.DB) []Recipe {
 	rows, err := db.Query(`SELECT * FROM recipes`)

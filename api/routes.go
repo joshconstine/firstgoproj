@@ -4,14 +4,35 @@ import (
 	"github.com/gorilla/mux" 
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
-	"net/http"
+	"net/http"	
+    "fmt"
+    "github.com/aws/aws-sdk-go/aws"
+    "github.com/aws/aws-sdk-go/aws/credentials"
+    "github.com/aws/aws-sdk-go/aws/session"
+    "github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
+func NewUploader() *s3manager.Uploader {
+	ACCESS_KEY:= "AKIAX6ZNEPNPAR6OXRRO"
+	SECRET_KEY:= "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"
+	s3Config := &aws.Config{
+		Region:      aws.String("us-west-1"),
+		Credentials: credentials.NewStaticCredentials(ACCESS_KEY, SECRET_KEY, ""),
+	}
+
+	s3Session := session.New(s3Config)
+
+	uploader := s3manager.NewUploader(s3Session)
+	fmt.Printf("Created new S3 Uploder")
+	
+	return uploader
+}
+
 
 // InitRoutes initializes routes and handlers.
 func InitRoutes(r *mux.Router, db *sql.DB) {
 	// Create a subrouter for the "/api" path.
 	apiRouter := r.PathPrefix("/api").Subrouter()
-
+    uploader := NewUploader()
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "public/index.html") 
     }).Methods("GET")		
@@ -56,4 +77,9 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
 	apiRouter.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
         SendList(w, r)
     }).Methods("POST")
+
+
+    r.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
+        UploadHandler(w, r, uploader)
+    }).Methods("POST")	
 }
