@@ -24,11 +24,6 @@ type Recipe struct {
 	Name  string
 	Description string
 }
-type RecipesPageData struct {
-	PageTitle string
-    Recipes []Recipe
-    Ingredients []Ingredient
-}
 type CreateRecipePageData struct {
 	PageTitle string
     Ingredients []Ingredient
@@ -47,21 +42,49 @@ type RecipeWithIngredientsAndPhotos struct {
 	Ingredients []Ingredient
 	Photos []string
 }
+type RecipeWithPhotos struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Photos []string
+}
+type RecipesPageData struct {
+	PageTitle string
+	Recipes []RecipeWithPhotos
+}
 type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredientsAndPhotos
 }
 
 //HTML TEMPLATES
+func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	vars := mux.Vars(r)
+        id := vars["id"]
+			tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
+	
+		recipe, err := getSingleRecipeWithIngredientsAndPhotos(db, id)
+		if err != nil {
+			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
+		}		
+
+
+		data := SingleRecipePageData{
+			PageTitle: recipe.Name,
+            Recipe: recipe,
+            
+        }
+
+        tmpl.Execute(w, data)
+}
+
 
 func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-   tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		recipes := getAllRecipes(db)
-        ingredients := getAllIngredients(db)
+   		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
+		recipes, _ := getAllRecipesWithPhotos(db)
 		data := RecipesPageData{
 			PageTitle: "Recipes",
             Recipes: recipes,
-            Ingredients: ingredients,
         }
 
         tmpl.Execute(w, data)
@@ -69,7 +92,7 @@ func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 
 func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-  tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
+ 		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
 	
         ingredients := getAllIngredients(db)
       
@@ -248,7 +271,45 @@ func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithI
 	}
 	return result, nil
 }
+func getAllRecipesWithPhotos(db *sql.DB) ([]RecipeWithPhotos, error) {
+	// Define a variable to hold the result
+	 recipes := getAllRecipes(db)
+	var result []RecipeWithPhotos
 
+for _, recipe := range recipes {
+    // Create a RecipeWithPhotos instance for the current recipe
+    recipeWithPhotos := RecipeWithPhotos{
+        Recipe_id: recipe.Recipe_id,
+	Name:recipe.Name,
+	Description:recipe.Description,
+    }
+
+    // Query the associated photos for the current recipe
+    rows, err := db.Query("SELECT photo_url FROM recipe_photos WHERE recipe_id = ?", recipe.Recipe_id)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    // Loop through the rows of photos and add them to the result for the current recipe
+    for rows.Next() {
+        var photoUrl string
+        if err := rows.Scan(&photoUrl); err != nil {
+            return nil, err
+        }
+        recipeWithPhotos.Photos = append(recipeWithPhotos.Photos, photoUrl)
+    }
+
+    // Check for errors during rows iteration
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    // Append the current recipe with its photos to the final result
+    result = append(result, recipeWithPhotos)
+}
+	return result, nil
+}
 func getSingleRecipeWithIngredients(db *sql.DB, id string) (RecipeWithIngredients, error) {
 	 // Define a variable to hold the result
 	 var result RecipeWithIngredients
@@ -387,25 +448,5 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
     }
 
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
-}
-
-func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	vars := mux.Vars(r)
-        id := vars["id"]
-			tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
-	
-		recipe, err := getSingleRecipeWithIngredientsAndPhotos(db, id)
-		if err != nil {
-			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
-		}		
-
-
-		data := SingleRecipePageData{
-			PageTitle: recipe.Name,
-            Recipe: recipe,
-            
-        }
-
-        tmpl.Execute(w, data)
 }
 

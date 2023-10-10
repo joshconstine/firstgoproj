@@ -19,17 +19,25 @@
         <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a>
     </div>
     <h1>{{.PageTitle}}</h1>
-    <div>
-        <ul class="flex flex-wrap flex gap-2">
-            {{range .Recipes}}
-            <li>
-                <div class="border-2 rounded-lg shadow-lg hover:scale-110">
+    <div class="flex gap-2">
+        {{range .Recipes}}
+        <div>
 
-                    <a href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
-                </div>
-            </li>
+            {{if .Photos}}
+            {{range $i, $v := .Photos}}
+            {{if eq $i 0}}
+            <img src="{{$v}}" alt="photo" />
             {{end}}
-        </ul>
+            {{end}}
+            {{else}}
+            <div>No photos</div>
+            {{end}}
+            <div class="border-2 rounded-lg shadow-lg hover:scale-110">
+
+                <a href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
+            </div>
+        </div>
+        {{end}}
     </div>
     <div>
 </body>
