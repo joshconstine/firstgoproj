@@ -26,33 +26,42 @@
     <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
 </form> -->
     <div class="flex justify-between">
-        <div class="carousel w-full">
+        <div class="flex flex-col gap-8 items-center justify-center">
 
-            {{if .Recipe.Photos}}
-            {{range $i, $a := .Recipe.Photos}}
-            <div id="item{{ $i }}" class="carousel-item w-full">
-                <img src="{{$a}}" alt="photo" />
+            <div class="carousel ">
+
+                {{if .Recipe.Photos}}
+                {{range $i, $a := .Recipe.Photos}}
+                <div id="item{{ $i }}" class="carousel-item w-full flex items-center justify-center">
+                    <img src="{{$a}}" alt="photo" />
+                </div>
+                {{end}}
+                {{else}}
+                <li>No photos</li>
+                {{end}}
+                </ul>
             </div>
-            {{end}}
-            {{else}}
-            <li>No photos</li>
-            {{end}}
-            </ul>
-        </div>
-        <div class="flex justify-center w-full py-2 gap-2">
-            {{range $i, $a := .Recipe.Photos}}
+            <div class="flex justify-center w-full py-2 gap-2">
+                {{range $i, $a := .Recipe.Photos}}
 
-            <a href="#item{{$i}}" class="btn btn-xs">{{$i}}</a>
-            {{end}}
+                <a href="#item{{$i}}" class="btn btn-xs">{{$i}}</a>
+                {{end}}
 
+            </div>
+            <div class="w-64 h-64 p-2 hidden border-primary border-2 rounded-lg flex items-center justify-center"
+                id="image-container">
+                <img id="blah" src="#" alt="your image" />
+            </div>
+            <form action="/recipes/add-photo" method="post" enctype="multipart/form-data">
+                <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
+                <label for="photo" class="btn btn-primary join-item">Add Image</label>
+
+                <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
+                <button type="submit" class="btn btn-success">Save</button>
+            </form>
         </div>
 
         <h2>Description</h2>
-        <form action="/recipes/add-photo" method="post" enctype="multipart/form-data">
-            <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-            <input type="file" name="photo" accept="image/*">
-            <button type="submit">Upload Photo</button>
-        </form>
 
         <p class="text-sm">{{.Recipe.Description}}</p>
         <h2>Ingredients</h2>
@@ -70,5 +79,16 @@
         <div>
         </div>
 </body>
+<script defer>
+    var imgInp = document.getElementById("photo")
+    var imgCtr = document.getElementById("image-container")
+    imgInp.onchange = evt => {
+        const [file] = imgInp.files
+        if (file) {
+            blah.src = URL.createObjectURL(file)
+            imgCtr.classList.remove('hidden')
+        }
+    }
+</script>
 
 </html>
