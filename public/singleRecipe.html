@@ -21,42 +21,69 @@
     </div>
     </div>
     <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
-    <form action="/api/recipes/delete" method="post" class="flex items-center gap-2">
+    <!-- <form action="/api/recipes/delete" method="post" class="flex items-center gap-2">
         <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-        <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
-    </form>
-    <ul class="flex-col flex gap-2">
-        {{if .Recipe.Photos}}
-        {{range .Recipe.Photos}}
-        <li>
-            <img src="{{.}}" alt="photo" />
-        </li>
-        {{end}}
-        {{else}}
-        <li>No photos</li>
-        {{end}}
-    </ul>
-    <h2>Description</h2>
-    <form action="/recipes/add-photo" method="post" enctype="multipart/form-data">
-        <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-        <input type="file" name="photo" accept="image/*">
-        <button type="submit">Upload Photo</button>
-    </form>
+    <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
+</form> -->
+    <div class="flex justify-between">
+        <div class="carousel w-full">
+            <!-- <div id="item1" class="carousel-item w-full">
+                <img src="/images/stock/photo-1625726411847-8cbb60cc71e6.jpg" class="w-full" />
+            </div>
+            <div id="item2" class="carousel-item w-full">
+                <img src="/images/stock/photo-1609621838510-5ad474b7d25d.jpg" class="w-full" />
+            </div>
+            <div id="item3" class="carousel-item w-full">
+                <img src="/images/stock/photo-1414694762283-acccc27bca85.jpg" class="w-full" />
+            </div>
+            <div id="item4" class="carousel-item w-full">
+                <img src="/images/stock/photo-1665553365602-b2fb8e5d1707.jpg" class="w-full" />
+            </div> -->
+            {{if .Recipe.Photos}}
+            {{range $i, $a := .Recipe.Photos}}
+            <div id="item{{ $i }}" class="carousel-item w-full">
+                <img src="{{$a}}" alt="photo" />
+            </div>
+            {{end}}
+            {{else}}
+            <li>No photos</li>
+            {{end}}
+            </ul>
+        </div>
+        <div class="flex justify-center w-full py-2 gap-2">
+            {{range $i, $a := .Recipe.Photos}}
+            <!-- <div id="item{{ $i }}" class="carousel-item w-full"> -->
+            <!-- <img src="{{$a}}" alt="photo" /> -->
+            <!-- </div> -->
+            <a href="#item{{$i}}" class="btn btn-xs">{{$i}}</a>
+            {{end}}
+            <!-- <a href="#item2" class="btn btn-xs">2</a> -->
+            <!-- <a href="#item3" class="btn btn-xs">3</a> -->
+            <!-- <a href="#item4" class="btn btn-xs">4</a> -->
+        </div>
 
-    <p class="text-sm">{{.Recipe.Description}}</p>
-    <h2>Ingredients</h2>
-    <ul class="flex-col flex gap-2">
-        {{if .Recipe.Ingredients}}
-        {{range .Recipe.Ingredients}}
-        <li>
-            {{.Name}}
-        </li>
-        {{end}}
-        {{else}}
-        <li>No ingredients</li>
-        {{end}}
-    </ul>
-    <div>
+        <h2>Description</h2>
+        <form action="/recipes/add-photo" method="post" enctype="multipart/form-data">
+            <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
+            <input type="file" name="photo" accept="image/*">
+            <button type="submit">Upload Photo</button>
+        </form>
+
+        <p class="text-sm">{{.Recipe.Description}}</p>
+        <h2>Ingredients</h2>
+        <ul class="flex-col flex gap-2">
+            {{if .Recipe.Ingredients}}
+            {{range .Recipe.Ingredients}}
+            <li>
+                {{.Name}}
+            </li>
+            {{end}}
+            {{else}}
+            <li>No ingredients</li>
+            {{end}}
+        </ul>
+        <div>
+        </div>
 </body>
 
 </html>
