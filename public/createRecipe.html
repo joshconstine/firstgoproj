@@ -28,7 +28,7 @@
                                 class="join-item input input-primary" required />
                             <label for="photo" class="btn btn-primary join-item">Select Image</label>
 
-                            <input type="file" name="photo" id='photo' accept="image/* " class="hidden">
+                            <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
 
                         </div>
                         <textarea type="text" id="recipeDescription" rows="10" name="recipeDescription"
@@ -50,8 +50,9 @@
                 <h2 class="text-xl font-bold">{{$ingredientName}}</h2>
                 <ul class="flex-col flex gap-2">
                     {{range $ingredientTypes}}
-                    <li>
-                        <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}" />
+                    <li class="flex items-center gap-2">
+                        <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}"
+                            class="checkbox checkbox-primary checkbox-sm" />
                         <label for="{{.Ingredient_id}}">{{.Name}}</label>
                     </li>
                     {{end}}
