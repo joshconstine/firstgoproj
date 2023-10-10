@@ -19,22 +19,31 @@
         <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a>
     </div>
     <h1>{{.PageTitle}}</h1>
-    <div class="flex gap-2">
+    <div class="flex gap-4 flex-wrap">
         {{range .Recipes}}
-        <div>
-
+        <div class="card w-96 bg-base-100 shadow-xl">
             {{if .Photos}}
             {{range $i, $v := .Photos}}
             {{if eq $i 0}}
-            <img src="{{$v}}" alt="photo" />
+            <figure>
+                <img src="{{$v}}" alt="photo" />
+            </figure>
             {{end}}
             {{end}}
             {{else}}
             <div>No photos</div>
             {{end}}
-            <div class="border-2 rounded-lg shadow-lg hover:scale-110">
+            <div class="card-body">
 
-                <a href="/recipes/{{.Recipe_id}}">{{.Name}}</a>
+                <h2 class="card-title">
+                    {{.Name}}
+                </h2>
+                <p>{{.Description}}</p>
+                <div class="card-actions justify-end">
+                    <a href="/recipes/{{.Recipe_id}}">
+                        <button class="btn btn-primary">View</button>
+                    </a>
+                </div>
             </div>
         </div>
         {{end}}
