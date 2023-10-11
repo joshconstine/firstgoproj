@@ -13,7 +13,7 @@ import (
 )
 type CreateListPageData struct {
 	PageTitle string
-    Recipes []Recipe
+    Recipes []RecipeWithPhotos
 }
 type ListPageData struct {
 	PageTitle string
@@ -25,7 +25,7 @@ type ListPageData struct {
 func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
   	tmpl := template.Must(template.ParseFiles("public/makeList.html"))
 	
-		recipes := getAllRecipes(db)
+		recipes,_ := getAllRecipesWithPhotos(db)
 	
 		data := CreateListPageData{
 			PageTitle: "Make a List",
@@ -104,8 +104,8 @@ func SendList(w http.ResponseWriter, r *http.Request) {
 			// Retrieve the form data
 			phoneNumber := r.FormValue("phone")
 			list := r.FormValue("list")
-			accountSid :=	os.Getenv("TWILIO_ACCOUNT_SID")
-			authToken := os.Getenv("TWILIO_AUTH_TOKEN")
+			accountSid :=os.Getenv("TWILIO_ACCOUNT_SID")	
+			authToken := os.Getenv("TWILIO_AUTH_TOKEN")	
 			fullPhoneNumber := "+1" + phoneNumber
 			client := twilio.NewRestClientWithParams(twilio.ClientParams{
 				Username: accountSid,
