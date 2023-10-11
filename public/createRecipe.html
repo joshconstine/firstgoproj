@@ -21,6 +21,7 @@
     <form action="api/recipes" method="post" class="flex flex-col gap-4" enctype="multipart/form-data">
         <div class="flex gap-4">
             <div class="w-full flex items-center justify-center">
+
                 <div class="flex flex-col gap-2">
 
                     <div class="flex gap-8">
@@ -28,6 +29,14 @@
                             <div class="join">
                                 <input type="text" id="recipeName" name="recipeName" placeholder="recipe name"
                                     class="join-item input input-primary" required />
+                                <select class="select select-primary join-item" id="ingredient-picker">
+                                    <option disabled selected>Choose ingredients</option>
+                                    {{range .Ingredients}}
+                                    <option value="{{.Ingredient_id}}">
+                                        {{.Name}}
+                                    </option>
+                                    {{end}}
+                                </select>
                                 <label for="photo" class="btn btn-primary join-item">Select Image</label>
 
                                 <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
@@ -70,11 +79,25 @@
 <script defer>
     var imgInp = document.getElementById("photo")
     var imgCtr = document.getElementById("image-container")
+    var ingPkr = document.getElementById("ingredient-picker")
+
     imgInp.onchange = evt => {
         const [file] = imgInp.files
         if (file) {
             blah.src = URL.createObjectURL(file)
             imgCtr.classList.remove('hidden')
+        }
+    }
+    ingPkr.onchange = evt => {
+        var selectedId = evt.target.value
+        var ingInp = document.getElementById(`${selectedId}`)
+
+        if (ingInp) {
+            if (ingInp.checked) {
+                ingInp.checked = false
+            } else {
+                ingInp.checked = true
+            }
         }
     }
 </script>
