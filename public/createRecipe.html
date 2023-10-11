@@ -20,30 +20,33 @@
     <h1>{{.PageTitle}}</h1>
     <form action="api/recipes" method="post" class="flex flex-col gap-4" enctype="multipart/form-data">
         <div class="flex gap-4">
-            <div class="flex flex-col gap-2">
-                <div class="flex gap-8">
-                    <div class="flex flex-col gap-4">
-                        <div class="join">
-                            <input type="text" id="recipeName" name="recipeName" placeholder="recipe name"
-                                class="join-item input input-primary" required />
-                            <label for="photo" class="btn btn-primary join-item">Select Image</label>
+            <div class="w-full flex items-center justify-center">
+                <div class="flex flex-col gap-2">
 
-                            <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
+                    <div class="flex gap-8">
+                        <div class="flex flex-col gap-4">
+                            <div class="join">
+                                <input type="text" id="recipeName" name="recipeName" placeholder="recipe name"
+                                    class="join-item input input-primary" required />
+                                <label for="photo" class="btn btn-primary join-item">Select Image</label>
 
+                                <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
+
+                            </div>
+                            <textarea type="text" id="recipeDescription" rows="10" name="recipeDescription"
+                                placeholder="description" class="textarea textarea-primary "></textarea>
                         </div>
-                        <textarea type="text" id="recipeDescription" rows="10" name="recipeDescription"
-                            placeholder="description" class="textarea textarea-primary "></textarea>
+                        <div class="w-64 h-64 p-2 hidden border-primary border-2 rounded-lg flex items-center justify-center"
+                            id="image-container">
+                            <img id="blah" src="#" alt="your image" />
+                        </div>
+                        <button type="submit" class="join-item btn btn-success">save</button>
                     </div>
-                    <div class="w-64 h-64 p-2 hidden border-primary border-2 rounded-lg flex items-center justify-center"
-                        id="image-container">
-                        <img id="blah" src="#" alt="your image" />
-                    </div>
-                    <button type="submit" class="join-item btn btn-success">save</button>
                 </div>
             </div>
 
         </div>
-        <div class="flex flex gap-16">
+        <div class="flex flex gap-4">
             {{range $ingredientName, $ingredientTypes := .MappedIngredients}}
             <div>
 
@@ -53,7 +56,7 @@
                     <li class="flex items-center gap-2">
                         <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}"
                             class="checkbox checkbox-primary checkbox-sm" />
-                        <label for="{{.Ingredient_id}}">{{.Name}}</label>
+                        <label for="{{.Ingredient_id}}" class="text-xs">{{.Name}}</label>
                     </li>
                     {{end}}
                 </ul>
