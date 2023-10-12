@@ -40,7 +40,7 @@ type RecipeWithIngredientsAndPhotos struct {
 	Recipe_id int
 	Name  string
 	Description string
-	Ingredients []Ingredient
+	Ingredients []IngredientWithQuantity
 	Photos []string
 }
 type RecipeWithPhotos struct {
@@ -232,28 +232,27 @@ func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithI
 		return result, err
 	}
 
-	// Query the associated ingredients for the recipe
-	rows, err := db.Query("SELECT  i.ingredient_id, i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", id)
+	// Query the associated ingredients with quantity for the recipe
+	rows, err := db.Query("SELECT i.ingredient_id, i.name, ri.quantity, ri.quantity_type_id, qt.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id INNER JOIN quantity_type qt ON ri.quantity_type_id = qt.quantity_type_id WHERE ri.recipe_id = ?", id)
 	if err != nil {
 		return result, err
 	}
 	defer rows.Close()
+
 	// Loop through the rows of ingredients and add them to the result
 	for rows.Next() {
-		var ingredientName string
-		var ingredientID int
-		  err := rows.Scan(&ingredientID, &ingredientName)
+		var ingredientWithQuantity IngredientWithQuantity
+		err := rows.Scan(&ingredientWithQuantity.Ingredient_id, &ingredientWithQuantity.Name, &ingredientWithQuantity.Quantity, &ingredientWithQuantity.Quantity_type_id, &ingredientWithQuantity.Quantity_type)
 		if err != nil {
 			return result, err
 		}
-		result.Ingredients = append(result.Ingredients, Ingredient{Name: ingredientName, Ingredient_id: ingredientID})
-	}
-	
-	// Check for errors during rows iteration
-	if err := rows.Err(); err != nil {
-		return result, err
+		result.Ingredients = append(result.Ingredients, ingredientWithQuantity)
 	}
 
+// Check for errors during rows iteration
+if err := rows.Err(); err != nil {
+	return result, err
+}
 
 	// Query the associated photos for the recipe
 	rows, err = db.Query("SELECT photo_url FROM recipe_photos  WHERE recipe_id = ?", id)

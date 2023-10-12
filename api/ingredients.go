@@ -28,6 +28,13 @@ type IngredientAndType struct {
 	Ingredient_type_name string
 
 }
+type IngredientWithQuantity struct {
+	Ingredient_id int
+	Name  string
+	Quantity float32
+	Quantity_type string
+	Quantity_type_id int
+}
 
 type IngredientPageData struct {
 	PageTitle string

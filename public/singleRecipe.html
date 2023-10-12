@@ -84,7 +84,8 @@
                                 {{end}}
                                 <!-- Add more options as needed -->
                             </select>
-                            <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity">
+                            <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity"
+                                value="{{.Quantity}}">
                         </li>
                         {{end}}
                         <input type="submit" value="Submit Recipe" class="btn btn-success">
@@ -97,8 +98,15 @@
                     {{if .Recipe.Ingredients}}
                     {{range .Recipe.Ingredients}}
                     <li class="flex gap-2">
-                        {{.Name}}
-
+                        <span>
+                            {{.Name}}
+                        </span>
+                        <span>
+                            {{.Quantity}}
+                        </span>
+                        <span>
+                            {{.Quantity_type}}
+                        </span>
                     </li>
                     {{end}}
                     {{else}}
