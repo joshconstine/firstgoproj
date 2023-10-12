@@ -17,7 +17,7 @@
         <a href="/create-recipe" class="bg-slate-200 rounded-sm p-1">Create Recipe</a>
         <a href="/list" class="bg-slate-200 rounded-sm p-1">Make a List</a>
     </div>
-    <h1>{{.PageTitle}}</h1>
+    <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
     <form action="/api/ingredients" method="post">
         <div class=" join">
             <input type="text" id="ingredient" name="ingredient" placeholder="Add Ingredient" required
