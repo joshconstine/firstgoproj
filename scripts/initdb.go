@@ -78,6 +78,7 @@ func main() {
             recipe_id INT,
             ingredient_id INT,
             quantity_type_id INT,
+            quantity FLOAT,
             PRIMARY KEY (recipe_id, ingredient_id),
             FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id),
             FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id),
