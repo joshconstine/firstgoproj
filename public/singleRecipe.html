@@ -77,10 +77,15 @@
                         </input>
                         {{range .Recipe.Ingredients}} <li class="flex gap-2">
                             <label for="{{.Ingredient_id}}_type">{{.Name}}:</label>
+                            <span>{{.Quantity_type}}</span>
                             <select name="{{.Ingredient_id}}_type">
+                                <option value="" selected disabled>Select a new Type</option> <!-- Default option -->
+
                                 <!-- Populate this select with ingredient types -->
                                 {{range $.QuantityTypes}}
+
                                 <option value="{{.Quantity_type_id}}">{{.Name}}</option>
+
                                 {{end}}
                                 <!-- Add more options as needed -->
                             </select>

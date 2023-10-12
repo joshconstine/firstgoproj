@@ -246,6 +246,10 @@ func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithI
 		if err != nil {
 			return result, err
 		}
+		// In your Go code, set the Quantity_type value based on Quantity
+if ingredientWithQuantity.Quantity > 1 {
+    ingredientWithQuantity.Quantity_type = ingredientWithQuantity.Quantity_type + "s"
+}
 		result.Ingredients = append(result.Ingredients, ingredientWithQuantity)
 	}
 
