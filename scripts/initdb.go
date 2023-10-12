@@ -34,6 +34,17 @@ func main() {
     if err != nil {
         panic(err)
     }
+    // Create the ingredient Quantity type table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS quantity_type (
+          quantity_type_id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(255) NOT NULL
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
+
 
 
     // Create the ingredients table
@@ -66,9 +77,11 @@ func main() {
         CREATE TABLE IF NOT EXISTS recipe_ingredients (
             recipe_id INT,
             ingredient_id INT,
+            quantity_type_id INT,
             PRIMARY KEY (recipe_id, ingredient_id),
             FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id),
-            FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id)
+            FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id),
+            FOREIGN KEY (quantity_type_id) REFERENCES quantity_type(quantity_type_id)
         );
     `)
     if err != nil {
@@ -105,6 +118,23 @@ func main() {
     if err != nil {
         panic(err)
     } 
+    // Seed the quantitiy types
+    _, err = db.Exec(`
+    INSERT INTO quantity_type (name)
+    VALUES
+        ('Cup'),
+        ('Ounce'),
+        ('Tablespoon'),
+        ('Teaspoon'),
+        ('Pound'),
+        ('Gram');
+    `)
+    if err != nil {
+        panic(err)
+    } 
+
+
+    
       // Seed the ingredient types
     _, err = db.Exec(`
     INSERT INTO ingredients (name, ingredient_type_id)
