@@ -62,7 +62,9 @@ type SingleRecipePageData struct {
 func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		vars := mux.Vars(r)
         id := vars["id"]
+	
 		tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
+
 		quantitiy_types := getAllQuantityTypes(db)
 		recipe, err := getSingleRecipeWithIngredientsAndPhotos(db, id)
 		if err != nil {
@@ -230,7 +232,7 @@ func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithI
 	}
 
 	// Query the associated ingredients for the recipe
-	rows, err := db.Query("SELECT i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", id)
+	rows, err := db.Query("SELECT  i.ingredient_id, i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", id)
 	if err != nil {
 		return result, err
 	}
@@ -238,11 +240,12 @@ func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithI
 	// Loop through the rows of ingredients and add them to the result
 	for rows.Next() {
 		var ingredientName string
-		err := rows.Scan(&ingredientName)
+		var ingredientID int
+		  err := rows.Scan(&ingredientID, &ingredientName)
 		if err != nil {
 			return result, err
 		}
-		result.Ingredients = append(result.Ingredients, Ingredient{Name: ingredientName})
+		result.Ingredients = append(result.Ingredients, Ingredient{Name: ingredientName, Ingredient_id: ingredientID})
 	}
 	
 	// Check for errors during rows iteration
