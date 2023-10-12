@@ -64,10 +64,13 @@
                 <h2 class="text-xl font-bold">Description</h2>
                 <p class="text-sm border-primary border-2 w-full rounded-lg p-2">{{.Recipe.Description}}</p>
             </div>
-            <div>
+            <div class="flex gap-4 flex-col">
+                <div class="flex gap-2">
 
-                <h2 class="text-xl font-bold">Ingredients</h2>
-                <ul class="flex-col flex gap-2">
+                    <h2 class="text-xl font-bold">Ingredients</h2>
+                    <button id="edit_ingredients" class="btn btn-secondary btn-sm">Edit ingredients</button>
+                </div>
+                <ul class="flex-col flex gap-2 hidden" id="ingredient_form">
                     {{if .Recipe.Ingredients}}
                     <form method="post" action="/submit_recipe" class="flex gap-2 flex-col">
                         {{range .Recipe.Ingredients}}
@@ -89,10 +92,40 @@
                     <li>No ingredients</li>
                     {{end}}
                 </ul>
+                <ul class="flex-col flex gap-2" id="ingredient_list">
+                    {{if .Recipe.Ingredients}}
+                    {{range .Recipe.Ingredients}}
+                    <li class="flex gap-2">
+                        {{.Name}}
+
+                    </li>
+                    {{end}}
+                    {{else}}
+                    <li>No ingredients</li>
+                    {{end}}
+                </ul>
             </div>
         </div>
 </body>
 <script defer>
+    var editButton = document.getElementById('edit_ingredients')
+    var ingredientsForm = document.getElementById('ingredient_form')
+    var ingredientsList = document.getElementById('ingredient_list')
+    let toggle = true
+    editButton.addEventListener('click', evt => {
+        if (toggle) {
+
+            ingredientsForm.classList.remove('hidden');
+            ingredientsList.classList.add('hidden')
+            toggle = false
+        } else {
+
+            ingredientsList.classList.remove('hidden');
+            ingredientsForm.classList.add('hidden')
+            toggle = true
+        }
+    });
+
     var imgInp = document.getElementById("photo")
     var imgCtr = document.getElementById("image-container")
     imgInp.onchange = evt => {
