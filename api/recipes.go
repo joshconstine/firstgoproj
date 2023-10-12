@@ -4,6 +4,7 @@ import (
     "net/http"
     "fmt"
     "database/sql"
+	"strings"
 	"html/template"
     _ "github.com/go-sql-driver/mysql"
     "github.com/gorilla/mux" 
@@ -455,3 +456,78 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
 }
 
+func UpdateRecipeIngredients(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+    if r.Method == http.MethodPost {
+        err := r.ParseForm()
+        if err != nil {
+            http.Error(w, "Failed to parse form data", http.StatusInternalServerError)
+            return
+        }
+
+        recipeID := r.FormValue("recipe_id")
+        if recipeID == "" {
+            http.Error(w, "Missing recipe_id in form data", http.StatusBadRequest)
+            return
+        }
+
+        for key, values := range r.Form {
+            // Check if the form data key represents an ingredient type or quantity
+            if strings.HasSuffix(key, "_type") {
+                ingredientID := strings.TrimSuffix(key, "_type")
+                ingredientType := values[0]
+
+                // Convert ingredientID and recipeID to integers
+                ingredientIDInt, err := strconv.Atoi(ingredientID)
+                if err != nil {
+                    http.Error(w, "Invalid ingredient ID", http.StatusBadRequest)
+                    return
+                }
+
+                recipeIDInt, err := strconv.Atoi(recipeID)
+                if err != nil {
+                    http.Error(w, "Invalid recipe ID", http.StatusBadRequest)
+                    return
+                }
+
+                // Update the database with the new ingredient type
+                // Example SQL query using the database/sql package:
+                // Assuming you have a db variable of type *sql.DB
+                _, err = db.Exec("UPDATE recipe_ingredients SET quantity_type_id = ? WHERE ingredient_id = ? AND recipe_id = ?", ingredientType, ingredientIDInt, recipeIDInt)
+                if err != nil {
+                    http.Error(w, "Failed to update ingredient type", http.StatusInternalServerError)
+                    return
+                }
+            } else if strings.HasSuffix(key, "_quantity") {
+                ingredientID := strings.TrimSuffix(key, "_quantity")
+                ingredientQuantity := values[0]
+
+                // Convert ingredientID and recipeID to integers
+                ingredientIDInt, err := strconv.Atoi(ingredientID)
+                if err != nil {
+                    http.Error(w, "Invalid ingredient ID", http.StatusBadRequest)
+                    return
+                }
+
+                recipeIDInt, err := strconv.Atoi(recipeID)
+                if err != nil {
+                    http.Error(w, "Invalid recipe ID", http.StatusBadRequest)
+                    return
+                }
+
+                // Update the database with the new ingredient quantity
+                // Example SQL query using the database/sql package:
+                // Assuming you have a db variable of type *sql.DB
+                _, err = db.Exec("UPDATE recipe_ingredients SET quantity = ? WHERE ingredient_id = ? AND recipe_id = ?", ingredientQuantity, ingredientIDInt, recipeIDInt)
+                if err != nil {
+                    http.Error(w, "Failed to update ingredient quantity", http.StatusInternalServerError)
+                    return
+                }
+            }
+        }
+
+        
+		redirectURL := fmt.Sprintf("/recipes/%s", recipeID)
+
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+    }
+}
