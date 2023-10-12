@@ -57,29 +57,39 @@ func GetGenerateListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
 				return
 			}
 	
-			// Query the ingredients for the current recipe
-			rows, err := db.Query("SELECT i.name, ri.quantity FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", recipeIDInt)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			defer rows.Close()
-	
-			// Loop through the rows of ingredients and append them to the list
-			for rows.Next() {
-				var ingredientName string
-				var quantity float32
-				err := rows.Scan(&ingredientName, &quantity)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				 // Convert the float32 to a string with a specific format
-				 stringValue := strconv.FormatFloat(float64(quantity), 'f', -1, 32)
+	rows, err := db.Query(`
+    SELECT i.name, ri.quantity, qt.name
+    FROM ingredients i
+    INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id
+    INNER JOIN quantity_type qt ON ri.quantity_type_id = qt.quantity_type_id
+    WHERE ri.recipe_id = ?
+`, recipeIDInt)
 
-				ingredients = append(ingredients, Ingredient{Name: ingredientName + " " + stringValue})
-			}
-	
+if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+}
+defer rows.Close()
+
+// Loop through the rows of ingredients and append them to the list
+for rows.Next() {
+    var ingredientName string
+    var quantity float32
+    var quantityTypeName string
+    err := rows.Scan(&ingredientName, &quantity, &quantityTypeName)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // Convert the float32 to a string with a specific format
+    stringValue := strconv.FormatFloat(float64(quantity), 'f', -1, 32)
+
+    ingredients = append(ingredients, Ingredient{
+        Name: ingredientName + " " + stringValue + " " + quantityTypeName,
+    })
+}
+
 			// Check for errors during rows iteration
 			if err := rows.Err(); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
