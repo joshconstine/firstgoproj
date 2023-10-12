@@ -378,6 +378,8 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			recipeName := r.FormValue("recipeName")
 			recipeDescription := r.FormValue("recipeDescription")
 			ingredientIDs := r.Form["ingredients"]
+			quantityValue := 1
+			quantityTypeValue := 1
 
 		_, err := db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipeName, recipeDescription )
 		if err != nil {
@@ -392,7 +394,7 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	
  for _, ingredientID := range ingredientIDs {
-	_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id) VALUES (?, ?)", recipeID, ingredientID)
+	_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, quantity_type_id) VALUES (?, ?, ?, ?)", recipeID, ingredientID, quantityValue, quantityTypeValue)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

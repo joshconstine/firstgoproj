@@ -123,6 +123,7 @@ func main() {
     _, err = db.Exec(`
     INSERT INTO quantity_type (name)
     VALUES
+        (''),
         ('Cup'),
         ('Ounce'),
         ('Tablespoon'),
