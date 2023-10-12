@@ -58,7 +58,7 @@ func GetGenerateListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
 			}
 	
 			// Query the ingredients for the current recipe
-			rows, err := db.Query("SELECT i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", recipeIDInt)
+			rows, err := db.Query("SELECT i.name, ri.quantity FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", recipeIDInt)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -68,12 +68,16 @@ func GetGenerateListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
 			// Loop through the rows of ingredients and append them to the list
 			for rows.Next() {
 				var ingredientName string
-				err := rows.Scan(&ingredientName)
+				var quantity float32
+				err := rows.Scan(&ingredientName, &quantity)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-				ingredients = append(ingredients, Ingredient{Name: ingredientName})
+				 // Convert the float32 to a string with a specific format
+				 stringValue := strconv.FormatFloat(float64(quantity), 'f', -1, 32)
+
+				ingredients = append(ingredients, Ingredient{Name: ingredientName + " " + stringValue})
 			}
 	
 			// Check for errors during rows iteration
