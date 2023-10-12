@@ -69,11 +69,22 @@
                 <h2 class="text-xl font-bold">Ingredients</h2>
                 <ul class="flex-col flex gap-2">
                     {{if .Recipe.Ingredients}}
-                    {{range .Recipe.Ingredients}}
-                    <li>
-                        {{.Name}}
-                    </li>
-                    {{end}}
+                    <form method="post" action="/submit_recipe" class="flex gap-2 flex-col">
+                        {{range .Recipe.Ingredients}}
+                        <li class="flex gap-2">
+                            <label for="ingredient_{{.Ingredient_id}}">{{.Name}}:</label>
+                            <select name="ingredient_{{.Ingredient_id}}_type">
+                                <!-- Populate this select with ingredient types -->
+                                {{range $.QuantityTypes}}
+                                <option value="{{.Quantity_type_id}}">{{.Name}}</option>
+                                {{end}}
+                                <!-- Add more options as needed -->
+                            </select>
+                            <input type="text" name="ingredient_{{.Ingredient_id}}_quantity" placeholder="Quantity">
+                        </li>
+                        {{end}}
+                        <input type="submit" value="Submit Recipe" class="btn btn-success">
+                    </form>
                     {{else}}
                     <li>No ingredients</li>
                     {{end}}

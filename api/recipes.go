@@ -55,14 +55,15 @@ type RecipesPageData struct {
 type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredientsAndPhotos
+    QuantityTypes []QuantityType
 }
 
 //HTML TEMPLATES
 func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	vars := mux.Vars(r)
+		vars := mux.Vars(r)
         id := vars["id"]
-			tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
-	
+		tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
+		quantitiy_types := getAllQuantityTypes(db)
 		recipe, err := getSingleRecipeWithIngredientsAndPhotos(db, id)
 		if err != nil {
 			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
@@ -72,6 +73,7 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		data := SingleRecipePageData{
 			PageTitle: recipe.Name,
             Recipe: recipe,
+			QuantityTypes: quantitiy_types,
             
         }
 
