@@ -1,4 +1,3 @@
-Here's your project description converted into a nice Markdown format:
 
 # Project Description
 
