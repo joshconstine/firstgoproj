@@ -69,6 +69,7 @@
 
                     <h2 class="text-xl font-bold">Ingredients</h2>
                     <button id="edit_ingredients" class="btn btn-secondary btn-sm">Edit ingredients</button>
+                    <button id="cancel_edit_ingredients" class="btn btn-secondary btn-sm hidden">Cancel</button>
                 </div>
                 <ul class="flex-col flex gap-2 hidden" id="ingredient_form">
                     {{if .Recipe.Ingredients}}
@@ -76,21 +77,27 @@
                         <input name="recipe_id" value="{{.Recipe.Recipe_id}}" hidden>
                         </input>
                         {{range .Recipe.Ingredients}} <li class="flex gap-2">
+                        <li class="flex gap-2 items-center">
                             <label for="{{.Ingredient_id}}_type">{{.Name}}:</label>
                             <span>{{.Quantity_type}}</span>
-                            <select name="{{.Ingredient_id}}_type">
-                                <option value="" selected disabled>Select a new Type</option> <!-- Default option -->
+                            <div class="join">
 
-                                <!-- Populate this select with ingredient types -->
-                                {{range $.QuantityTypes}}
+                                <select name="{{.Ingredient_id}}_type"
+                                    class="select select-primary join-item select-sm">
+                                    <option value="" selected disabled>new Qty Type</option>
+                                    <!-- Default option -->
 
-                                <option value="{{.Quantity_type_id}}">{{.Name}}</option>
+                                    <!-- Populate this select with ingredient types -->
+                                    {{range $.QuantityTypes}}
 
-                                {{end}}
-                                <!-- Add more options as needed -->
-                            </select>
-                            <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity"
-                                value="{{.Quantity}}">
+                                    <option value="{{.Quantity_type_id}}">{{.Name}}</option>
+
+                                    {{end}}
+                                    <!-- Add more options as needed -->
+                                </select>
+                                <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity"
+                                    value="{{.Quantity}}" class="input input-primary join-item w-16 input-sm">
+                            </div>
                         </li>
                         {{end}}
                         <input type="submit" value="Submit Recipe" class="btn btn-success">
@@ -102,9 +109,9 @@
                 <ul class="flex-col flex gap-2" id="ingredient_list">
                     {{if .Recipe.Ingredients}}
                     {{range .Recipe.Ingredients}}
-                    <li class="flex gap-2">
-                        <span>
-                            {{.Name}}
+                    <li class="flex gap-2 items-center">
+                        <span class="text-xl font-bold">
+                            {{.Name}} -
                         </span>
                         <span>
                             {{.Quantity}}
@@ -123,6 +130,7 @@
 </body>
 <script defer>
     var editButton = document.getElementById('edit_ingredients')
+    var cancelButton = document.getElementById('cancel_edit_ingredients')
     var ingredientsForm = document.getElementById('ingredient_form')
     var ingredientsList = document.getElementById('ingredient_list')
     let toggle = true
@@ -131,15 +139,35 @@
 
             ingredientsForm.classList.remove('hidden');
             ingredientsList.classList.add('hidden')
+            editButton.classList.add('hidden')
+            cancelButton.classList.remove('hidden')
             toggle = false
         } else {
 
             ingredientsList.classList.remove('hidden');
             ingredientsForm.classList.add('hidden')
+            cancelButton.classList.add('hidden')
+            editButton.classList.remove('hidden')
             toggle = true
         }
     });
+    cancelButton.addEventListener('click', evt => {
+        if (toggle) {
 
+            ingredientsForm.classList.remove('hidden');
+            ingredientsList.classList.add('hidden')
+            editButton.classList.add('hidden')
+            cancelButton.classList.remove('hidden')
+            toggle = false
+        } else {
+
+            ingredientsList.classList.remove('hidden');
+            ingredientsForm.classList.add('hidden')
+            cancelButton.classList.add('hidden')
+            editButton.classList.remove('hidden')
+            toggle = true
+        }
+    });
     var imgInp = document.getElementById("photo")
     var imgCtr = document.getElementById("image-container")
     imgInp.onchange = evt => {
