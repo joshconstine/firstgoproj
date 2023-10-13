@@ -45,11 +45,12 @@ func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 
 func GetGenerateListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-  // REcipe ids only reads if there is another form value? am i an idot
-			recipeName := r.FormValue("recipeName")
-			recipeIds := r.Form["recipes"]
-		// Define a slice to hold all ingredients
-		var ingredients []Ingredient
+	// REcipe ids only reads if there is another form value? am i an idot
+	recipeName := r.FormValue("recipeName")
+	recipeIds := r.Form["recipes"]
+	// Define a slice to hold all ingredients
+	var ingredients []Ingredient
+	var ingredientQuantityData []IngredientQuantityData
 		// Retrieve the selected ingredients
 
 // Log the selected ingredient IDs
@@ -78,7 +79,6 @@ if err != nil {
 }
 defer rows.Close()
 
-var ingredientQuantityData []IngredientQuantityData
 
 
 // Loop through the rows of ingredients and append them to the list
@@ -99,14 +99,12 @@ ingredientExists := false
 for i, data := range ingredientQuantityData {
     if data.IngredientId == ingredientId {
         // Ingredient with the same ID exists, update the quantity
-        ingredientQuantityData[i].Quantity += quantity
+
+        ingredientQuantityData[i].Quantity =  quantity + ingredientQuantityData[i].Quantity
         ingredientExists = true
-        break
-    }else {
-		ingredientExists = false
-	}
+    }
 }
-if !ingredientExists {
+if ingredientExists == false {
     ingredientQuantityData = append(ingredientQuantityData, IngredientQuantityData{
         IngredientName:    ingredientName,
         Quantity:          quantity,
@@ -116,6 +114,7 @@ if !ingredientExists {
 }
 }
 
+}
 for _, data := range ingredientQuantityData {
     // Convert the float32 to a string with a specific format
     stringValue := strconv.FormatFloat(float64(data.Quantity), 'f', -1, 32)
@@ -134,7 +133,6 @@ for _, data := range ingredientQuantityData {
             Ingredients: ingredients,
 		}
         tmpl.Execute(w, data)
-	}
 }
 	
 
