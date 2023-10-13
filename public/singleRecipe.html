@@ -80,9 +80,22 @@
             </form>
         </div>
         <div class="w-96 flex flex-col gap-8">
-            <div>
-                <h2 class="text-xl font-bold">Description</h2>
-                <p class="text-sm border-primary border-2 w-full rounded-lg p-2">{{.Recipe.Description}}</p>
+            <div class="flex flex-col gap-4">
+                <div class="flex gap-2">
+
+                    <h2 class="text-xl font-bold">Description</h2>
+                    <button id="edit_description" class="btn btn-secondary btn-sm">Edit Description</button>
+                    <button id="cancel_edit_description" class="btn btn-secondary btn-sm hidden">Cancel</button>
+                </div>
+                <form id="description_form" action="/api/recipes/description" method="post"
+                    class="hidden flex gap-2 items-center">
+                    <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
+                    <textarea class="textarea textarea-primary" name="description">{{.Recipe.Description}}
+                    </textarea>
+                    <input type="submit" value="Save" class="btn btn-success">
+                </form>
+                <p class="text-sm border-primary border-2 w-full rounded-lg p-2" id="description">
+                    {{.Recipe.Description}}</p>
             </div>
             <div class="flex gap-4 flex-col">
                 <div class="flex gap-2">
@@ -151,10 +164,16 @@
 </body>
 <script defer>
     var editButton = document.getElementById('edit_ingredients')
+    var editDescButton = document.getElementById('edit_description')
+    var cancelEditDescButton = document.getElementById('cancel_edit_description')
+    var descriptionForm = document.getElementById('description_form')
+    var description = document.getElementById('description')
+
     var cancelButton = document.getElementById('cancel_edit_ingredients')
     var ingredientsForm = document.getElementById('ingredient_form')
     var ingredientsList = document.getElementById('ingredient_list')
     let toggle = true
+    let toggleDesc = true
     editButton.addEventListener('click', evt => {
         if (toggle) {
 
@@ -188,6 +207,32 @@
             editButton.classList.remove('hidden')
             toggle = true
         }
+    });
+    editDescButton.addEventListener('click', evt => {
+        if (toggleDesc) {
+
+            descriptionForm.classList.remove('hidden');
+            description.classList.add('hidden')
+            editDescButton.classList.add('hidden')
+            cancelEditDescButton.classList.remove('hidden')
+            toggleDesc = false
+        } else {
+
+            descriptionForm.classList.remove('hidden');
+            description.classList.add('hidden')
+            cancelEditDescButton.classList.add('hidden')
+            editDescButton.classList.remove('hidden')
+            toggleDesc = true
+        }
+    });
+    cancelEditDescButton.addEventListener('click', evt => {
+
+        descriptionForm.classList.add('hidden');
+        description.classList.remove('hidden')
+        cancelEditDescButton.classList.add('hidden')
+        editDescButton.classList.remove('hidden')
+        toggleDesc = true
+
     });
     var imgInp = document.getElementById("photo")
     var imgCtr = document.getElementById("image-container")

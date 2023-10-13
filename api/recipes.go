@@ -49,6 +49,7 @@ type RecipeWithPhotos struct {
 	Description string
 	Photos []string
 }
+
 type RecipesPageData struct {
 	PageTitle string
 	Recipes []RecipeWithPhotos
@@ -536,3 +537,31 @@ func UpdateRecipeIngredients(w http.ResponseWriter, r *http.Request, db *sql.DB)
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
     }
 }
+func UpdateDescription(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	
+	
+			r.ParseForm()
+			
+			// Get the recipe ID from the form data
+			recipeID := r.FormValue("id")
+			
+			// Get the new description from the form data
+			newDescription := r.FormValue("description")
+			
+			// Update the description in the database using SQL or an ORM
+			// Example SQL query: "UPDATE recipes SET description = ? WHERE recipe_id = ?"
+			
+			_, err := db.Exec("UPDATE recipes SET description = ? WHERE recipe_id = ?", newDescription, recipeID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+
+		redirectURL := fmt.Sprintf("/recipes/%s", recipeID)
+			// Redirect to the updated recipe's page or display a success message
+			http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+	
+		http.ListenAndServe(":8080", nil)
+	}
+	
