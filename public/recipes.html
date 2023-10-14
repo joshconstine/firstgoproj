@@ -116,6 +116,29 @@
     // Get references to the search input field and the recipe cards
     const searchInput = document.getElementById('searchbar');
     const recipeCards = document.querySelectorAll('.card');
+    const tags = document.querySelectorAll('.tag'); // Select all tag elements
+    tags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            // Remove the 'selected' class from all tags
+            tags.forEach(t => t.classList.remove('btn-primary'));
+            // Add the 'selected' class to the clicked tag
+            tag.classList.add('btn-primary');
+
+            // Hide all cards
+            recipeCards.forEach(card => card.style.display = 'none');
+
+            // Show cards with the corresponding tag
+            const selectedTag = tag.textContent.trim().toLowerCase(); // Get the text content of the clicked tag, convert to lowercase, and remove whitespace
+            recipeCards.forEach(card => {
+                const cardTags = card.getAttribute('data-tags').split(',').map(tag => tag.trim().toLowerCase()); // Convert tags to lowercase and remove whitespace
+                console.log(cardTags)
+
+                if (cardTags.includes(selectedTag)) {
+                    card.style.display = 'block';
+                }
+            });
+        });
+    });
 
     // Add an event listener to the search input field
     searchInput.addEventListener('input', () => {
