@@ -97,70 +97,99 @@
                 <p class="text-sm border-primary border-2 w-full rounded-lg p-2" id="description">
                     {{.Recipe.Description}}</p>
             </div>
-            <div class="flex gap-4 flex-col">
-                <div class="flex gap-2">
+            <div class="flex gap-16">
 
-                    <h2 class="text-xl font-bold">Ingredients</h2>
-                    <button id="edit_ingredients" class="btn btn-secondary btn-sm">Edit ingredients</button>
-                    <button id="cancel_edit_ingredients" class="btn btn-secondary btn-sm hidden">Cancel</button>
-                </div>
-                <ul class="flex-col flex gap-2 hidden" id="ingredient_form">
-                    {{if .Recipe.Ingredients}}
-                    <form method="post" action="/update_recipe_ingredients" class="flex gap-2 flex-col">
-                        <input name="recipe_id" value="{{.Recipe.Recipe_id}}" hidden>
-                        </input>
-                        {{range .Recipe.Ingredients}} <li class="flex gap-2">
-                        <li class="flex gap-2 items-center">
-                            <label for="{{.Ingredient_id}}_type">{{.Name}}:</label>
-                            <span>{{.Quantity_type}}</span>
-                            <div class="join">
+                <div class="flex flex-col gap-4">
+                    <div class="flex gap-2">
 
-                                <select name="{{.Ingredient_id}}_type"
-                                    class="select select-primary join-item select-sm">
-                                    <option value="" selected disabled>new Qty Type</option>
-                                    <!-- Default option -->
+                        <h2 class="text-xl font-bold">Tags</h2>
+                        <!-- <button id="edit_description" class="btn btn-secondary btn-sm">Edit Tags</button>
+                    <button id="cancel_edit_description" class="btn btn-secondary btn-sm hidden">Cancel</button> -->
+                    </div>
+                    <!-- <form id="description_form" action="/api/recipes/description" method="post"
+                    class="hidden flex gap-2 items-center">
+                    <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
+                    <textarea class="textarea textarea-primary" name="description">{{.Recipe.Description}}
+                    </textarea>
+                    <input type="submit" value="Save" class="btn btn-success">
+                </form> -->
 
-                                    <!-- Populate this select with ingredient types -->
-                                    {{range $.QuantityTypes}}
 
-                                    <option value="{{.Quantity_type_id}}">{{.Name}}</option>
-
-                                    {{end}}
-                                    <!-- Add more options as needed -->
-                                </select>
-                                <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity"
-                                    value="{{.Quantity}}" class="input input-primary join-item w-16 input-sm">
-                            </div>
+                    <ul class="flex flex-col">
+                        {{range .Recipe.Tags}}
+                        <li>
+                            {{.Name}}
                         </li>
                         {{end}}
+                    </ul>
+                </div>
+                <div class="flex gap-4 flex-col">
+                    <div class="flex gap-2">
 
-                        <input type="submit" value="Submit Changes" class="btn btn-success">
-                    </form>
-                    {{else}}
-                    <li>No ingredients</li>
-                    {{end}}
-                </ul>
-                <ul class="flex-col flex gap-2" id="ingredient_list">
-                    {{if .Recipe.Ingredients}}
-                    {{range .Recipe.Ingredients}}
-                    <li class="flex gap-2 items-center">
-                        <span class="text-xl font-bold">
-                            {{.Name}} -
-                        </span>
-                        <span>
-                            {{.Quantity}}
-                        </span>
-                        <span>
-                            {{.Quantity_type}}
-                        </span>
-                    </li>
-                    {{end}}
-                    {{else}}
-                    <li>No ingredients</li>
-                    {{end}}
-                </ul>
+                        <h2 class="text-xl font-bold">Ingredients</h2>
+                        <button id="edit_ingredients" class="btn btn-secondary btn-sm">Edit ingredients</button>
+                        <button id="cancel_edit_ingredients" class="btn btn-secondary btn-sm hidden">Cancel</button>
+                    </div>
+                    <ul class="flex-col flex gap-2 hidden" id="ingredient_form">
+                        {{if .Recipe.Ingredients}}
+                        <form method="post" action="/update_recipe_ingredients" class="flex gap-2 flex-col">
+                            <input name="recipe_id" value="{{.Recipe.Recipe_id}}" hidden>
+                            </input>
+                            {{range .Recipe.Ingredients}} <li class="flex gap-2">
+                            <li class="flex gap-2 items-center">
+                                <label for="{{.Ingredient_id}}_type">{{.Name}}:</label>
+                                <span>{{.Quantity_type}}</span>
+                                <div class="join">
+
+                                    <select name="{{.Ingredient_id}}_type"
+                                        class="select select-primary join-item select-sm">
+                                        <option value="" selected disabled>new Qty Type</option>
+                                        <!-- Default option -->
+
+                                        <!-- Populate this select with ingredient types -->
+                                        {{range $.QuantityTypes}}
+
+                                        <option value="{{.Quantity_type_id}}">{{.Name}}</option>
+
+                                        {{end}}
+                                        <!-- Add more options as needed -->
+                                    </select>
+                                    <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity"
+                                        value="{{.Quantity}}" class="input input-primary join-item w-16 input-sm">
+                                </div>
+                            </li>
+                            {{end}}
+
+                            <input type="submit" value="Submit Changes" class="btn btn-success">
+                        </form>
+                        {{else}}
+                        <li>No ingredients</li>
+                        {{end}}
+                    </ul>
+                    <ul class="flex-col flex gap-2" id="ingredient_list">
+                        {{if .Recipe.Ingredients}}
+                        {{range .Recipe.Ingredients}}
+                        <li class="flex gap-2 items-center">
+                            <span class="text-xl font-bold">
+                                {{.Name}} -
+                            </span>
+                            <span>
+                                {{.Quantity}}
+                            </span>
+                            <span>
+                                {{.Quantity_type}}
+                            </span>
+                        </li>
+                        {{end}}
+                        {{else}}
+                        <li>No ingredients</li>
+                        {{end}}
+                    </ul>
+                </div>
             </div>
+
         </div>
+    </div>
 </body>
 <script defer>
     var editButton = document.getElementById('edit_ingredients')

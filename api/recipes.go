@@ -44,6 +44,14 @@ type RecipeWithIngredientsAndPhotos struct {
 	Ingredients []IngredientWithQuantity
 	Photos []string
 }
+type RecipeWithIngredientsAndPhotosAndTags struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Ingredients []IngredientWithQuantity
+	Photos []string
+	Tags []Tag
+}
 type RecipeWithPhotos struct {
 	Recipe_id int
 	Name  string
@@ -57,7 +65,7 @@ type RecipesPageData struct {
 }
 type SingleRecipePageData struct {
 	PageTitle string
-    Recipe RecipeWithIngredientsAndPhotos
+    Recipe RecipeWithIngredientsAndPhotosAndTags
     QuantityTypes []QuantityType
 }
 
@@ -69,7 +77,7 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
 
 		quantitiy_types := getAllQuantityTypes(db)
-		recipe, err := getSingleRecipeWithIngredientsAndPhotos(db, id)
+		recipe, err := getSingleRecipeWithIngredientsAndPhotosAndTags(db, id)
 		if err != nil {
 			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
 		}		
@@ -224,10 +232,13 @@ func getAllRecipes(db *sql.DB) []Recipe {
         }
 		return recipes
 }
-func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithIngredientsAndPhotos, error) {
+func getSingleRecipeWithIngredientsAndPhotosAndTags(db *sql.DB, id string) (RecipeWithIngredientsAndPhotosAndTags, error) {
 	// Define a variable to hold the result
-	var result RecipeWithIngredientsAndPhotos
+	var result RecipeWithIngredientsAndPhotosAndTags
 
+	
+	tags := getTagsforRecipeId(db, id)
+	result.Tags = tags
 	// Query the recipe information based on the provided id
 	err := db.QueryRow("SELECT name, description, recipe_id FROM recipes WHERE recipe_id = ?", id).
 		Scan(&result.Name, &result.Description, &result.Recipe_id)
