@@ -13,17 +13,25 @@ func main() {
     }
     defer db.Close()
 
-    // Create the food database
-    _, err = db.Exec("CREATE DATABASE IF NOT EXISTS food;")
+    var dbName string
+err = db.QueryRow("SHOW DATABASES LIKE 'food'").Scan(&dbName)
+if err == nil {
+    // The "food" database already exists
+    fmt.Println("The 'food' database already exists. Skipping initilization.")
+} else if err == sql.ErrNoRows {
+    // The "food" database doesn't exist, so create it
+    _, err := db.Exec("CREATE DATABASE IF NOT EXISTS food;")
+    
     if err != nil {
         panic(err)
     }
-
-    // Connect to the food database
     _, err = db.Exec("USE food;")
     if err != nil {
-        panic(err)
+     panic(err)
     }
+
+
+
     // Create the ingredient TYPE table
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS ingredient_type (
@@ -194,5 +202,20 @@ func main() {
     if err != nil {
         panic(err)
     }
+    fmt.Println("seeded the 'food' database.")
     fmt.Println("Database initialization completed.")
+
+
+} else {
+    panic(err)
 }
+
+// Connect to the "food" database
+_, err = db.Exec("USE food;")
+if err != nil {
+    panic(err)
+}
+}
+
+
+
