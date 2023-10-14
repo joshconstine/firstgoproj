@@ -41,8 +41,9 @@
 
         <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
         <div class="flex flex-col items-center gap-4">
-            <div class="">
+            <div class=" flex gap-16">
                 <input class="input input-primary input-sm " type="text" id="searchbar" placeholder="Search by name" />
+                <button class="btn btn-sm btn-secondary btn-outline" id="clear">Clear Filters</button>
             </div>
             <div class="flex gap-4 items-center">
                 {{range .Tags}}
@@ -116,6 +117,8 @@
     // Get references to the search input field and the recipe cards
     const searchInput = document.getElementById('searchbar');
     const recipeCards = document.querySelectorAll('.card');
+    const clearButton = document.getElementById('clear');
+
     const tags = document.querySelectorAll('.tag'); // Select all tag elements
     tags.forEach(tag => {
         tag.addEventListener('click', () => {
@@ -154,6 +157,15 @@
         });
     });
 
+    clearButton.addEventListener('click', () => {
+        searchbar.value = ''; // Clear the search bar input
+        tags.forEach(tag => tag.classList.remove('btn-primary')); // Deselect all tags
+
+        // Show all recipe cards
+        recipeCards.forEach(card => {
+            card.style.display = 'block';
+        });
+    });
 </script>
 
 </html>
