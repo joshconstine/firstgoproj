@@ -180,9 +180,14 @@
         searchbar.value = ''; // Clear the search bar input
         tags.forEach(tag => tag.classList.remove('btn-primary')); // Deselect all tags
 
-        // Show all recipe cards
         recipeCards.forEach(card => {
-            card.style.display = 'block';
+
+
+            card.querySelectorAll('.recipe_tag').forEach(cardTag => {
+                cardTag.classList.remove('bg-yellow-200'); // Remove the highlighting class
+            });
+
+            card.style.display = 'block'; // Show the card
         });
     });
 </script>
