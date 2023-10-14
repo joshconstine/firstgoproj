@@ -102,8 +102,8 @@ func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
  		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
 	
         ingredients := getAllIngredients(db)
-        tags := getAllTags(db)
 		ingredientTypeMap := getAllIngredientsWithTypes(db)
+        tags := getAllTags(db)
 		
 		data := CreateRecipePageData{
 			PageTitle: "Create Recipe",
@@ -385,6 +385,7 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			recipeName := r.FormValue("recipeName")
 			recipeDescription := r.FormValue("recipeDescription")
 			ingredientIDs := r.Form["ingredients"]
+			tagIDs := r.Form["tags"]
 			quantityValue := 1
 			quantityTypeValue := 1
 
@@ -407,7 +408,13 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 }
-
+ for _, tagID := range tagIDs {
+	_, err = db.Exec("INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)", recipeID, tagID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
     uploader := NewUploader()
 	newPhotoLocation, err := UploadHandler(w, r, uploader)
 	if err == nil {
