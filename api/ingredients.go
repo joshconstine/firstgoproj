@@ -17,12 +17,23 @@ type IngredientType struct {
 	Ingredient_type_id int
 	Name string
 }
+type QuantityType struct {
+	Quantity_type_id int
+	Name string
+}
 type IngredientAndType struct {
 	Ingredient_id int
 	Name  string
 	Ingredient_type_id int
 	Ingredient_type_name string
 
+}
+type IngredientWithQuantity struct {
+	Ingredient_id int
+	Name  string
+	Quantity float32
+	Quantity_type string
+	Quantity_type_id int
 }
 
 type IngredientPageData struct {
@@ -80,6 +91,28 @@ func getAllIngredientTypes(db *sql.DB) []IngredientType {
 			log.Fatal(err)
         }
 		return ingredient_types
+}
+func getAllQuantityTypes(db *sql.DB) []QuantityType {
+	rows, err := db.Query(`SELECT * FROM quantity_type`)
+        if err != nil {
+			log.Fatal(err)
+        }
+        defer rows.Close()
+		
+	var quantitiy_types []QuantityType
+        for rows.Next() {
+			var r QuantityType
+			
+            err := rows.Scan(&r.Quantity_type_id, &r.Name)
+            if err != nil {
+				log.Fatal(err)
+            }
+            quantitiy_types = append(quantitiy_types, r)
+        }
+        if err := rows.Err(); err != nil {
+			log.Fatal(err)
+        }
+		return quantitiy_types
 }
 func getAllIngredientsWithTypes(db *sql.DB)  map[string][]IngredientAndType {
 	  rows, err := db.Query(`

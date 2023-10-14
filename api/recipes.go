@@ -4,6 +4,7 @@ import (
     "net/http"
     "fmt"
     "database/sql"
+	"strings"
 	"html/template"
     _ "github.com/go-sql-driver/mysql"
     "github.com/gorilla/mux" 
@@ -39,7 +40,7 @@ type RecipeWithIngredientsAndPhotos struct {
 	Recipe_id int
 	Name  string
 	Description string
-	Ingredients []Ingredient
+	Ingredients []IngredientWithQuantity
 	Photos []string
 }
 type RecipeWithPhotos struct {
@@ -48,6 +49,7 @@ type RecipeWithPhotos struct {
 	Description string
 	Photos []string
 }
+
 type RecipesPageData struct {
 	PageTitle string
 	Recipes []RecipeWithPhotos
@@ -55,14 +57,17 @@ type RecipesPageData struct {
 type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredientsAndPhotos
+    QuantityTypes []QuantityType
 }
 
 //HTML TEMPLATES
 func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	vars := mux.Vars(r)
+		vars := mux.Vars(r)
         id := vars["id"]
-			tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
 	
+		tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
+
+		quantitiy_types := getAllQuantityTypes(db)
 		recipe, err := getSingleRecipeWithIngredientsAndPhotos(db, id)
 		if err != nil {
 			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
@@ -72,6 +77,7 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		data := SingleRecipePageData{
 			PageTitle: recipe.Name,
             Recipe: recipe,
+			QuantityTypes: quantitiy_types,
             
         }
 
@@ -227,27 +233,31 @@ func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithI
 		return result, err
 	}
 
-	// Query the associated ingredients for the recipe
-	rows, err := db.Query("SELECT i.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipe_id = ?", id)
+	// Query the associated ingredients with quantity for the recipe
+	rows, err := db.Query("SELECT i.ingredient_id, i.name, ri.quantity, ri.quantity_type_id, qt.name FROM ingredients i INNER JOIN recipe_ingredients ri ON i.ingredient_id = ri.ingredient_id INNER JOIN quantity_type qt ON ri.quantity_type_id = qt.quantity_type_id WHERE ri.recipe_id = ?", id)
 	if err != nil {
 		return result, err
 	}
 	defer rows.Close()
+
 	// Loop through the rows of ingredients and add them to the result
 	for rows.Next() {
-		var ingredientName string
-		err := rows.Scan(&ingredientName)
+		var ingredientWithQuantity IngredientWithQuantity
+		err := rows.Scan(&ingredientWithQuantity.Ingredient_id, &ingredientWithQuantity.Name, &ingredientWithQuantity.Quantity, &ingredientWithQuantity.Quantity_type_id, &ingredientWithQuantity.Quantity_type)
 		if err != nil {
 			return result, err
 		}
-		result.Ingredients = append(result.Ingredients, Ingredient{Name: ingredientName})
-	}
-	
-	// Check for errors during rows iteration
-	if err := rows.Err(); err != nil {
-		return result, err
+		// In your Go code, set the Quantity_type value based on Quantity
+if ingredientWithQuantity.Quantity > 1 {
+    ingredientWithQuantity.Quantity_type = ingredientWithQuantity.Quantity_type + "s"
+}
+		result.Ingredients = append(result.Ingredients, ingredientWithQuantity)
 	}
 
+// Check for errors during rows iteration
+if err := rows.Err(); err != nil {
+	return result, err
+}
 
 	// Query the associated photos for the recipe
 	rows, err = db.Query("SELECT photo_url FROM recipe_photos  WHERE recipe_id = ?", id)
@@ -373,6 +383,8 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			recipeName := r.FormValue("recipeName")
 			recipeDescription := r.FormValue("recipeDescription")
 			ingredientIDs := r.Form["ingredients"]
+			quantityValue := 1
+			quantityTypeValue := 1
 
 		_, err := db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipeName, recipeDescription )
 		if err != nil {
@@ -387,7 +399,7 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	
  for _, ingredientID := range ingredientIDs {
-	_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id) VALUES (?, ?)", recipeID, ingredientID)
+	_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, quantity_type_id) VALUES (?, ?, ?, ?)", recipeID, ingredientID, quantityValue, quantityTypeValue)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -450,3 +462,106 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
 }
 
+func UpdateRecipeIngredients(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+    if r.Method == http.MethodPost {
+        err := r.ParseForm()
+        if err != nil {
+            http.Error(w, "Failed to parse form data", http.StatusInternalServerError)
+            return
+        }
+
+        recipeID := r.FormValue("recipe_id")
+        if recipeID == "" {
+            http.Error(w, "Missing recipe_id in form data", http.StatusBadRequest)
+            return
+        }
+
+        for key, values := range r.Form {
+            // Check if the form data key represents an ingredient type or quantity
+            if strings.HasSuffix(key, "_type") {
+                ingredientID := strings.TrimSuffix(key, "_type")
+                ingredientType := values[0]
+
+                // Convert ingredientID and recipeID to integers
+                ingredientIDInt, err := strconv.Atoi(ingredientID)
+                if err != nil {
+                    http.Error(w, "Invalid ingredient ID", http.StatusBadRequest)
+                    return
+                }
+
+                recipeIDInt, err := strconv.Atoi(recipeID)
+                if err != nil {
+                    http.Error(w, "Invalid recipe ID", http.StatusBadRequest)
+                    return
+                }
+
+                // Update the database with the new ingredient type
+                // Example SQL query using the database/sql package:
+                // Assuming you have a db variable of type *sql.DB
+                _, err = db.Exec("UPDATE recipe_ingredients SET quantity_type_id = ? WHERE ingredient_id = ? AND recipe_id = ?", ingredientType, ingredientIDInt, recipeIDInt)
+                if err != nil {
+                    http.Error(w, "Failed to update ingredient type", http.StatusInternalServerError)
+                    return
+                }
+            } else if strings.HasSuffix(key, "_quantity") {
+                ingredientID := strings.TrimSuffix(key, "_quantity")
+                ingredientQuantity := values[0]
+
+                // Convert ingredientID and recipeID to integers
+                ingredientIDInt, err := strconv.Atoi(ingredientID)
+                if err != nil {
+                    http.Error(w, "Invalid ingredient ID", http.StatusBadRequest)
+                    return
+                }
+
+                recipeIDInt, err := strconv.Atoi(recipeID)
+                if err != nil {
+                    http.Error(w, "Invalid recipe ID", http.StatusBadRequest)
+                    return
+                }
+
+                // Update the database with the new ingredient quantity
+                // Example SQL query using the database/sql package:
+                // Assuming you have a db variable of type *sql.DB
+                _, err = db.Exec("UPDATE recipe_ingredients SET quantity = ? WHERE ingredient_id = ? AND recipe_id = ?", ingredientQuantity, ingredientIDInt, recipeIDInt)
+                if err != nil {
+                    http.Error(w, "Failed to update ingredient quantity", http.StatusInternalServerError)
+                    return
+                }
+            }
+        }
+
+        
+		redirectURL := fmt.Sprintf("/recipes/%s", recipeID)
+
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+    }
+}
+func UpdateDescription(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	
+	
+			r.ParseForm()
+			
+			// Get the recipe ID from the form data
+			recipeID := r.FormValue("id")
+			
+			// Get the new description from the form data
+			newDescription := r.FormValue("description")
+			
+			// Update the description in the database using SQL or an ORM
+			// Example SQL query: "UPDATE recipes SET description = ? WHERE recipe_id = ?"
+			
+			_, err := db.Exec("UPDATE recipes SET description = ? WHERE recipe_id = ?", newDescription, recipeID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+
+		redirectURL := fmt.Sprintf("/recipes/%s", recipeID)
+			// Redirect to the updated recipe's page or display a success message
+			http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+	
+		http.ListenAndServe(":8080", nil)
+	}
+	
