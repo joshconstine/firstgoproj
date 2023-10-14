@@ -58,10 +58,17 @@ type RecipeWithPhotos struct {
 	Description string
 	Photos []string
 }
+type RecipeWithPhotosAndTags struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Photos []string
+	Tags []Tag
+}
 
 type RecipesPageData struct {
 	PageTitle string
-	Recipes []RecipeWithPhotos
+	Recipes []RecipeWithPhotosAndTags
 	Tags []Tag
 }
 type SingleRecipePageData struct {
@@ -97,7 +104,7 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
    		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		recipes, _ := getAllRecipesWithPhotos(db)
+		recipes, _ := getAllRecipesWithPhotosAndTags(db)
 		tags := getAllTags(db)
 		data := RecipesPageData{
 			PageTitle: "Recipes",
@@ -309,6 +316,54 @@ for _, recipe := range recipes {
 	Name:recipe.Name,
 	Description:recipe.Description,
     }
+
+    // Query the associated photos for the current recipe
+    rows, err := db.Query("SELECT photo_url FROM recipe_photos WHERE recipe_id = ?", recipe.Recipe_id)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    // Loop through the rows of photos and add them to the result for the current recipe
+    for rows.Next() {
+        var photoUrl string
+        if err := rows.Scan(&photoUrl); err != nil {
+            return nil, err
+        }
+        recipeWithPhotos.Photos = append(recipeWithPhotos.Photos, photoUrl)
+    }
+
+    // Check for errors during rows iteration
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    // Append the current recipe with its photos to the final result
+    result = append(result, recipeWithPhotos)
+}
+	return result, nil
+}
+func getAllRecipesWithPhotosAndTags(db *sql.DB) ([]RecipeWithPhotosAndTags, error) {
+	// Define a variable to hold the result
+	 recipes := getAllRecipes(db)
+	var result []RecipeWithPhotosAndTags
+
+for _, recipe := range recipes {
+    // Create a RecipeWithPhotos instance for the current recipe
+    recipeWithPhotos := RecipeWithPhotosAndTags{
+        Recipe_id: recipe.Recipe_id,
+	Name:recipe.Name,
+	Description:recipe.Description,
+    }
+
+
+recipeID := strconv.Itoa(recipe.Recipe_id) // Convert int to string
+
+tags := getTagsforRecipeId(db,recipeID) // Now, you can pass the string value
+
+
+
+	recipeWithPhotos.Tags = tags
 
     // Query the associated photos for the current recipe
     rows, err := db.Query("SELECT photo_url FROM recipe_photos WHERE recipe_id = ?", recipe.Recipe_id)
