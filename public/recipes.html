@@ -182,6 +182,8 @@
 
         recipeCards.forEach(card => {
 
+            const recipeNameElement = card.querySelector('.card-title');
+            recipeNameElement.innerHTML = recipeNameElement.textContent; // Reset to the original content
 
             card.querySelectorAll('.recipe_tag').forEach(cardTag => {
                 cardTag.classList.remove('bg-yellow-200'); // Remove the highlighting class
