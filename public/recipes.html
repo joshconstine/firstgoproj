@@ -66,13 +66,13 @@
                 {{end}}
                 <div class="card-body px-4 py-2">
 
-                    <p class="card-title ">
+                    <p class="card-title">
                         {{.Name}}
                     </p>
                     <ul>
 
                         {{range .Tags}}
-                        <li>{{.Name}}</li>
+                        <li class="recipe_tag">{{.Name}}</li>
                         {{end}}
                     </ul>
                     <div class="card-actions justify-start">
@@ -138,6 +138,13 @@
                 if (cardTags.includes(selectedTag)) {
                     card.style.display = 'block';
                 }
+                card.querySelectorAll('.recipe_tag').forEach(cardTag => {
+                    if (cardTags.includes(selectedTag) && cardTag.textContent.trim().toLowerCase() === selectedTag) {
+                        cardTag.classList.add('bg-yellow-200'); // Apply the highlighting
+                    } else {
+                        cardTag.classList.remove('bg-yellow-200'); // Remove highlighting if not a match
+                    }
+                });
             });
         });
     });
@@ -145,11 +152,23 @@
     // Add an event listener to the search input field
     searchInput.addEventListener('input', () => {
         const searchQuery = searchInput.value.toLowerCase();
-
-        // Iterate through recipe cards and hide/show them based on the search query
         recipeCards.forEach((card) => {
-            const recipeName = card.querySelector('.card-title').textContent.toLowerCase();
-            if (recipeName.includes(searchQuery)) {
+            const recipeNameElement = card.querySelector('.card-title');
+            const recipeName = recipeNameElement.textContent.toLowerCase();
+
+            if (searchQuery === "") {
+                // If there is no search query, reset the highlighting
+                recipeNameElement.innerHTML = recipeName;
+                card.style.display = 'block'; // Show the card
+            } else if (recipeName.includes(searchQuery)) {
+                // Create a RegExp pattern for the search query, globally and as case-insensitive
+                const pattern = new RegExp(searchQuery, 'gi');
+                // Highlight matching text by wrapping it with a <span> element
+                const highlightedText = recipeName.replace(pattern, (match) => {
+                    return `<span class="bg-yellow-200">${match}</span>`;
+                });
+                // Update the recipe card's content with the highlighted text
+                recipeNameElement.innerHTML = highlightedText;
                 card.style.display = 'block'; // Show the card
             } else {
                 card.style.display = 'none'; // Hide the card
