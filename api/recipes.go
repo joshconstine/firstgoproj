@@ -62,6 +62,7 @@ type RecipeWithPhotos struct {
 type RecipesPageData struct {
 	PageTitle string
 	Recipes []RecipeWithPhotos
+	Tags []Tag
 }
 type SingleRecipePageData struct {
 	PageTitle string
@@ -97,9 +98,11 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
    		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
 		recipes, _ := getAllRecipesWithPhotos(db)
+		tags := getAllTags(db)
 		data := RecipesPageData{
 			PageTitle: "Recipes",
             Recipes: recipes,
+			Tags: tags,
         }
 
         tmpl.Execute(w, data)
