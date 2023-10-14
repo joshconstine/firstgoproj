@@ -40,25 +40,22 @@
     <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
     <div class="flex gap-4 flex-wrap">
         {{range .Recipes}}
-        <div class="card w-96 bg-base-300 shadow-xl">
+        <div class="card bg-base-300 shadow-xl">
             {{if .Photos}}
             {{range $i, $v := .Photos}}
             {{if eq $i 0}}
-            <figure>
-                <img src="{{$v}}" alt="photo" />
-            </figure>
+            <img src="{{$v}}" alt="photo " class="rounded-lg" />
             {{end}}
             {{end}}
             {{else}}
             <div>No photos</div>
             {{end}}
-            <div class="card-body">
+            <div class="card-body px-4 py-2">
 
-                <h2 class="card-title">
+                <p class="card-title ">
                     {{.Name}}
-                </h2>
-                <p>{{.Description}}</p>
-                <div class="card-actions justify-end">
+                </p>
+                <div class="card-actions justify-start">
                     <a href="/recipes/{{.Recipe_id}}">
                         <button class="btn btn-primary">View</button>
                     </a>
