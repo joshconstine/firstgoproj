@@ -131,7 +131,6 @@
             const selectedTag = tag.textContent.trim().toLowerCase(); // Get the text content of the clicked tag, convert to lowercase, and remove whitespace
             recipeCards.forEach(card => {
                 const cardTags = card.getAttribute('data-tags').split(',').map(tag => tag.trim().toLowerCase()); // Convert tags to lowercase and remove whitespace
-                console.log(cardTags)
 
                 if (cardTags.includes(selectedTag)) {
                     card.style.display = 'block';
