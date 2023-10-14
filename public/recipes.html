@@ -46,14 +46,14 @@
             </div>
             <div class="flex gap-4 items-center">
                 {{range .Tags}}
-                <button href="javascript:void(0);" class="btn btn-sm ">{{.Name}}</button>
+                <button href="javascript:void(0);" class="btn btn-sm tag">{{.Name}}</button>
 
                 {{end}}
             </div>
         </div>
         <div class="flex gap-4 flex-wrap">
             {{range .Recipes}}
-            <div class="card bg-base-300 shadow-xl">
+            <div class="card bg-base-300 shadow-xl" data-tags="{{.TagString}}">
                 {{if .Photos}}
                 {{range $i, $v := .Photos}}
                 {{if eq $i 0}}
@@ -68,6 +68,12 @@
                     <p class="card-title ">
                         {{.Name}}
                     </p>
+                    <ul>
+
+                        {{range .Tags}}
+                        <li>{{.Name}}</li>
+                        {{end}}
+                    </ul>
                     <div class="card-actions justify-start">
                         <a href="/recipes/{{.Recipe_id}}">
                             <button class="btn btn-primary">View</button>

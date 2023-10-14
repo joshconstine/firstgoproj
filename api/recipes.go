@@ -64,6 +64,7 @@ type RecipeWithPhotosAndTags struct {
 	Description string
 	Photos []string
 	Tags []Tag
+	TagString string
 }
 
 type RecipesPageData struct {
@@ -343,6 +344,14 @@ for _, recipe := range recipes {
 }
 	return result, nil
 }
+func getJoinedTags(tags []Tag) string {
+    var tagStrings []string
+    for _, tag := range tags {
+        tagStrings = append(tagStrings, tag.Name)
+    }
+    return strings.Join(tagStrings, ", ")
+}
+
 func getAllRecipesWithPhotosAndTags(db *sql.DB) ([]RecipeWithPhotosAndTags, error) {
 	// Define a variable to hold the result
 	 recipes := getAllRecipes(db)
@@ -360,10 +369,11 @@ for _, recipe := range recipes {
 recipeID := strconv.Itoa(recipe.Recipe_id) // Convert int to string
 
 tags := getTagsforRecipeId(db,recipeID) // Now, you can pass the string value
+recipeWithPhotos.Tags = tags
+tagString := getJoinedTags(tags)
+recipeWithPhotos.TagString =  tagString
 
 
-
-	recipeWithPhotos.Tags = tags
 
     // Query the associated photos for the current recipe
     rows, err := db.Query("SELECT photo_url FROM recipe_photos WHERE recipe_id = ?", recipe.Recipe_id)
