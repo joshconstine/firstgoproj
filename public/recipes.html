@@ -37,32 +37,40 @@
 
         </label>
     </div>
-    <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
-    <div class="flex gap-4 flex-wrap">
-        {{range .Recipes}}
-        <div class="card bg-base-300 shadow-xl">
-            {{if .Photos}}
-            {{range $i, $v := .Photos}}
-            {{if eq $i 0}}
-            <img src="{{$v}}" alt="photo " class="rounded-lg" />
-            {{end}}
-            {{end}}
-            {{else}}
-            <div>No photos</div>
-            {{end}}
-            <div class="card-body px-4 py-2">
+    <div class="flex flex-col gap-4 items-center">
 
-                <p class="card-title ">
-                    {{.Name}}
-                </p>
-                <div class="card-actions justify-start">
-                    <a href="/recipes/{{.Recipe_id}}">
-                        <button class="btn btn-primary">View</button>
-                    </a>
+        <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
+        <div class="w-1/2">
+
+            <input class="input input-primary " type="text" id="searchbar" placeholder="Search by name" />
+
+        </div>
+        <div class="flex gap-4 flex-wrap">
+            {{range .Recipes}}
+            <div class="card bg-base-300 shadow-xl">
+                {{if .Photos}}
+                {{range $i, $v := .Photos}}
+                {{if eq $i 0}}
+                <img src="{{$v}}" alt="photo " class="rounded-lg" />
+                {{end}}
+                {{end}}
+                {{else}}
+                <div>No photos</div>
+                {{end}}
+                <div class="card-body px-4 py-2">
+
+                    <p class="card-title ">
+                        {{.Name}}
+                    </p>
+                    <div class="card-actions justify-start">
+                        <a href="/recipes/{{.Recipe_id}}">
+                            <button class="btn btn-primary">View</button>
+                        </a>
+                    </div>
                 </div>
             </div>
+            {{end}}
         </div>
-        {{end}}
     </div>
     <div>
 </body>
@@ -93,6 +101,25 @@
             }
         });
     });
+    // Get references to the search input field and the recipe cards
+    const searchInput = document.getElementById('searchbar');
+    const recipeCards = document.querySelectorAll('.card');
+
+    // Add an event listener to the search input field
+    searchInput.addEventListener('input', () => {
+        const searchQuery = searchInput.value.toLowerCase();
+
+        // Iterate through recipe cards and hide/show them based on the search query
+        recipeCards.forEach((card) => {
+            const recipeName = card.querySelector('.card-title').textContent.toLowerCase();
+            if (recipeName.includes(searchQuery)) {
+                card.style.display = 'block'; // Show the card
+            } else {
+                card.style.display = 'none'; // Hide the card
+            }
+        });
+    });
+
 </script>
 
 </html>
