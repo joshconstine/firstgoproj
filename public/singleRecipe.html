@@ -43,7 +43,7 @@
     </div>
     <div class="flex gap-2">
 
-        <input type="checkbox" id="add-to-list" class="checkbox checkbox-primary"></input>
+        <input type="checkbox" id="add-to-list" class="checkbox "></input>
         <label for="add-to-list" class="text-sm" id="add-to-list-label">Add to list</label>
     </div>
     <div class="flex justify-around w-full">
@@ -68,13 +68,12 @@
                 {{end}}
 
             </div>
-            <div class="w-64 h-64 p-2 hidden border-primary border-2 rounded-lg flex items-center justify-center"
-                id="image-container">
+            <div class="w-64 h-64 p-2 hidden border-2 rounded-lg flex items-center justify-center" id="image-container">
                 <img id="blah" src="#" alt="your image" />
             </div>
             <form action="/recipes/add-photo" method="post" enctype="multipart/form-data">
                 <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-                <label for="photo" class="btn btn-primary join-item">Add Image</label>
+                <label for="photo" class="btn  join-item">Add Image</label>
 
                 <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
                 <button type="submit" class="btn btn-success">Save</button>
@@ -85,17 +84,17 @@
                 <div class="flex gap-2">
 
                     <h2 class="text-xl font-bold">Description</h2>
-                    <button id="edit_description" class="btn btn-secondary btn-sm">Edit Description</button>
-                    <button id="cancel_edit_description" class="btn btn-secondary btn-sm hidden">Cancel</button>
+                    <button id="edit_description" class="btn  btn-sm">Edit Description</button>
+                    <button id="cancel_edit_description" class="btn  btn-sm hidden">Cancel</button>
                 </div>
                 <form id="description_form" action="/api/recipes/description" method="post"
                     class="hidden flex gap-2 items-center">
                     <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-                    <textarea class="textarea textarea-primary" name="description">{{.Recipe.Description}}
+                    <textarea class="textarea " name="description">{{.Recipe.Description}}
                     </textarea>
                     <input type="submit" value="Save" class="btn btn-success">
                 </form>
-                <p class="text-sm border-primary border-2 w-full rounded-lg p-2" id="description">
+                <p class="text-sm  border-2 w-full rounded-lg p-2" id="description">
                     {{.Recipe.Description}}</p>
             </div>
             <div class="flex gap-16">
@@ -104,8 +103,8 @@
                     <div class="flex gap-2">
 
                         <h2 class="text-xl font-bold">Tags</h2>
-                        <!-- <button id="edit_description" class="btn btn-secondary btn-sm">Edit Tags</button>
-                    <button id="cancel_edit_description" class="btn btn-secondary btn-sm hidden">Cancel</button> -->
+                        <!-- <button id="edit_description" class="btn  btn-sm">Edit Tags</button>
+                    <button id="cancel_edit_description" class="btn  btn-sm hidden">Cancel</button> -->
                     </div>
                     <!-- <form id="description_form" action="/api/recipes/description" method="post"
                     class="hidden flex gap-2 items-center">
@@ -128,8 +127,8 @@
                     <div class="flex gap-2">
 
                         <h2 class="text-xl font-bold">Ingredients</h2>
-                        <button id="edit_ingredients" class="btn btn-secondary btn-sm">Edit ingredients</button>
-                        <button id="cancel_edit_ingredients" class="btn btn-secondary btn-sm hidden">Cancel</button>
+                        <button id="edit_ingredients" class="btn  btn-sm">Edit ingredients</button>
+                        <button id="cancel_edit_ingredients" class="btn  btn-sm hidden">Cancel</button>
                     </div>
                     <ul class="flex-col flex gap-2 hidden" id="ingredient_form">
                         {{if .Recipe.Ingredients}}
@@ -142,8 +141,7 @@
                                 <span>{{.Quantity_type}}</span>
                                 <div class="join">
 
-                                    <select name="{{.Ingredient_id}}_type"
-                                        class="select select-primary join-item select-sm">
+                                    <select name="{{.Ingredient_id}}_type" class="select  join-item select-sm">
                                         <option value="" selected disabled>new Qty Type</option>
                                         <!-- Default option -->
 
@@ -156,7 +154,7 @@
                                         <!-- Add more options as needed -->
                                     </select>
                                     <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity"
-                                        value="{{.Quantity}}" class="input input-primary join-item w-16 input-sm">
+                                        value="{{.Quantity}}" class="input  join-item w-16 input-sm">
                                 </div>
                             </li>
                             {{end}}

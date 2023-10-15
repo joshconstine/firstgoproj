@@ -43,7 +43,7 @@
 
         <div class="flex flex-col items-center gap-4">
             <div class=" flex gap-8">
-                <input class="input input-primary input-sm " type="text" id="searchbar" placeholder="Search by name" />
+                <input class="input input-sm " type="text" id="searchbar" placeholder="Search by name" />
                 <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
             </div>
             <div class="flex gap-4 items-center">
@@ -78,7 +78,7 @@
                         </ul>
                         <div class="card-actions  justify-end self-end">
                             <a href="/recipes/{{.Recipe_id}}">
-                                <button class="btn btn-primary btn-sm ">View</button>
+                                <button class="btn  btn-sm ">View</button>
                             </a>
                         </div>
                     </div>
@@ -126,12 +126,12 @@
         tag.addEventListener('click', () => {
             // Remove the 'selected' class from all tags
             tags.forEach((t) => {
-                t.classList.remove('btn-primary')
+                t.classList.remove('')
                 t.classList.remove('btn-outline')
             }
             );
             // Add the 'selected' class to the clicked tag
-            tag.classList.add('btn-primary');
+            tag.classList.add('');
             tag.classList.add('btn-outline');
             // Hide all cards
             recipeCards.forEach(card => card.style.display = 'none');
@@ -185,7 +185,7 @@
     clearButton.addEventListener('click', () => {
         searchbar.value = ''; // Clear the search bar input
         tags.forEach(tag => {
-            tag.classList.remove('btn-primary')
+            tag.classList.remove('')
             tag.classList.remove('btn-outline')
         }); // Deselect all tags
 

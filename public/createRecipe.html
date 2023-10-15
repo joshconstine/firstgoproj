@@ -51,7 +51,7 @@
                                 {{ range .Tags}}
                                 <li class="flex items-center gap-2">
                                     <input id="{{.Tag_id}}" name="tags" type="checkbox" value="{{.Tag_id}}"
-                                        class="checkbox checkbox-primary checkbox-sm" />
+                                        class="checkbox checkbox-sm" />
                                     <label for="{{.Tag_id}}" class="text-xs">{{.Name}}</label>
                                 </li>
                                 {{end}}
@@ -60,8 +60,8 @@
                         <div class="flex flex-col gap-4">
                             <div class="join">
                                 <input type="text" id="recipeName" name="recipeName" placeholder="recipe name"
-                                    class="join-item input input-primary" required />
-                                <select class="select select-primary join-item" id="ingredient-picker">
+                                    class="join-item input " required />
+                                <select class="select  join-item" id="ingredient-picker">
                                     <option disabled selected>Choose ingredients</option>
                                     {{range .Ingredients}}
                                     <option value="{{.Ingredient_id}}">
@@ -69,15 +69,15 @@
                                     </option>
                                     {{end}}
                                 </select>
-                                <label for="photo" class="btn btn-primary join-item">Select Image</label>
+                                <label for="photo" class="btn  join-item">Select Image</label>
 
 
                             </div>
                             <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
                             <textarea type="text" id="recipeDescription" rows="10" name="recipeDescription"
-                                placeholder="description" class="textarea textarea-primary "></textarea>
+                                placeholder="description" class="textarea  "></textarea>
                         </div>
-                        <div class="w-64 h-64 p-2 hidden border-primary border-2 rounded-lg flex items-center justify-center"
+                        <div class="w-64 h-64 p-2 hidden border-2 rounded-lg flex items-center justify-center"
                             id="image-container">
                             <img id="blah" src="#" alt="your image" />
                         </div>
@@ -96,7 +96,7 @@
                     {{range $ingredientTypes}}
                     <li class="flex items-center gap-2">
                         <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}"
-                            class="checkbox checkbox-primary checkbox-sm" />
+                            class="checkbox  checkbox-sm" />
                         <label for="{{.Ingredient_id}}" class="text-xs">{{.Name}}</label>
                     </li>
                     {{end}}
