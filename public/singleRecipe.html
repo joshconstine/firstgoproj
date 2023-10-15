@@ -13,8 +13,9 @@
 
 <body class="  flex items-center w-full flex-col gap-2">
 
-    <div class="navbar bg-gray-400 flex gap-2 w-full justify-between px-12">
+    <div class="navbar bg-gray-400 flex gap-2 w-full justify-around px-12">
         <div class="flex gap-2">
+            <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
             <a href="/ingredients" class=" btn btn-sm  rounded-lg">Ingredients</a>
             <a href="/recipes" class=" btn btn-sm  rounded-lg">Recipes</a>
             <a href="/create-recipe" class=" btn btn-sm  rounded-lg">Create Recipe</a>
@@ -40,7 +41,6 @@
         </label>
     </div>
     </div>
-    <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
     <!-- <form action="/api/recipes/delete" method="post" class="flex items-center gap-2">
         <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
     <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
