@@ -103,6 +103,14 @@
                 localStorage.setItem('theme', 'dark'); // Store user's preference
             }
         });
+        const list = JSON.parse(localStorage.getItem('list')) || []
+        const checkboxes = document.querySelectorAll('input[type=checkbox]')
+        checkboxes.forEach(checkbox => {
+            if (list.includes(checkbox.value)) {
+                checkbox.checked = true
+            }
+        })
+
     });
 </script>
 
