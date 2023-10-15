@@ -48,7 +48,7 @@
             </div>
             <div class="flex gap-4 items-center">
                 {{range .Tags}}
-                <button href="javascript:void(0);" class="btn btn-sm tag">{{.Name}}</button>
+                <button href="javascript:void(0);" class="btn btn-sm tag btn-ghost no-animation">{{.Name}}</button>
 
                 {{end}}
             </div>
@@ -125,10 +125,14 @@
     tags.forEach(tag => {
         tag.addEventListener('click', () => {
             // Remove the 'selected' class from all tags
-            tags.forEach(t => t.classList.remove('btn-primary'));
+            tags.forEach((t) => {
+                t.classList.remove('btn-primary')
+                t.classList.remove('btn-outline')
+            }
+            );
             // Add the 'selected' class to the clicked tag
             tag.classList.add('btn-primary');
-
+            tag.classList.add('btn-outline');
             // Hide all cards
             recipeCards.forEach(card => card.style.display = 'none');
 
@@ -180,7 +184,10 @@
 
     clearButton.addEventListener('click', () => {
         searchbar.value = ''; // Clear the search bar input
-        tags.forEach(tag => tag.classList.remove('btn-primary')); // Deselect all tags
+        tags.forEach(tag => {
+            tag.classList.remove('btn-primary')
+            tag.classList.remove('btn-outline')
+        }); // Deselect all tags
 
         recipeCards.forEach(card => {
 
