@@ -108,7 +108,30 @@ if err == nil {
     if err != nil {
         panic(err)
     }
+         // Create the tags table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS tags (
+            tag_id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL UNIQUE
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
 
+// Create the recipe_tags table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS recipe_tags (
+            recipe_id INT,
+            tag_id INT,
+            PRIMARY KEY (recipe_id, tag_id),
+            FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id),
+            FOREIGN KEY (tag_id) REFERENCES tags(tag_id)
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
 
 
     // Seed the ingredient types
@@ -142,6 +165,26 @@ if err == nil {
     if err != nil {
         panic(err)
     } 
+  // Seed the tags
+    _, err = db.Exec(`
+    INSERT INTO tags (name)
+    VALUES
+        ('Recipes With Video'),
+        ('Munchies'),
+        ('Soup'),
+        ('Pasta'),
+        ('Beverages'),
+        ('Salad'),
+        ('Desserts'),
+        ('Fish And Seafood'),
+        ('Cool Stuff'),
+        ('Appitizers'),
+        ('Main Dishes');
+    `)
+    if err != nil {
+        panic(err)
+    } 
+
 
 
     

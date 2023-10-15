@@ -29,6 +29,7 @@ type CreateRecipePageData struct {
 	PageTitle string
     Ingredients []Ingredient
 	MappedIngredients map[string][]IngredientAndType
+	Tags []Tag
 }
 type RecipeWithIngredients struct {
 	Recipe_id int
@@ -43,20 +44,37 @@ type RecipeWithIngredientsAndPhotos struct {
 	Ingredients []IngredientWithQuantity
 	Photos []string
 }
+type RecipeWithIngredientsAndPhotosAndTags struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Ingredients []IngredientWithQuantity
+	Photos []string
+	Tags []Tag
+}
 type RecipeWithPhotos struct {
 	Recipe_id int
 	Name  string
 	Description string
 	Photos []string
 }
+type RecipeWithPhotosAndTags struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Photos []string
+	Tags []Tag
+	TagString string
+}
 
 type RecipesPageData struct {
 	PageTitle string
-	Recipes []RecipeWithPhotos
+	Recipes []RecipeWithPhotosAndTags
+	Tags []Tag
 }
 type SingleRecipePageData struct {
 	PageTitle string
-    Recipe RecipeWithIngredientsAndPhotos
+    Recipe RecipeWithIngredientsAndPhotosAndTags
     QuantityTypes []QuantityType
 }
 
@@ -68,7 +86,7 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		tmpl := template.Must(template.ParseFiles("public/singleRecipe.html"))
 
 		quantitiy_types := getAllQuantityTypes(db)
-		recipe, err := getSingleRecipeWithIngredientsAndPhotos(db, id)
+		recipe, err := getSingleRecipeWithIngredientsAndPhotosAndTags(db, id)
 		if err != nil {
 			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
 		}		
@@ -87,10 +105,12 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
    		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		recipes, _ := getAllRecipesWithPhotos(db)
+		recipes, _ := getAllRecipesWithPhotosAndTags(db)
+		tags := getAllTags(db)
 		data := RecipesPageData{
 			PageTitle: "Recipes",
             Recipes: recipes,
+			Tags: tags,
         }
 
         tmpl.Execute(w, data)
@@ -101,13 +121,14 @@ func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB)
  		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
 	
         ingredients := getAllIngredients(db)
-      
 		ingredientTypeMap := getAllIngredientsWithTypes(db)
+        tags := getAllTags(db)
 		
 		data := CreateRecipePageData{
 			PageTitle: "Create Recipe",
             Ingredients: ingredients,
 			MappedIngredients: ingredientTypeMap,
+			Tags: tags,
         }
 
         tmpl.Execute(w, data)
@@ -222,10 +243,13 @@ func getAllRecipes(db *sql.DB) []Recipe {
         }
 		return recipes
 }
-func getSingleRecipeWithIngredientsAndPhotos(db *sql.DB, id string) (RecipeWithIngredientsAndPhotos, error) {
+func getSingleRecipeWithIngredientsAndPhotosAndTags(db *sql.DB, id string) (RecipeWithIngredientsAndPhotosAndTags, error) {
 	// Define a variable to hold the result
-	var result RecipeWithIngredientsAndPhotos
+	var result RecipeWithIngredientsAndPhotosAndTags
 
+	
+	tags := getTagsforRecipeId(db, id)
+	result.Tags = tags
 	// Query the recipe information based on the provided id
 	err := db.QueryRow("SELECT name, description, recipe_id FROM recipes WHERE recipe_id = ?", id).
 		Scan(&result.Name, &result.Description, &result.Recipe_id)
@@ -320,6 +344,63 @@ for _, recipe := range recipes {
 }
 	return result, nil
 }
+func getJoinedTags(tags []Tag) string {
+    var tagStrings []string
+    for _, tag := range tags {
+        tagStrings = append(tagStrings, tag.Name)
+    }
+    return strings.Join(tagStrings, ", ")
+}
+
+func getAllRecipesWithPhotosAndTags(db *sql.DB) ([]RecipeWithPhotosAndTags, error) {
+	// Define a variable to hold the result
+	 recipes := getAllRecipes(db)
+	var result []RecipeWithPhotosAndTags
+
+for _, recipe := range recipes {
+    // Create a RecipeWithPhotos instance for the current recipe
+    recipeWithPhotos := RecipeWithPhotosAndTags{
+        Recipe_id: recipe.Recipe_id,
+	Name:recipe.Name,
+	Description:recipe.Description,
+    }
+
+
+recipeID := strconv.Itoa(recipe.Recipe_id) // Convert int to string
+
+tags := getTagsforRecipeId(db,recipeID) // Now, you can pass the string value
+recipeWithPhotos.Tags = tags
+tagString := getJoinedTags(tags)
+recipeWithPhotos.TagString =  tagString
+
+
+
+    // Query the associated photos for the current recipe
+    rows, err := db.Query("SELECT photo_url FROM recipe_photos WHERE recipe_id = ?", recipe.Recipe_id)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    // Loop through the rows of photos and add them to the result for the current recipe
+    for rows.Next() {
+        var photoUrl string
+        if err := rows.Scan(&photoUrl); err != nil {
+            return nil, err
+        }
+        recipeWithPhotos.Photos = append(recipeWithPhotos.Photos, photoUrl)
+    }
+
+    // Check for errors during rows iteration
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    // Append the current recipe with its photos to the final result
+    result = append(result, recipeWithPhotos)
+}
+	return result, nil
+}
 func getSingleRecipeWithIngredients(db *sql.DB, id string) (RecipeWithIngredients, error) {
 	 // Define a variable to hold the result
 	 var result RecipeWithIngredients
@@ -383,6 +464,7 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			recipeName := r.FormValue("recipeName")
 			recipeDescription := r.FormValue("recipeDescription")
 			ingredientIDs := r.Form["ingredients"]
+			tagIDs := r.Form["tags"]
 			quantityValue := 1
 			quantityTypeValue := 1
 
@@ -405,7 +487,13 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 }
-
+ for _, tagID := range tagIDs {
+	_, err = db.Exec("INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)", recipeID, tagID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
     uploader := NewUploader()
 	newPhotoLocation, err := UploadHandler(w, r, uploader)
 	if err == nil {

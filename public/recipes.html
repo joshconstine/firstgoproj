@@ -8,11 +8,13 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.8.3/dist/full.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
 
+
 </head>
 
 <body class="  flex items-center w-3xl flex-col gap-2">
-    <div class="navbar bg-primary flex gap-2 w-full justify-between px-12">
+    <div class="navbar bg-gray-400 flex gap-2 w-full justify-around px-12">
         <div class="flex gap-2">
+            <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
             <a href="/ingredients" class=" btn btn-sm  rounded-lg">Ingredients</a>
             <a href="/recipes" class=" btn btn-sm  rounded-lg">Recipes</a>
             <a href="/create-recipe" class=" btn btn-sm  rounded-lg">Create Recipe</a>
@@ -37,32 +39,53 @@
 
         </label>
     </div>
-    <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
-    <div class="flex gap-4 flex-wrap">
-        {{range .Recipes}}
-        <div class="card bg-base-300 shadow-xl">
-            {{if .Photos}}
-            {{range $i, $v := .Photos}}
-            {{if eq $i 0}}
-            <img src="{{$v}}" alt="photo " class="rounded-lg" />
-            {{end}}
-            {{end}}
-            {{else}}
-            <div>No photos</div>
-            {{end}}
-            <div class="card-body px-4 py-2">
+    <div class="flex flex-col gap-4 items-center">
 
-                <p class="card-title ">
-                    {{.Name}}
-                </p>
-                <div class="card-actions justify-start">
-                    <a href="/recipes/{{.Recipe_id}}">
-                        <button class="btn btn-primary">View</button>
-                    </a>
-                </div>
+        <div class="flex flex-col items-center gap-4">
+            <div class=" flex gap-8">
+                <input class="input input-primary input-sm " type="text" id="searchbar" placeholder="Search by name" />
+                <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
+            </div>
+            <div class="flex gap-4 items-center">
+                {{range .Tags}}
+                <button href="javascript:void(0);" class="btn btn-sm tag btn-ghost no-animation">{{.Name}}</button>
+
+                {{end}}
             </div>
         </div>
-        {{end}}
+        <div class="flex gap-4 flex-wrap">
+            {{range .Recipes}}
+            <div class="card bg-base-300 shadow-xl" data-tags="{{.TagString}}">
+                {{if .Photos}}
+                {{range $i, $v := .Photos}}
+                {{if eq $i 0}}
+                <img src="{{$v}}" alt="photo " class="rounded-lg" />
+                {{end}}
+                {{end}}
+                {{else}}
+                <div>No photos</div>
+                {{end}}
+                <div class="card-body px-4 py-2">
+
+                    <p class="card-title">
+                        {{.Name}}
+                    </p>
+                    <div class="flex justify-between">
+                        <ul>
+                            {{range .Tags}}
+                            <li class="recipe_tag">{{.Name}}</li>
+                            {{end}}
+                        </ul>
+                        <div class="card-actions  justify-end self-end">
+                            <a href="/recipes/{{.Recipe_id}}">
+                                <button class="btn btn-primary btn-sm ">View</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
     </div>
     <div>
 </body>
@@ -91,6 +114,91 @@
                 html.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark'); // Store user's preference
             }
+        });
+    });
+    // Get references to the search input field and the recipe cards
+    const searchInput = document.getElementById('searchbar');
+    const recipeCards = document.querySelectorAll('.card');
+    const clearButton = document.getElementById('clear');
+
+    const tags = document.querySelectorAll('.tag'); // Select all tag elements
+    tags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            // Remove the 'selected' class from all tags
+            tags.forEach((t) => {
+                t.classList.remove('btn-primary')
+                t.classList.remove('btn-outline')
+            }
+            );
+            // Add the 'selected' class to the clicked tag
+            tag.classList.add('btn-primary');
+            tag.classList.add('btn-outline');
+            // Hide all cards
+            recipeCards.forEach(card => card.style.display = 'none');
+
+            // Show cards with the corresponding tag
+            const selectedTag = tag.textContent.trim().toLowerCase(); // Get the text content of the clicked tag, convert to lowercase, and remove whitespace
+            recipeCards.forEach(card => {
+                const cardTags = card.getAttribute('data-tags').split(',').map(tag => tag.trim().toLowerCase()); // Convert tags to lowercase and remove whitespace
+
+                if (cardTags.includes(selectedTag)) {
+                    card.style.display = 'block';
+                }
+                card.querySelectorAll('.recipe_tag').forEach(cardTag => {
+                    if (cardTags.includes(selectedTag) && cardTag.textContent.trim().toLowerCase() === selectedTag) {
+                        cardTag.classList.add('bg-yellow-200'); // Apply the highlighting
+                    } else {
+                        cardTag.classList.remove('bg-yellow-200'); // Remove highlighting if not a match
+                    }
+                });
+            });
+        });
+    });
+
+    // Add an event listener to the search input field
+    searchInput.addEventListener('input', () => {
+        const searchQuery = searchInput.value.toLowerCase();
+        recipeCards.forEach((card) => {
+            const recipeNameElement = card.querySelector('.card-title');
+            const recipeName = recipeNameElement.textContent.toLowerCase();
+
+            if (searchQuery === "") {
+                // If there is no search query, reset the highlighting
+                recipeNameElement.innerHTML = recipeName;
+                card.style.display = 'block'; // Show the card
+            } else if (recipeName.includes(searchQuery)) {
+                // Create a RegExp pattern for the search query, globally and as case-insensitive
+                const pattern = new RegExp(searchQuery, 'gi');
+                // Highlight matching text by wrapping it with a <span> element
+                const highlightedText = recipeName.replace(pattern, (match) => {
+                    return `<span class="bg-yellow-200">${match}</span>`;
+                });
+                // Update the recipe card's content with the highlighted text
+                recipeNameElement.innerHTML = highlightedText;
+                card.style.display = 'block'; // Show the card
+            } else {
+                card.style.display = 'none'; // Hide the card
+            }
+        });
+    });
+
+    clearButton.addEventListener('click', () => {
+        searchbar.value = ''; // Clear the search bar input
+        tags.forEach(tag => {
+            tag.classList.remove('btn-primary')
+            tag.classList.remove('btn-outline')
+        }); // Deselect all tags
+
+        recipeCards.forEach(card => {
+
+            const recipeNameElement = card.querySelector('.card-title');
+            recipeNameElement.innerHTML = recipeNameElement.textContent; // Reset to the original content
+
+            card.querySelectorAll('.recipe_tag').forEach(cardTag => {
+                cardTag.classList.remove('bg-yellow-200'); // Remove the highlighting class
+            });
+
+            card.style.display = 'block'; // Show the card
         });
     });
 </script>

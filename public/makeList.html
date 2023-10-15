@@ -10,9 +10,10 @@
 
 </head>
 
-<body class="  flex items-center w-3xl flex-col gap-4">
-    <div class="navbar bg-primary flex gap-2 w-full justify-between px-12">
+<body class="  flex items-center w-3xl flex-col gap-2">
+    <div class="navbar bg-gray-400 flex gap-2 w-full justify-around px-12">
         <div class="flex gap-2">
+            <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
             <a href="/ingredients" class=" btn btn-sm  rounded-lg">Ingredients</a>
             <a href="/recipes" class=" btn btn-sm  rounded-lg">Recipes</a>
             <a href="/create-recipe" class=" btn btn-sm  rounded-lg">Create Recipe</a>
@@ -37,14 +38,12 @@
 
         </label>
     </div>
-    <form action="/generate-list" method="post" class="flex flex-col gap-4">
+    <form action="/generate-list" method="post" class="flex flex-col  items-center w-full">
         <div class="flex gap-8 items-center">
-            <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
-            <button type="submit" class="btn  btn-primary">Generate List</button>
+            <button type="submit" class="btn  btn-primary btn-active w-64 ">Generate List</button>
         </div>
         <div class="divider"></div>
         <div class="flex flex-col items-center gap-4">
-            <h2>Select Recipes</h2>
             <ul class="flex-wrap flex gap-2">
                 {{range .Recipes}}
                 <div>
