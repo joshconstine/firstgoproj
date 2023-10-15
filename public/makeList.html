@@ -103,6 +103,22 @@
                 localStorage.setItem('theme', 'dark'); // Store user's preference
             }
         });
+        const recipes = document.querySelectorAll('input[type=checkbox]')
+        recipes.forEach(recipe => {
+            recipe.addEventListener('change', function () {
+                const list = JSON.parse(localStorage.getItem('list')) || []
+                if (this.checked) {
+                    list.push(this.value)
+                } else {
+                    const index = list.indexOf(this.value)
+                    if (index > -1) {
+                        list.splice(index, 1)
+                    }
+                }
+                localStorage.setItem('list', JSON.stringify(list))
+            })
+        })
+
         const list = JSON.parse(localStorage.getItem('list')) || []
         const checkboxes = document.querySelectorAll('input[type=checkbox]')
         checkboxes.forEach(checkbox => {
