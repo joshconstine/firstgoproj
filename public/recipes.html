@@ -70,16 +70,17 @@
                     <p class="card-title">
                         {{.Name}}
                     </p>
-                    <ul>
-
-                        {{range .Tags}}
-                        <li class="recipe_tag">{{.Name}}</li>
-                        {{end}}
-                    </ul>
-                    <div class="card-actions justify-start">
-                        <a href="/recipes/{{.Recipe_id}}">
-                            <button class="btn btn-primary">View</button>
-                        </a>
+                    <div class="flex justify-between">
+                        <ul>
+                            {{range .Tags}}
+                            <li class="recipe_tag">{{.Name}}</li>
+                            {{end}}
+                        </ul>
+                        <div class="card-actions  justify-end self-end">
+                            <a href="/recipes/{{.Recipe_id}}">
+                                <button class="btn btn-primary btn-sm ">View</button>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
