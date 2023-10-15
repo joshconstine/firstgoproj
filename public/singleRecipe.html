@@ -41,10 +41,11 @@
         </label>
     </div>
     </div>
-    <!-- <form action="/api/recipes/delete" method="post" class="flex items-center gap-2">
-        <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-    <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
-</form> -->
+    <div class="flex gap-2">
+
+        <input type="checkbox" id="add-to-list" class="checkbox checkbox-primary"></input>
+        <label for="add-to-list" class="text-sm" id="add-to-list-label">Add to list</label>
+    </div>
     <div class="flex justify-around w-full">
         <div class="flex flex-col gap-8 items-center ">
 
@@ -298,6 +299,36 @@
             }
         });
     });
+    const addToListButton = document.getElementById('add-to-list')
+    const addToListLabel = document.getElementById('add-to-list-label')
+    const addRecipeIdToLocalStorage = (recipeId) => {
+        const list = JSON.parse(localStorage.getItem('list')) || []
+        list.push(recipeId)
+        localStorage.setItem('list', JSON.stringify(list))
+        addToListLabel.innerText = "Added to list"
+
+    }
+    const removeRecipeIdFromLocalStorage = (recipeId) => {
+        const list = JSON.parse(localStorage.getItem('list')) || []
+        const newList = list.filter(id => id !== recipeId)
+        localStorage.setItem('list', JSON.stringify(newList))
+        addToListLabel.innerText = "Add to list"
+    }
+    addToListButton.addEventListener('click', evt => {
+        const recipeId = "{{.Recipe.Recipe_id}}"
+        if (addToListButton.checked) {
+            addRecipeIdToLocalStorage(recipeId)
+        } else {
+            removeRecipeIdFromLocalStorage(recipeId)
+        }
+    })
+    const list = JSON.parse(localStorage.getItem('list')) || []
+    if (list.includes("{{.Recipe.Recipe_id}}")) {
+        addToListButton.checked = true
+        addToListLabel.innerText = "Added to list"
+    }
+
+
 </script>
 
 </html>
