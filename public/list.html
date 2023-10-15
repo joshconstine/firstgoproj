@@ -38,13 +38,22 @@
 
         </label>
     </div>
-    <form action="api/list" method="post">
-        <div class="join">
-            <input type="phone" placeholder="999-222-3333" name="phone" class="join-item input input-primary" />
-            <textarea name="list" class="textarea textarea-primary join-item" rows="20">{{range .Ingredients}}{{.Name}}
+    <form action="api/list" method="post" class="w-96">
+        <div class="flex flex-col gap-4 w-full h-full">
+            <label for="phone" class="text-4xl">Text me the List</label>
+            <label for="list" class="text-xs">Add more ingredients to your generated list below</label>
+            <div class="flex gap-4 items-center">
+                <div class="flex flex-col gap-2">
+                    <input type="phone" placeholder="999-222-3333" name="phone" class=" input input-primary" />
+                </div>
+                <button type="submit " class="btn btn-primary ">send </button>
+
+            </div>
+            <textarea name="list" class="block w-full border rounded-lg p-3 textarea textarea-primary resize-none"
+                rows="20">
+                {{range .Ingredients}}{{.Name}}
 {{end}}
         </textarea>
-            <button type="submit " class="btn btn-primary join-item">send </button>
         </div>
     </form>
 
