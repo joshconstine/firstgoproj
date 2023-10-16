@@ -74,6 +74,12 @@
 
                             </div>
                             <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
+                            <select class="select select-bordered" id="tagSelector">
+                                <option default selected value="">Add Tags ...</option>
+                                {{range .Tags}}
+                                <option value="{{.Tag_id}}">{{.Name}}</option>
+                                {{end}}
+                            </select>
                             <textarea type="text" id="recipeDescription" rows="10" name="recipeDescription"
                                 placeholder="description" class="textarea textarea-bordered "></textarea>
                         </div>
@@ -156,6 +162,21 @@
                 localStorage.setItem('theme', 'dark'); // Store user's preference
             }
         });
+
+        const tagSelector = document.getElementById('tagSelector')
+
+        tagSelector.addEventListener('change', function (e) {
+            const tagId = e.target.value
+            const tagInput = document.getElementById(tagId)
+            if (tagInput) {
+                if (tagInput.checked) {
+                    tagInput.checked = false
+                } else {
+                    tagInput.checked = true
+                }
+            }
+        })
+
     });
 
 </script>
