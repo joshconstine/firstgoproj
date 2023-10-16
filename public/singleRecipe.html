@@ -11,9 +11,9 @@
 </head>
 
 
-<body class="  flex items-center w-full flex-col gap-2">
+<body class="  flex items-center w-full flex-col gap-8">
 
-    <div class="navbar bg-gray-400 flex gap-2 w-full justify-around px-12">
+    <div class="navbar bg-gray-400 flex gap-2 justify-around px-12">
         <div class="flex gap-2">
             <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
             <a href="/ingredients" class=" btn btn-sm  rounded-lg">Ingredients</a>
@@ -40,17 +40,14 @@
 
         </label>
     </div>
-    </div>
 
-    <div class="flex justify-around w-full">
+    <div class="flex justify-around w-full ">
         <div class="flex flex-col gap-8 items-center ">
-
-            <div class="carousel ">
-
+            <div class="carousel w-full">
                 {{if .Recipe.Photos}}
                 {{range $i, $a := .Recipe.Photos}}
-                <div id="item{{ $i }}" class="carousel-item w-full flex items-center justify-center">
-                    <img src="{{$a}}" alt="photo" />
+                <div id="item{{ $i }}" class="carousel-item h-96 w-full self-center">
+                    <img src="{{$a}}" alt="photo" style="object-fit: cover;" />
                 </div>
                 {{end}}
                 {{else}}
@@ -75,7 +72,7 @@
                 <button type="submit" class="btn btn-success">Save</button>
             </form>
         </div>
-        <div class="w-96 flex flex-col gap-8">
+        <div class="w-3xl flex flex-col gap-8">
             <div class="flex flex-col gap-4">
                 <div class="flex gap-2">
 
@@ -118,7 +115,7 @@
 
                     <ul class="flex flex-col">
                         {{range .Recipe.Tags}}
-                        <li>
+                        <li class="whitespace-nowrap">
                             {{.Name}}
                         </li>
                         {{end}}
@@ -138,7 +135,7 @@
                             </input>
                             {{range .Recipe.Ingredients}} <li class="flex gap-2">
                             <li class="flex gap-2 items-center">
-                                <label for="{{.Ingredient_id}}_type">{{.Name}}:</label>
+                                <label for="{{.Ingredient_id}}_type" class="whitespace-nowrap">{{.Name}}:</label>
                                 <span>{{.Quantity_type}}</span>
                                 <div class="join">
 
