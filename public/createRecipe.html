@@ -95,9 +95,9 @@
                 <ul class="flex-col flex gap-2">
                     {{range $ingredientTypes}}
                     <li class="flex items-center gap-2">
-                        <input id="{{.Ingredient_id}}" name="ingredients" type="checkbox" value="{{.Ingredient_id}}"
-                            class="checkbox  checkbox-sm" />
-                        <label for="{{.Ingredient_id}}" class="text-xs">{{.Name}}</label>
+                        <input id="ingredient_{{.Ingredient_id}}" name="ingredients" type="checkbox"
+                            value="{{.Ingredient_id}}" class="checkbox  checkbox-sm" />
+                        <label for="ingredient_{{.Ingredient_id}}" class="text-xs">{{.Name}}</label>
                     </li>
                     {{end}}
                 </ul>
@@ -122,7 +122,7 @@
     }
     ingPkr.onchange = evt => {
         var selectedId = evt.target.value
-        var ingInp = document.getElementById(`${selectedId}`)
+        var ingInp = document.getElementById(`ingredient_${selectedId}`)
 
         if (ingInp) {
             if (ingInp.checked) {
