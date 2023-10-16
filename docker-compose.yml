@@ -10,7 +10,7 @@ services:
       - db
     entrypoint: /app/entrypoint.sh  # Specify the entry point script
     environment:
-      TWILIO_AUTH_TOKEN: 893b3fe93856e4413c6b5e10f0fb7bd6
+      TWILIO_AUTH_TOKEN: 66cd4e3b178108f486e8a558aa4d49cf
       TWILIO_ACCOUNT_SID: AC729653ba85434ab1e60023fb3d38d604
   db:
     image: mysql:5.7.43
@@ -19,3 +19,7 @@ services:
       MYSQL_DATABASE: food-db
     ports:
       - "3306:3306"
+    volumes:
+      - my-datavolume:/var/lib/mysql
+volumes:
+  my-datavolume:
