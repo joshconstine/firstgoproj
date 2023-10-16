@@ -41,8 +41,9 @@
     <form action="/api/ingredients" method="post">
         <div class=" join">
             <input type="text" id="ingredient" name="ingredient" placeholder="Add Ingredient" required
-                class="input  join-item" />
-            <select id="ingredient_type select " name="ingredient_type" required class="join-item select">
+                class="input input-bordered join-item" />
+            <select id="ingredient_type select " name="ingredient_type" required
+                class="join-item select select-bordered">
                 {{range .IngredientTypes}}
                 <option value="{{.Ingredient_type_id}}" class="option" label="{{.Name}}"></option>
                 {{end}}
