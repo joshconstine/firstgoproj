@@ -184,6 +184,20 @@
                 if (searchQuery === "") {
                     // If there is no search query, reset the highlighting
                     recipeNameElement.innerHTML = recipeName;
+                    card.querySelectorAll('.collapse').forEach(e => {
+                        e.classList.remove('collapse-open')
+                        e.classList.add('collapse-close')
+
+                    })
+                    recipeIngredients.forEach(elem => {
+                        const ingredientName = elem.textContent
+
+                        elem.innerHTML = ingredientName
+
+                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        collapseElem?.classList?.remove('collapse-open')
+
+                    })
                     card.style.display = 'block'; // Show the card
                 } else if (recipeNameLowerCase.includes(searchQuery) || recipeIncludesSearchedIngredient) {
                     // Create a RegExp pattern for the search query, globally and as case-insensitive
@@ -203,6 +217,8 @@
                         });
                         elem.innerHTML = highlightedTxt
 
+                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        collapseElem?.classList?.add('collapse-open')
 
                     })
 
@@ -210,6 +226,7 @@
                     card.style.display = 'block'; // Show the card
                 } else {
                     card.style.display = 'none'; // Hide the card
+                    card.querySelectorAll('.collapse').forEach(e => e.classList.remove('collapse-open'))
                 }
             });
         });
