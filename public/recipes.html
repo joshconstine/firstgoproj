@@ -156,13 +156,14 @@
             const searchQuery = searchInput.value.toLowerCase();
             recipeCards.forEach((card) => {
                 const recipeNameElement = card.querySelector('.card-title');
-                const recipeName = recipeNameElement.textContent.toLowerCase();
+                const recipeNameLowerCase = recipeNameElement.textContent.toLowerCase();
+                const recipeName = recipeNameElement.textContent;
 
                 if (searchQuery === "") {
                     // If there is no search query, reset the highlighting
                     recipeNameElement.innerHTML = recipeName;
                     card.style.display = 'block'; // Show the card
-                } else if (recipeName.includes(searchQuery)) {
+                } else if (recipeNameLowerCase.includes(searchQuery)) {
                     // Create a RegExp pattern for the search query, globally and as case-insensitive
                     const pattern = new RegExp(searchQuery, 'gi');
                     // Highlight matching text by wrapping it with a <span> element
