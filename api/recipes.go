@@ -65,6 +65,7 @@ type RecipeWithPhotosAndTags struct {
 	Photos []string
 	Tags []Tag
 	TagString string
+	Ingredients []IngredientWithQuantity
 }
 
 type RecipesPageData struct {
@@ -352,6 +353,7 @@ func getJoinedTags(tags []Tag) string {
     return strings.Join(tagStrings, ", ")
 }
 
+
 func getAllRecipesWithPhotosAndTags(db *sql.DB) ([]RecipeWithPhotosAndTags, error) {
 	// Define a variable to hold the result
 	 recipes := getAllRecipes(db)
@@ -372,6 +374,10 @@ tags := getTagsforRecipeId(db,recipeID) // Now, you can pass the string value
 recipeWithPhotos.Tags = tags
 tagString := getJoinedTags(tags)
 recipeWithPhotos.TagString =  tagString
+
+ingredientWithQuantity := getIngredientsForRecipe(db, recipeID)
+
+recipeWithPhotos.Ingredients = ingredientWithQuantity
 
 
 
