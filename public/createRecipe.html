@@ -46,18 +46,6 @@
 
                     <div class="flex gap-8">
                         <div class="flex flex-col gap-4">
-                            Tags
-                            <div class="flex flex-col gap-2">
-                                {{ range .Tags}}
-                                <li class="flex items-center gap-2">
-                                    <input id="{{.Tag_id}}" name="tags" type="checkbox" value="{{.Tag_id}}"
-                                        class="checkbox checkbox-sm" />
-                                    <label for="{{.Tag_id}}" class="text-xs">{{.Name}}</label>
-                                </li>
-                                {{end}}
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-4">
                             <div class="join">
                                 <input type="text" id="recipeName" name="recipeName" placeholder="recipe name"
                                     class="join-item input input-bordered" required />
@@ -72,6 +60,17 @@
                                 <label for="photo" class="btn  join-item">Select Image</label>
 
 
+                            </div>
+                            <div class="flex flex-wrap gap-4">
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .Tags}}
+                                    <li class="flex items-center gap-2 hidden">
+                                        <input id="{{.Tag_id}}" name="tags" type="checkbox" value="{{.Tag_id}}"
+                                            class="checkbox checkbox-sm single-tag" />
+                                        <label for="{{.Tag_id}}" class="text-xs">{{.Name}}</label>
+                                    </li>
+                                    {{end}}
+                                </div>
                             </div>
                             <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
                             <select class="select select-bordered" id="tagSelector">
@@ -138,12 +137,17 @@
             }
         }
     }
+
+
     document.addEventListener('DOMContentLoaded', function () {
         const themeToggle = document.getElementById('themeToggle');
         const html = document.documentElement;
 
         // Check the user's local storage for the current theme (light or dark)
         const currentTheme = localStorage.getItem('theme') || 'dark';
+
+
+
 
         // Set the theme based on the user's preference
         if (currentTheme === 'dark') {
@@ -165,17 +169,45 @@
 
         const tagSelector = document.getElementById('tagSelector')
 
+        const removeHiddenClassFromParentLi = (el) => {
+            const parentEl = el.parentElement
+            parentEl.classList.remove('hidden')
+        }
+        const addHiddenClassToParentLi = (el) => {
+            const parentEl = el.parentElement
+            parentEl.classList.add('hidden')
+        }
+
         tagSelector.addEventListener('change', function (e) {
             const tagId = e.target.value
             const tagInput = document.getElementById(tagId)
             if (tagInput) {
                 if (tagInput.checked) {
                     tagInput.checked = false
+                    addHiddenClassToParentLi(tagInput)
                 } else {
                     tagInput.checked = true
+                    removeHiddenClassFromParentLi(tagInput)
                 }
             }
         })
+        const allTags = document.querySelectorAll('.single-tag')
+        console.log(allTags)
+        allTags.forEach((el) => {
+            el.addEventListener('change', (event) => {
+                if (event.target.checked) {
+                    // Checkbox has been checked
+                    // Add your code for when a checkbox is checked here
+                    // console.log(`${event.target.value} has been checked`);
+                    removeHiddenClassFromParentLi(el)
+                } else {
+                    // Checkbox has been unchecked
+                    addHiddenClassToParentLi(el)
+                    // Add your code for when a checkbox is unchecked here
+                    // console.log(`${event.target.value} has been unchecked`);
+                }
+            });
+        });
 
     });
 
