@@ -96,14 +96,14 @@
         </div>
         <div class="flex flex gap-4">
             {{range $ingredientName, $ingredientTypes := .MappedIngredients}}
-            <div>
+            <div class="flex flex-col gap-4">
 
                 <h2 class="text-xl font-bold">{{$ingredientName}}</h2>
                 <ul class="flex-col flex gap-2">
                     {{range $ingredientTypes}}
                     <li class="flex items-center gap-2">
                         <input id="ingredient_{{.Ingredient_id}}" name="ingredients" type="checkbox"
-                            value="{{.Ingredient_id}}" class="checkbox  checkbox-sm" />
+                            value="{{.Ingredient_id}}" class="checkbox  checkbox-xs" />
                         <label for="ingredient_{{.Ingredient_id}}" class="text-xs">{{.Name}}</label>
                     </li>
                     {{end}}

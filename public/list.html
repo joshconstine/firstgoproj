@@ -44,12 +44,12 @@
             <label for="list" class="text-xs">Add more ingredients to your generated list below</label>
             <div class="flex gap-4 items-center">
                 <div class="flex flex-col gap-2">
-                    <input type="phone" placeholder="999-222-3333" name="phone" class=" input " />
+                    <input type="phone" placeholder="999-222-3333" name="phone" class=" input input-bordered " />
                 </div>
                 <button type="submit " class="btn  ">send </button>
 
             </div>
-            <textarea name="list" class="block w-full border rounded-lg p-3 textarea  resize-none" rows="20">
+            <textarea name="list" class="block w-full rounded-lg p-3 textarea  resize-none textarea-bordered" rows="20">
                 {{range .Ingredients}}{{.Name}}
 {{end}}
         </textarea>

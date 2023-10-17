@@ -44,11 +44,11 @@
         </div>
         <div class="divider"></div>
         <div class="flex flex-col items-center gap-4">
-            <ul class="flex-wrap flex gap-2">
+            <ul class="flex-wrap flex gap-2 px-12">
                 {{range .Recipes}}
                 <div>
 
-                    <div class="card  bg-base-100 shadow-xl">
+                    <div class="card  bg-base-300 shadow-md">
                         {{if .Photos}}
                         {{range $i, $v := .Photos}}
                         {{if eq $i 0}}
