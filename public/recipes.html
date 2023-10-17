@@ -246,6 +246,14 @@
                     cardTag.classList.remove('bg-yellow-200'); // Remove the highlighting class
                 });
 
+                const cardIngredients = card.querySelectorAll('.ingredient');
+                cardIngredients.forEach(elem => {
+                    const ingredientName = elem.textContent
+                    elem.innerHTML = ingredientName
+                    const collapseElem = elem.parentElement.parentElement.parentElement
+                    collapseElem?.classList?.remove('collapse-open')
+
+                })
                 card.style.display = 'block'; // Show the card
             });
         });
