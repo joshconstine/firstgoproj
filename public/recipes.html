@@ -43,7 +43,8 @@
 
         <div class="flex flex-col items-center gap-4">
             <div class=" flex gap-8 items-center">
-                <input class="input input-bordered " type="text" id="searchbar" placeholder="Search by name" />
+                <input class="input input-bordered " type="text" id="searchbar"
+                    placeholder="Search by name / ingredient" />
                 <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
             </div>
             <div class="flex gap-4 items-center">
@@ -89,7 +90,7 @@
                         <div class="collapse-content">
                             <ul>
                                 {{range .Ingredients}}
-                                <li>{{.Name}}</li>
+                                <li class="ingredient">{{.Name}}</li>
                                 {{end}}
                             </ul>
                         </div>
@@ -173,19 +174,39 @@
                 const recipeNameLowerCase = recipeNameElement.textContent.toLowerCase();
                 const recipeName = recipeNameElement.textContent;
 
+                const recipeIngredients = card.querySelectorAll('.ingredient');
+
+                const recipeIncludesSearchedIngredient = Array.from(recipeIngredients).some((ingredient) => {
+                    return ingredient.textContent.toLowerCase().includes(searchQuery);
+                });
+
+
                 if (searchQuery === "") {
                     // If there is no search query, reset the highlighting
                     recipeNameElement.innerHTML = recipeName;
                     card.style.display = 'block'; // Show the card
-                } else if (recipeNameLowerCase.includes(searchQuery)) {
+                } else if (recipeNameLowerCase.includes(searchQuery) || recipeIncludesSearchedIngredient) {
                     // Create a RegExp pattern for the search query, globally and as case-insensitive
                     const pattern = new RegExp(searchQuery, 'gi');
                     // Highlight matching text by wrapping it with a <span> element
                     const highlightedText = recipeName.replace(pattern, (match) => {
                         return `<span class="bg-yellow-200">${match}</span>`;
                     });
+
                     // Update the recipe card's content with the highlighted text
                     recipeNameElement.innerHTML = highlightedText;
+
+                    recipeIngredients.forEach(elem => {
+                        const ingredientName = elem.textContent
+                        const highlightedTxt = ingredientName.replace(pattern, (match) => {
+                            return `<span class="bg-yellow-200">${match}</span>`;
+                        });
+                        elem.innerHTML = highlightedTxt
+
+
+                    })
+
+
                     card.style.display = 'block'; // Show the card
                 } else {
                     card.style.display = 'none'; // Hide the card
