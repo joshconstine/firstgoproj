@@ -64,9 +64,11 @@
                             <div class="flex flex-wrap gap-4">
                                 <div class="flex flex-wrap gap-2">
                                     {{ range .Tags}}
-                                    <li class="flex items-center gap-2 hidden">
+                                    <li class="flex items-center gap-2 hidden border-2 border-gray-400 p-2 rounded-lg">
                                         <input id="{{.Tag_id}}" name="tags" type="checkbox" value="{{.Tag_id}}"
-                                            class="checkbox checkbox-sm single-tag" />
+                                            class="checkbox checkbox-sm single-tag hidden" />
+                                        <label for="{{.Tag_id}}" class="remove-tag btn btn-outline btn-xs"
+                                            type="button">x</label>
                                         <label for="{{.Tag_id}}" class="text-xs">{{.Name}}</label>
                                     </li>
                                     {{end}}
