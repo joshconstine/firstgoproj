@@ -171,3 +171,29 @@ func SendList(w http.ResponseWriter, r *http.Request) {
 		// Redirect back to the home page
     fmt.Fprintf(w, "List send to : %+v\n", phoneNumber)
 }
+// Handle the HTMX GET request for updating ingredients
+func UpdateIngredientsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+    recipeID := r.URL.Query().Get("recipe_id")
+	
+
+    // Implement logic to retrieve updated ingredients based on the selected recipe
+    // You should generate an HTML list structure here
+	ingredients:= getIngredientsForRecipe(db, recipeID)
+
+    var updatedIngredients []IngredientWithQuantity
+
+	for _, ingredient := range ingredients {
+		updatedIngredients = append(updatedIngredients, ingredient)
+	}
+
+    // Generate an HTML ul and li structure
+    ul := "<ul>"
+    for _, ingredient := range updatedIngredients {
+        ul += "<li>" + ingredient.Name + "</li>"
+    }
+    ul += "</ul"
+
+    // Send the updated HTML ingredient list as a response
+    w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
+    w.Write([]byte(ul)) // Write the HTML structure to the response
+}

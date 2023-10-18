@@ -53,7 +53,10 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
     }).Methods("GET")	
 	r.HandleFunc("/generate-list", func(w http.ResponseWriter, r *http.Request) {
         GetGenerateListTemplate(w, r, db)
-    }).Methods("POST")	
+    }).Methods("POST")		
+    r.HandleFunc("/update-ingredients", func(w http.ResponseWriter, r *http.Request) {
+        UpdateIngredientsHandler(w, r, db)
+    }).Methods("GET")	
 
 
     apiRouter.HandleFunc("/ingredients", func(w http.ResponseWriter, r *http.Request) {
@@ -86,4 +89,5 @@ func InitRoutes(r *mux.Router, db *sql.DB) {
     r.HandleFunc("/recipes/add-photo", func(w http.ResponseWriter, r *http.Request) {
         UploadNewPhoto(w, r, db)
     }).Methods("POST")	
+
 }
