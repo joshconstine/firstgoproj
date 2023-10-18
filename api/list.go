@@ -105,14 +105,15 @@ func SendList(w http.ResponseWriter, r *http.Request) {
 }
 // Handle the HTMX GET request for updating ingredients
 func UpdateIngredientsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-    recipeID := r.URL.Query().Get("recipe_id")
-	
+	recipeName := r.FormValue("recipeName")
+	recipeIds := r.Form["recipes"]
+	fmt.Println("", recipeName)
 
     // Implement logic to retrieve updated ingredients based on the selected recipe
     // You should generate an HTML list structure here
 	// ingredients:= getIngredientsForRecipe(db, recipeID)
 
-	ingredientData := GetIngredientQuantityDataFromRecipeIds([]string{recipeID}, db)
+	ingredientData := GetIngredientQuantityDataFromRecipeIds(recipeIds, db)
 
 
     // Generate an HTML ul and li structure
