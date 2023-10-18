@@ -110,18 +110,15 @@ func UpdateIngredientsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB
 
     // Implement logic to retrieve updated ingredients based on the selected recipe
     // You should generate an HTML list structure here
-	ingredients:= getIngredientsForRecipe(db, recipeID)
+	// ingredients:= getIngredientsForRecipe(db, recipeID)
 
-    var updatedIngredients []IngredientWithQuantity
+	ingredientData := GetIngredientQuantityDataFromRecipeIds([]string{recipeID}, db)
 
-	for _, ingredient := range ingredients {
-		updatedIngredients = append(updatedIngredients, ingredient)
-	}
 
     // Generate an HTML ul and li structure
     ul := "<ul>"
-    for _, ingredient := range updatedIngredients {
-        ul += "<li>" + ingredient.Name + "</li>"
+    for _, ingredient := range ingredientData {
+        ul += "<li>" + ingredient + "</li>"
     }
     ul += "</ul"
 
