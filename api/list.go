@@ -117,15 +117,26 @@ func UpdateIngredientsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB
 
 
     // Generate an HTML ul and li structure
-    ul := "<ul>"
-    for _, ingredient := range ingredientData {
-        ul += "<li>" + ingredient + "</li>"
-    }
-    ul += "</ul"
+    // ul := "<ul>"
+    // for _, ingredient := range ingredientData {
+    //     ul += "<li>" + ingredient + "</li>"
+    // }
+    // ul += "</ul"
+//   <textarea name="list" id="ingredientList" data-hx-target="ingredientList"
+//                         class="block w-full rounded-lg p-3 textarea  resize-none textarea-bordered" rows="20">
+
+
+//                     </textarea>=
+
+		textarea := "<textarea name=\"list\" id=\"ingredientList\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 textarea  resize-none textarea-bordered\" rows=\"20\">"
+		for _, ingredient := range ingredientData {
+			textarea += ingredient + "\n"
+		}
+		textarea += "</textarea>"
 
     // Send the updated HTML ingredient list as a response
     w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
-    w.Write([]byte(ul)) // Write the HTML structure to the response
+    w.Write([]byte(textarea)) // Write the HTML structure to the response
 }
 
 
