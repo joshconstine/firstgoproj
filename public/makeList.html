@@ -48,18 +48,21 @@
             <h1 class=" whitespace-nowrap font-bold text-3xl">
                 ingredients list
             </h1>
-            <form action="api/list" method="post" class="w-96" id="sendForm">
+            <form action="api/list" method="post" class="w-50" id="sendForm">
                 <div class="flex flex-col gap-2 w-full h-full">
                     <div class="flex gap-4 items-center">
                         <div class="flex flex-col gap-2">
                             <input type="phone" placeholder="999-222-3333" name="phone"
-                                class=" input input-bordered " />
+                                class=" input input-bordered w-32 input-sm " />
                         </div>
                         <button type="submit " class="btn  ">send </button>
 
                     </div>
-                    <span class="loading loading-dots loading-lg htmx-indicator"></span>
-                    <div id="ingredientList" data-hx-target="ingredientList"> </div>
+                    <div id="ingredientList" data-hx-target="ingredientList">
+                        <textarea name="list" id="ingredientList" data-hx-target="ingredientList"
+                            class="block w-full rounded-lg p-3 textarea resize-none textarea-bordered" rows="20">
+                        </textarea>
+                    </div>
                 </div>
             </form>
         </div>
@@ -67,6 +70,7 @@
         <div class="flex flex-col  items-center w-full">
             <form data-hx-get="/update-ingredients" data-hx-target="#ingredientList" data-hx-swap="innerHTML"
                 hx-trigger="change" class="flex flex-col  items-center w-full" action="/generate-list" method="post">
+                <span class="loading loading-dots loading-lg htmx-indicator"></span>
                 <!-- <div class="flex gap-8 items-center">
                 <button type="submit" class="btn  btn-primary btn-outline w-64 ">Generate List</button>
             </div> -->
