@@ -80,7 +80,8 @@
                         {{range .Recipes}}
 
 
-                        <div class="flex gap-2  items-center justify-center whitespace-nowrap shadow-md ">
+                        <div
+                            class="flex gap-4 flex-grow items-center bg-base-300 rounded-lg whitespace-nowrap shadow-md ">
                             {{if .Photos}}
                             {{range $i, $v := .Photos}}
                             {{if eq $i 0}}
@@ -92,14 +93,16 @@
                             {{else}}
                             <div>No photos</div>
                             {{end}}
+                            <div class="flex-grow flex flex-col items-center">
 
-                            <a href="/recipes/{{.Recipe_id}}">
-                                <h2 class="text-xl ">{{.Name}}</button>
-                            </a>
-                            <div class="flex items-center gap-2">
-                                <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to list</label>
-                                <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
-                                    value="{{.Recipe_id}}" />
+                                <a href=" /recipes/{{.Recipe_id}}">
+                                    <h2 class="text-xl ">{{.Name}}</button>
+                                </a>
+                                <div class="flex items-center gap-2  ">
+                                    <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to list</label>
+                                    <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
+                                        value="{{.Recipe_id}}" />
+                                </div>
                             </div>
 
 
