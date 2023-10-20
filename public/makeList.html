@@ -43,12 +43,13 @@
     </div>
 
     <div class="flex w-full px-12 gap-2">
-        <div class="flex flex-col items-center gap-2">
+        <div class="flex flex-col items-center gap-2" data-hx-target="sideContainer" id="sideContainer">
 
             <h1 class=" whitespace-nowrap font-bold text-3xl">
                 ingredients list
             </h1>
-            <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true" hx-trigger="submit">
+            <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true"
+                data-hx-target="#sideContainer" data-hx-swap="innerHTML" hx-trigger="submit">
                 <div class="flex flex-col gap-2 w-full h-full">
                     <div class="flex gap-4 items-center">
                         <div class="flex flex-col gap-2">
