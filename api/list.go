@@ -101,7 +101,7 @@ func SendList(w http.ResponseWriter, r *http.Request) {
 
 			formattedPhoneNumber := "(" + phoneNumber[0:3] + ") " + phoneNumber[3:6] + "-" + phoneNumber[6:10]
 		// Redirect back to the home page
-	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center flex-col items-center \" >"
+	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center max-h-full flex-col items-center \" >"
 			container += `<h1 class="text-m"> list send to </h1> <h1 class="text-m">` + formattedPhoneNumber + `</h1>`
 			container += "<button class='btn btn-ghost'> <a href='/recipes'> Return to Recipes </a> </button>"
 		container += "</div>"

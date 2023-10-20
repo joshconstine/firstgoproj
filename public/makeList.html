@@ -43,20 +43,21 @@
     </div>
 
     <div class="flex w-full px-12 gap-2">
-        <div class="flex flex-col items-center gap-2" data-hx-target="sideContainer" id="sideContainer">
+        <div class="flex flex-col items-center gap-2 max-h-full" data-hx-target="sideContainer" id="sideContainer">
 
-            <h1 class=" whitespace-nowrap font-bold text-3xl">
-                ingredients list
+            <h1 class=" whitespace-nowrap font-bold text-xl">
+                Ingredient list
             </h1>
             <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true"
                 data-hx-target="#sideContainer" data-hx-swap="innerHTML" hx-trigger="submit">
                 <div class="flex flex-col gap-2 w-full h-full">
                     <div class="flex gap-4 items-center">
                         <div class="flex flex-col gap-2">
-                            <input type="phone" placeholder="999-222-3333" name="phone"
+                            <label for="phone" class="text-xs">Text me the List</label>
+                            <input type="phone" placeholder="222-222-2222" name="phone" id="phone"
                                 class=" input input-bordered w-32 input-sm " />
                         </div>
-                        <button type="submit " class="btn  ">send </button>
+                        <button type="submit " class="btn btn-sm ">send </button>
 
                     </div>
                     <span class="loading loading-dots loading-lg htmx-indicator"></span>
@@ -79,34 +80,33 @@
             </div> -->
 
                 <div class="flex flex-col items-center gap-4">
-                    <ul class="flex-wrap flex gap-2 px-12">
+                    <ul class="flex flex-wrap gap-4 px-12">
                         {{range .Recipes}}
                         <div>
 
-                            <div class="card  bg-base-300 shadow-md">
+                            <div class="flex gap-2  items-center justify-center whitespace-nowrap shadow-md ">
                                 {{if .Photos}}
                                 {{range $i, $v := .Photos}}
                                 {{if eq $i 0}}
-                                <figure>
+                                <div class="w-42 rounded">
                                     <img src="{{$v}}" alt="photo" />
-                                </figure>
+                                </div>
                                 {{end}}
                                 {{end}}
                                 {{else}}
                                 <div>No photos</div>
                                 {{end}}
-                                <div class="card-body">
 
-                                    <div class="card-actions justify-end">
-                                        <a href="/recipes/{{.Recipe_id}}">
-                                            <h2 class="card-title ">{{.Name}}</button>
-                                        </a>
-                                        <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
-                                            value="{{.Recipe_id}}" />
-
-                                    </div>
-
+                                <a href="/recipes/{{.Recipe_id}}">
+                                    <h2 class="text-xl ">{{.Name}}</button>
+                                </a>
+                                <div class="flex items-center gap-2">
+                                    <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to list</label>
+                                    <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
+                                        value="{{.Recipe_id}}" />
                                 </div>
+
+
                             </div>
                         </div>
                         {{end}}
