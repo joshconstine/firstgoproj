@@ -48,7 +48,7 @@
             <h1 class=" whitespace-nowrap font-bold text-3xl">
                 ingredients list
             </h1>
-            <form action="api/list" method="post" class="w-50" id="sendForm">
+            <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true" hx-trigger="submit">
                 <div class="flex flex-col gap-2 w-full h-full">
                     <div class="flex gap-4 items-center">
                         <div class="flex flex-col gap-2">
@@ -58,6 +58,7 @@
                         <button type="submit " class="btn  ">send </button>
 
                     </div>
+                    <span class="loading loading-dots loading-lg htmx-indicator"></span>
                     <div id="ingredientList" data-hx-target="ingredientList">
                         <textarea name="list" id="ingredientList" data-hx-target="ingredientList"
                             class="block w-full rounded-lg p-3 textarea resize-none textarea-bordered" rows="20">
