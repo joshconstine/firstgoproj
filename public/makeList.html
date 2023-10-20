@@ -43,16 +43,16 @@
     </div>
 
     <div class="flex w-full px-12 gap-2">
-        <div class="flex flex-col items-center gap-2 max-h-full" data-hx-target="sideContainer" id="sideContainer">
+        <div class="flex flex-col items-center  max-h-full" data-hx-target="sideContainer" id="sideContainer">
 
             <h1 class=" whitespace-nowrap font-bold text-xl">
                 Ingredient list
             </h1>
             <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true"
                 data-hx-target="#sideContainer" data-hx-swap="innerHTML" hx-trigger="submit">
-                <div class="flex flex-col gap-2 w-full h-full">
-                    <div class="flex gap-4 items-center">
-                        <div class="flex flex-col gap-2">
+                <div class="flex flex-col w-full h-full">
+                    <div class="flex gap-4 items-end">
+                        <div class="flex flex-col gap-1">
                             <label for="phone" class="text-xs">Text me the List</label>
                             <input type="phone" placeholder="222-222-2222" name="phone" id="phone"
                                 class=" input input-bordered w-32 input-sm " />
@@ -74,40 +74,35 @@
             <form data-hx-get="/update-ingredients" data-hx-target="#ingredientList" data-hx-swap="innerHTML"
                 hx-trigger="load delay:100ms, change " class="flex flex-col  items-center w-full"
                 action="/generate-list" method="post">
-                <span class="loading loading-dots loading-lg htmx-indicator"></span>
-                <!-- <div class="flex gap-8 items-center">
-                <button type="submit" class="btn  btn-primary btn-outline w-64 ">Generate List</button>
-            </div> -->
 
                 <div class="flex flex-col items-center gap-4">
-                    <ul class="flex flex-wrap gap-4 px-12">
+                    <ul class="flex flex-wrap gap-4 ">
                         {{range .Recipes}}
-                        <div>
-
-                            <div class="flex gap-2  items-center justify-center whitespace-nowrap shadow-md ">
-                                {{if .Photos}}
-                                {{range $i, $v := .Photos}}
-                                {{if eq $i 0}}
-                                <div class="w-42 rounded">
-                                    <img src="{{$v}}" alt="photo" />
-                                </div>
-                                {{end}}
-                                {{end}}
-                                {{else}}
-                                <div>No photos</div>
-                                {{end}}
-
-                                <a href="/recipes/{{.Recipe_id}}">
-                                    <h2 class="text-xl ">{{.Name}}</button>
-                                </a>
-                                <div class="flex items-center gap-2">
-                                    <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to list</label>
-                                    <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
-                                        value="{{.Recipe_id}}" />
-                                </div>
 
 
+                        <div class="flex gap-2  items-center justify-center whitespace-nowrap shadow-md ">
+                            {{if .Photos}}
+                            {{range $i, $v := .Photos}}
+                            {{if eq $i 0}}
+                            <div class="w-42 rounded">
+                                <img src="{{$v}}" alt="photo" />
                             </div>
+                            {{end}}
+                            {{end}}
+                            {{else}}
+                            <div>No photos</div>
+                            {{end}}
+
+                            <a href="/recipes/{{.Recipe_id}}">
+                                <h2 class="text-xl ">{{.Name}}</button>
+                            </a>
+                            <div class="flex items-center gap-2">
+                                <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to list</label>
+                                <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
+                                    value="{{.Recipe_id}}" />
+                            </div>
+
+
                         </div>
                         {{end}}
                     </ul>
