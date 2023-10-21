@@ -42,45 +42,62 @@
     <div class="flex flex-col gap-4 items-center">
 
         <div class="flex flex-col items-center gap-4">
-            <div class=" flex gap-8">
-                <input class="input input-primary input-sm " type="text" id="searchbar" placeholder="Search by name" />
+            <div class=" flex gap-8 items-center">
+                <input class="input input-bordered " type="text" id="searchbar"
+                    placeholder="Search by Name / Ingredient" />
                 <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
             </div>
             <div class="flex gap-4 items-center">
                 {{range .Tags}}
                 <button href="javascript:void(0);" class="btn btn-sm tag btn-ghost no-animation">{{.Name}}</button>
-
                 {{end}}
             </div>
         </div>
-        <div class="flex gap-4 flex-wrap">
+        <div class="flex gap-4 flex-wrap px-12">
             {{range .Recipes}}
-            <div class="card bg-base-300 shadow-xl" data-tags="{{.TagString}}">
-                {{if .Photos}}
-                {{range $i, $v := .Photos}}
-                {{if eq $i 0}}
-                <img src="{{$v}}" alt="photo " class="rounded-lg" />
-                {{end}}
-                {{end}}
-                {{else}}
-                <div>No photos</div>
-                {{end}}
-                <div class="card-body px-4 py-2">
+            <div>
 
-                    <p class="card-title">
-                        {{.Name}}
-                    </p>
-                    <div class="flex justify-between">
-                        <ul>
-                            {{range .Tags}}
-                            <li class="recipe_tag">{{.Name}}</li>
-                            {{end}}
-                        </ul>
-                        <div class="card-actions  justify-end self-end">
-                            <a href="/recipes/{{.Recipe_id}}">
-                                <button class="btn btn-primary btn-sm ">View</button>
-                            </a>
+                <div class="card bg-base-300 shadow-sm" data-tags="{{.TagString}}">
+                    {{if .Photos}}
+                    {{range $i, $v := .Photos}}
+                    {{if eq $i 0}}
+                    <img src="{{$v}}" alt="photo " class="rounded-lg" />
+                    {{end}}
+                    {{end}}
+                    {{else}}
+                    <div>No photos</div>
+                    {{end}}
+                    <div class="card-body px-4 py-2">
+
+                        <p class="card-title">
+                            {{.Name}}
+                        </p>
+                        <div class="flex justify-between">
+                            <ul>
+                                {{range .Tags}}
+                                <li class="recipe_tag">{{.Name}}</li>
+                                {{end}}
+                            </ul>
+                            <div class="card-actions  justify-end self-end">
+                                <a href="/recipes/{{.Recipe_id}}">
+                                    <button class="btn  btn-sm ">View</button>
+                                </a>
+                            </div>
                         </div>
+                        <div class="collapse collapse-arrow">
+                            <input type="checkbox" />
+                            <div class="collapse-title text-sm  font-medium">
+                                View Ingredients
+                            </div>
+                            <div class="collapse-content">
+                                <ul>
+                                    {{range .Ingredients}}
+                                    <li class="ingredient">{{.Name}}</li>
+                                    {{end}}
+                                </ul>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -115,92 +132,136 @@
                 localStorage.setItem('theme', 'dark'); // Store user's preference
             }
         });
-    });
-    // Get references to the search input field and the recipe cards
-    const searchInput = document.getElementById('searchbar');
-    const recipeCards = document.querySelectorAll('.card');
-    const clearButton = document.getElementById('clear');
+        // Get references to the search input field and the recipe cards
+        const searchInput = document.getElementById('searchbar');
+        const recipeCards = document.querySelectorAll('.card');
+        const clearButton = document.getElementById('clear');
 
-    const tags = document.querySelectorAll('.tag'); // Select all tag elements
-    tags.forEach(tag => {
-        tag.addEventListener('click', () => {
-            // Remove the 'selected' class from all tags
-            tags.forEach((t) => {
-                t.classList.remove('btn-primary')
-                t.classList.remove('btn-outline')
-            }
-            );
-            // Add the 'selected' class to the clicked tag
-            tag.classList.add('btn-primary');
-            tag.classList.add('btn-outline');
-            // Hide all cards
-            recipeCards.forEach(card => card.style.display = 'none');
-
-            // Show cards with the corresponding tag
-            const selectedTag = tag.textContent.trim().toLowerCase(); // Get the text content of the clicked tag, convert to lowercase, and remove whitespace
-            recipeCards.forEach(card => {
-                const cardTags = card.getAttribute('data-tags').split(',').map(tag => tag.trim().toLowerCase()); // Convert tags to lowercase and remove whitespace
-
-                if (cardTags.includes(selectedTag)) {
-                    card.style.display = 'block';
-                }
-                card.querySelectorAll('.recipe_tag').forEach(cardTag => {
-                    if (cardTags.includes(selectedTag) && cardTag.textContent.trim().toLowerCase() === selectedTag) {
-                        cardTag.classList.add('bg-yellow-200'); // Apply the highlighting
-                    } else {
-                        cardTag.classList.remove('bg-yellow-200'); // Remove highlighting if not a match
-                    }
-                });
-            });
-        });
-    });
-
-    // Add an event listener to the search input field
-    searchInput.addEventListener('input', () => {
-        const searchQuery = searchInput.value.toLowerCase();
-        recipeCards.forEach((card) => {
-            const recipeNameElement = card.querySelector('.card-title');
-            const recipeName = recipeNameElement.textContent.toLowerCase();
-
-            if (searchQuery === "") {
-                // If there is no search query, reset the highlighting
-                recipeNameElement.innerHTML = recipeName;
-                card.style.display = 'block'; // Show the card
-            } else if (recipeName.includes(searchQuery)) {
-                // Create a RegExp pattern for the search query, globally and as case-insensitive
-                const pattern = new RegExp(searchQuery, 'gi');
-                // Highlight matching text by wrapping it with a <span> element
-                const highlightedText = recipeName.replace(pattern, (match) => {
-                    return `<span class="bg-yellow-200">${match}</span>`;
-                });
-                // Update the recipe card's content with the highlighted text
-                recipeNameElement.innerHTML = highlightedText;
-                card.style.display = 'block'; // Show the card
-            } else {
-                card.style.display = 'none'; // Hide the card
-            }
-        });
-    });
-
-    clearButton.addEventListener('click', () => {
-        searchbar.value = ''; // Clear the search bar input
+        const tags = document.querySelectorAll('.tag'); // Select all tag elements
         tags.forEach(tag => {
-            tag.classList.remove('btn-primary')
-            tag.classList.remove('btn-outline')
-        }); // Deselect all tags
+            tag.addEventListener('click', () => {
+                // Remove the 'selected' class from all tags
+                tags.forEach((t) => {
+                    t.classList.remove('btn-outline')
+                }
+                );
+                // Add the 'selected' class to the clicked tag
+                tag.classList.add('btn-outline');
+                // Hide all cards
+                recipeCards.forEach(card => card.style.display = 'none');
 
-        recipeCards.forEach(card => {
+                // Show cards with the corresponding tag
+                const selectedTag = tag.textContent.trim().toLowerCase(); // Get the text content of the clicked tag, convert to lowercase, and remove whitespace
+                recipeCards.forEach(card => {
+                    const cardTags = card.getAttribute('data-tags').split(',').map(tag => tag.trim().toLowerCase()); // Convert tags to lowercase and remove whitespace
 
-            const recipeNameElement = card.querySelector('.card-title');
-            recipeNameElement.innerHTML = recipeNameElement.textContent; // Reset to the original content
-
-            card.querySelectorAll('.recipe_tag').forEach(cardTag => {
-                cardTag.classList.remove('bg-yellow-200'); // Remove the highlighting class
+                    if (cardTags.includes(selectedTag)) {
+                        card.style.display = 'block';
+                    }
+                    card.querySelectorAll('.recipe_tag').forEach(cardTag => {
+                        if (cardTags.includes(selectedTag) && cardTag.textContent.trim().toLowerCase() === selectedTag) {
+                            cardTag.classList.add('bg-yellow-200'); // Apply the highlighting
+                        } else {
+                            cardTag.classList.remove('bg-yellow-200'); // Remove highlighting if not a match
+                        }
+                    });
+                });
             });
+        });
 
-            card.style.display = 'block'; // Show the card
+        // Add an event listener to the search input field
+        searchInput.addEventListener('input', () => {
+            const searchQuery = searchInput.value.toLowerCase();
+            recipeCards.forEach((card) => {
+                const recipeNameElement = card.querySelector('.card-title');
+                const recipeNameLowerCase = recipeNameElement.textContent.toLowerCase();
+                const recipeName = recipeNameElement.textContent;
+
+                const recipeIngredients = card.querySelectorAll('.ingredient');
+
+                const recipeIncludesSearchedIngredient = Array.from(recipeIngredients).some((ingredient) => {
+                    return ingredient.textContent.toLowerCase().includes(searchQuery);
+                });
+
+
+                if (searchQuery === "") {
+                    // If there is no search query, reset the highlighting
+                    recipeNameElement.innerHTML = recipeName;
+                    card.querySelectorAll('.collapse').forEach(e => {
+                        e.classList.remove('collapse-open')
+                        e.classList.add('collapse')
+
+                    })
+                    recipeIngredients.forEach(elem => {
+                        const ingredientName = elem.textContent
+
+                        elem.innerHTML = ingredientName
+
+                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        collapseElem?.classList?.remove('collapse-open')
+
+                    })
+                    card.style.display = 'block'; // Show the card
+                } else if (recipeNameLowerCase.includes(searchQuery) || recipeIncludesSearchedIngredient) {
+                    // Create a RegExp pattern for the search query, globally and as case-insensitive
+                    const pattern = new RegExp(searchQuery, 'gi');
+                    // Highlight matching text by wrapping it with a <span> element
+                    const highlightedText = recipeName.replace(pattern, (match) => {
+                        return `<span class="bg-yellow-200">${match}</span>`;
+                    });
+
+                    // Update the recipe card's content with the highlighted text
+                    recipeNameElement.innerHTML = highlightedText;
+
+                    recipeIngredients.forEach(elem => {
+                        const ingredientName = elem.textContent
+                        const highlightedTxt = ingredientName.replace(pattern, (match) => {
+                            return `<span class="bg-yellow-200">${match}</span>`;
+                        });
+                        elem.innerHTML = highlightedTxt
+
+                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        collapseElem?.classList?.add('collapse-open')
+
+                    })
+
+
+                    card.style.display = 'block'; // Show the card
+                } else {
+                    card.style.display = 'none'; // Hide the card
+                    card.querySelectorAll('.collapse').forEach(e => e.classList.remove('collapse-open'))
+                }
+            });
+        });
+
+        clearButton.addEventListener('click', () => {
+            searchbar.value = ''; // Clear the search bar input
+            tags.forEach(tag => {
+                tag.classList.remove('btn-outline')
+            }); // Deselect all tags
+
+            recipeCards.forEach(card => {
+
+                const recipeNameElement = card.querySelector('.card-title');
+                recipeNameElement.innerHTML = recipeNameElement.textContent; // Reset to the original content
+
+                card.querySelectorAll('.recipe_tag').forEach(cardTag => {
+                    cardTag.classList.remove('bg-yellow-200'); // Remove the highlighting class
+                });
+
+                const cardIngredients = card.querySelectorAll('.ingredient');
+                cardIngredients.forEach(elem => {
+                    const ingredientName = elem.textContent
+                    elem.innerHTML = ingredientName
+                    const collapseElem = elem.parentElement.parentElement.parentElement
+                    collapseElem?.classList?.remove('collapse-open')
+
+                })
+                card.style.display = 'block'; // Show the card
+            });
         });
     });
+
 </script>
 
 </html>

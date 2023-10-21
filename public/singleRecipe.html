@@ -11,9 +11,9 @@
 </head>
 
 
-<body class="  flex items-center w-full flex-col gap-2">
+<body class="  flex items-center w-full flex-col gap-8">
 
-    <div class="navbar bg-gray-400 flex gap-2 w-full justify-around px-12">
+    <div class="navbar bg-gray-400 flex gap-2 justify-around px-12">
         <div class="flex gap-2">
             <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
             <a href="/ingredients" class=" btn btn-sm  rounded-lg">Ingredients</a>
@@ -40,20 +40,14 @@
 
         </label>
     </div>
-    </div>
-    <!-- <form action="/api/recipes/delete" method="post" class="flex items-center gap-2">
-        <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-    <button type="submit" class="btn btn-secondary  p-1 rounded-lg">delete</button>
-</form> -->
-    <div class="flex justify-around w-full">
+
+    <div class="flex justify-around w-full ">
         <div class="flex flex-col gap-8 items-center ">
-
-            <div class="carousel ">
-
+            <div class="carousel w-full">
                 {{if .Recipe.Photos}}
                 {{range $i, $a := .Recipe.Photos}}
-                <div id="item{{ $i }}" class="carousel-item w-full flex items-center justify-center">
-                    <img src="{{$a}}" alt="photo" />
+                <div id="item{{ $i }}" class="carousel-item h-96 w-full self-center">
+                    <img src="{{$a}}" alt="photo" style="object-fit: cover;" />
                 </div>
                 {{end}}
                 {{else}}
@@ -67,34 +61,38 @@
                 {{end}}
 
             </div>
-            <div class="w-64 h-64 p-2 hidden border-primary border-2 rounded-lg flex items-center justify-center"
-                id="image-container">
+            <div class="w-64 h-64 p-2 hidden border-2 rounded-lg flex items-center justify-center" id="image-container">
                 <img id="blah" src="#" alt="your image" />
             </div>
             <form action="/recipes/add-photo" method="post" enctype="multipart/form-data">
                 <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-                <label for="photo" class="btn btn-primary join-item">Add Image</label>
+                <label for="photo" class="btn  join-item">Add Image</label>
 
                 <input type="file" required name="photo" id='photo' accept="image/* " class="hidden">
                 <button type="submit" class="btn btn-success">Save</button>
             </form>
         </div>
-        <div class="w-96 flex flex-col gap-8">
+        <div class="w-3xl flex flex-col gap-8">
             <div class="flex flex-col gap-4">
+                <div class="flex gap-2 items-center">
+
+                    <input type="checkbox" id="add-to-list" class="checkbox checkbox-lg"></input>
+                    <label for="add-to-list" class="text-xl " id="add-to-list-label">Add to list</label>
+                </div>
                 <div class="flex gap-2">
 
                     <h2 class="text-xl font-bold">Description</h2>
-                    <button id="edit_description" class="btn btn-secondary btn-sm">Edit Description</button>
-                    <button id="cancel_edit_description" class="btn btn-secondary btn-sm hidden">Cancel</button>
+                    <button id="edit_description" class="btn  btn-sm">Edit Description</button>
+                    <button id="cancel_edit_description" class="btn  btn-sm hidden">Cancel</button>
                 </div>
                 <form id="description_form" action="/api/recipes/description" method="post"
                     class="hidden flex gap-2 items-center">
                     <input id="id" name="id" value="{{.Recipe.Recipe_id}}" hidden></input>
-                    <textarea class="textarea textarea-primary" name="description">{{.Recipe.Description}}
+                    <textarea class="textarea " name="description">{{.Recipe.Description}}
                     </textarea>
                     <input type="submit" value="Save" class="btn btn-success">
                 </form>
-                <p class="text-sm border-primary border-2 w-full rounded-lg p-2" id="description">
+                <p class="text-sm  border-2 w-full rounded-lg p-2" id="description">
                     {{.Recipe.Description}}</p>
             </div>
             <div class="flex gap-16">
@@ -103,8 +101,8 @@
                     <div class="flex gap-2">
 
                         <h2 class="text-xl font-bold">Tags</h2>
-                        <!-- <button id="edit_description" class="btn btn-secondary btn-sm">Edit Tags</button>
-                    <button id="cancel_edit_description" class="btn btn-secondary btn-sm hidden">Cancel</button> -->
+                        <!-- <button id="edit_description" class="btn  btn-sm">Edit Tags</button>
+                    <button id="cancel_edit_description" class="btn  btn-sm hidden">Cancel</button> -->
                     </div>
                     <!-- <form id="description_form" action="/api/recipes/description" method="post"
                     class="hidden flex gap-2 items-center">
@@ -117,7 +115,7 @@
 
                     <ul class="flex flex-col">
                         {{range .Recipe.Tags}}
-                        <li>
+                        <li class="whitespace-nowrap">
                             {{.Name}}
                         </li>
                         {{end}}
@@ -127,8 +125,8 @@
                     <div class="flex gap-2">
 
                         <h2 class="text-xl font-bold">Ingredients</h2>
-                        <button id="edit_ingredients" class="btn btn-secondary btn-sm">Edit ingredients</button>
-                        <button id="cancel_edit_ingredients" class="btn btn-secondary btn-sm hidden">Cancel</button>
+                        <button id="edit_ingredients" class="btn  btn-sm">Edit ingredients</button>
+                        <button id="cancel_edit_ingredients" class="btn  btn-sm hidden">Cancel</button>
                     </div>
                     <ul class="flex-col flex gap-2 hidden" id="ingredient_form">
                         {{if .Recipe.Ingredients}}
@@ -137,12 +135,11 @@
                             </input>
                             {{range .Recipe.Ingredients}} <li class="flex gap-2">
                             <li class="flex gap-2 items-center">
-                                <label for="{{.Ingredient_id}}_type">{{.Name}}:</label>
+                                <label for="{{.Ingredient_id}}_type" class="whitespace-nowrap">{{.Name}}:</label>
                                 <span>{{.Quantity_type}}</span>
                                 <div class="join">
 
-                                    <select name="{{.Ingredient_id}}_type"
-                                        class="select select-primary join-item select-sm">
+                                    <select name="{{.Ingredient_id}}_type" class="select  join-item select-sm">
                                         <option value="" selected disabled>new Qty Type</option>
                                         <!-- Default option -->
 
@@ -155,7 +152,7 @@
                                         <!-- Add more options as needed -->
                                     </select>
                                     <input type="text" name="{{.Ingredient_id}}_quantity" placeholder="Quantity"
-                                        value="{{.Quantity}}" class="input input-primary join-item w-16 input-sm">
+                                        value="{{.Quantity}}" class="input  join-item w-16 input-sm">
                                 </div>
                             </li>
                             {{end}}
@@ -298,6 +295,36 @@
             }
         });
     });
+    const addToListButton = document.getElementById('add-to-list')
+    const addToListLabel = document.getElementById('add-to-list-label')
+    const addRecipeIdToLocalStorage = (recipeId) => {
+        const list = JSON.parse(localStorage.getItem('list')) || []
+        list.push(recipeId)
+        localStorage.setItem('list', JSON.stringify(list))
+        addToListLabel.innerText = "Added to list"
+
+    }
+    const removeRecipeIdFromLocalStorage = (recipeId) => {
+        const list = JSON.parse(localStorage.getItem('list')) || []
+        const newList = list.filter(id => id !== recipeId)
+        localStorage.setItem('list', JSON.stringify(newList))
+        addToListLabel.innerText = "Add to list"
+    }
+    addToListButton.addEventListener('click', evt => {
+        const recipeId = "{{.Recipe.Recipe_id}}"
+        if (addToListButton.checked) {
+            addRecipeIdToLocalStorage(recipeId)
+        } else {
+            removeRecipeIdFromLocalStorage(recipeId)
+        }
+    })
+    const list = JSON.parse(localStorage.getItem('list')) || []
+    if (list.includes("{{.Recipe.Recipe_id}}")) {
+        addToListButton.checked = true
+        addToListLabel.innerText = "Added to list"
+    }
+
+
 </script>
 
 </html>

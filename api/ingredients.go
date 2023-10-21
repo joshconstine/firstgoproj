@@ -222,3 +222,30 @@ func DeleteIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		// Redirect back to the home page
 		fmt.Fprintf(w, `<script>window.location.href = "/ingredients";</script>`)
 }
+func getIngredientsForRecipe( db *sql.DB, recipeId string) []IngredientWithQuantity {
+	rows, err := db.Query(`
+		SELECT i.ingredient_id, i.name, ri.quantity, qt.name AS quantity_type, qt.quantity_type_id
+		FROM ingredients i
+		JOIN recipe_ingredients ri ON ri.ingredient_id = i.ingredient_id
+		JOIN quantity_type qt ON qt.quantity_type_id = ri.quantity_type_id
+		WHERE ri.recipe_id = ?
+	`, recipeId)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	var ingredients []IngredientWithQuantity
+
+	for rows.Next() {
+		var ingredient IngredientWithQuantity
+
+		err := rows.Scan(&ingredient.Ingredient_id, &ingredient.Name, &ingredient.Quantity, &ingredient.Quantity_type, &ingredient.Quantity_type_id)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		ingredients = append(ingredients, ingredient)
+	}
+	return ingredients
+}
