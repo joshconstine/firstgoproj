@@ -16,4 +16,5 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/srinathgs/mysqlstore v0.0.0-20200417050510-9cbb9420fc4c // indirect
 	github.com/twilio/twilio-go v1.14.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 )
