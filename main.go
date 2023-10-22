@@ -6,14 +6,20 @@ import (
 
 	"strconv"
 
+	"os"
 	"net/http"
     "github.com/gorilla/mux"
     "firstgoprog/api" // Replace "firstgoprog" with your actual module name.
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
     _ "github.com/joho/godotenv/autoload"
+	"github.com/srinathgs/mysqlstore"
+
+
 
 )
+var store *mysqlstore.MySQLStore
+
 
 func main() {
 	port := 8080
@@ -21,11 +27,15 @@ func main() {
 	portStr := strconv.Itoa(port)
 	
 	
-
-	r := mux.NewRouter()
-	// r.HandleFunc("/upload", UploadHandler(uploader))
+	var err error
+    store, err = mysqlstore.NewMySQLStore("root:daddy@(db:3306)/food?parseTime=true", "sessions", "/", 3600, []byte(os.Getenv("SESSION_KEY")))
+    if err != nil {
+      panic(err)
+    }
+    defer store.Close()
 	
 
+	r := mux.NewRouter()
 
 	db, err := sql.Open("mysql", "root:daddy@(db:3306)/food?parseTime=true")
 	
@@ -39,7 +49,7 @@ func main() {
 
 	// Your other application routes go here...
     // Use the functions from the 'api' package to define routes.
-	api.InitRoutes(r, db)
+	api.InitRoutes(r, db, store)
 
 	fmt.Printf("Server is listening on port %d...\n", port)
 
