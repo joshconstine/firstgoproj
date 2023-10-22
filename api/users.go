@@ -3,8 +3,10 @@ package api
 
 import (
 	"database/sql"
+	"log"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"	
+	"github.com/srinathgs/mysqlstore"
 )
 // User struct represents a user's data
 type User struct {
@@ -23,7 +25,47 @@ func HashPassword(password string) (string, error) {
     return string(hash), nil
 }
 
-
+func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
+	err := r.ParseForm()
+	if err != nil {
+	   http.Error(w, "Please pass the data as URL form encoded",
+  http.StatusBadRequest)
+	  return
+	}
+	username := r.FormValue( "username")
+	password := r.FormValue( "password")
+	// fmt.Printf("username: %s\n", username)
+	// fmt.Printf("password: %s\n", password)
+	var hashedPassword string
+	err = db.QueryRow("SELECT password FROM users WHERE username=?", username).Scan(&hashedPassword)
+	if err != nil {
+		
+	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center max-h-full flex-col items-center \" >"
+			container += `<h1 class="text-m"> User not found</h1> <h1 class="text-m">` + username + `</h1>`
+		container += "</div>"
+	w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
+	w.Write([]byte(container)) // Write the HTML structure to the response
+	return
+	}
+	userID := db.QueryRow("SELECT id FROM users WHERE username=?", username)
+	// fmt.Printf("hashedPassword: %s\n", hashedPassword)
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	if err != nil {
+		http.Error(w, "Invalid Credentials",http.StatusUnauthorized)
+	// fmt.Printf("err: %s\n", err)
+	}
+	session, err := store.Get(r, username)
+	session.Values["authenticated"] = true
+	session.Values["username"] = username
+	session.Values["userID"] = userID
+	err = session.Save(r, w)
+	
+	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center max-h-full flex-col items-center \" >"
+			container += `<h1 class="text-m"> User logged in </h1> <h1 class="text-m">` + username + `</h1>`
+		container += "</div>"
+	w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
+	w.Write([]byte(container)) // Write the HTML structure to the response
+}
 
 func HandleInsertUser(w http.ResponseWriter, r *http.Request, db *sql.DB)  {
 	// Retrieve the form data
@@ -49,4 +91,12 @@ func HandleInsertUser(w http.ResponseWriter, r *http.Request, db *sql.DB)  {
 		container += "</div>"
     w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
     w.Write([]byte(container)) // Write the HTML structure to the response
+}
+func LogoutHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MySQLStore) {
+	   //fix this session id
+    session, _ := store.Get(r, "session.id")
+    session.Values["authenticated"] = false
+    session.Save(r, w)
+log.Println("User logged out")
+    w.Write([]byte(""))
 }

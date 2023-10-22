@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 </form>
-                <form data-hx-get="api/session" class="flex flex-col gap-2">
+                <form hx-post="api/login" class="flex flex-col gap-2" method="post" hx-post="true" hx-trigger="submit">
                     <div class="card">
                         <div class="card-body">
                             <h1>Login</h1>
@@ -40,10 +40,16 @@
                         </div>
                     </div>
                 </form>
-
+                <div class="card">
+                    <div class="card-body">
+                        <h1>Logout</h1>
+                        <form data-hx-get="api/logout" hx-trigger="submit">
+                            <input type="submit" class="btn btn-primary" value="Sign Out">
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
 </body>
 

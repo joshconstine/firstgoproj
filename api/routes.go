@@ -114,9 +114,16 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
         sessTest(w, r, store)
     }).Methods("GET")
 
+    apiRouter.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+        LoginUser(w, r, db, store)
+    }).Methods("POST")
+
     
     apiRouter.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
         HandleInsertUser(w, r, db)
     }).Methods("POST")
+    apiRouter.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
+        LogoutHandler(w, r, store)
+    }).Methods("GET")
 
 }
