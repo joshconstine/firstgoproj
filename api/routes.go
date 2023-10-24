@@ -7,6 +7,8 @@ import (
 	"net/http"	
     "time"
     "fmt"
+    "log"
+    "errors"
     "github.com/aws/aws-sdk-go/aws"
     "github.com/aws/aws-sdk-go/aws/credentials"
     "github.com/aws/aws-sdk-go/aws/session"
@@ -42,9 +44,45 @@ func NewUploader() *s3manager.Uploader {
     fmt.Printf("%#v\n", session)
     fmt.Println(err)
   }
+  func Welcome(w http.ResponseWriter, r *http.Request, store *mysqlstore.MySQLStore) {
+	// We can obtain the session token from the requests cookies, which come with every request
+	c, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			// If the cookie is not set, return an unauthorized status
+			w.WriteHeader(http.StatusUnauthorized)
+            fmt.Printf("session_token not found")
+			return
+		}
+		// For any other type of error, return a bad request status
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	sessionToken := c.Value
+
+
+	// We then get the session from our session map
+	userSession, err := store.Get(r, sessionToken)
+    if err != nil {
+        switch {
+        case errors.Is(err, http.ErrNoCookie):
+            http.Error(w, "cookie not found", http.StatusBadRequest)
+        default:
+            log.Println(err)
+            http.Error(w, "server error", http.StatusInternalServerError)
+        }
+        return
+    }
+
+    username := userSession.Values["username"]
+
+	// If the session is valid, return the welcome message to the user
+	w.Write([]byte(fmt.Sprintf("Welcome %s!", username)))
+}
+
 
   func DashboardHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MySQLStore) {
-    session, _ := store.Get(r, "session.id")
+    session, _ := store.Get(r, "session_token")
 
     // Check if the user is authenticated (you might use a different key for authentication)
     authenticated, ok := session.Values["authenticated"].(bool)
@@ -53,6 +91,7 @@ func NewUploader() *s3manager.Uploader {
         w.Write([]byte(time.Now().String()))
     } else {
         http.Error(w, "Forbidden", http.StatusForbidden)
+        fmt.Printf("Forbidden", session.Values["username"])
     }
 }
 
@@ -141,6 +180,10 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
     }).Methods("POST")
     apiRouter.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
         LogoutHandler(w, r, store)
+    }).Methods("GET")
+
+    r.HandleFunc("/welcome", func(w http.ResponseWriter, r *http.Request) {
+        Welcome(w, r, store)
     }).Methods("GET")
 
 }

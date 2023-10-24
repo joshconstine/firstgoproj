@@ -55,6 +55,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqls
 
 	session, err := store.Get(r, sessionToken)
 	session.Values["username"] = username
+	session.Values["authenticated"] = true
 	if err := session.Save(r, w); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -65,6 +66,10 @@ func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqls
         Name:   "session_token",
         Value:  sessionToken,
         MaxAge: 86400, // Session duration (in seconds)
+		HttpOnly: true,
+		Path: "/",
+        Secure:   true,
+        SameSite: http.SameSiteLaxMode,
     }
     http.SetCookie(w, &cookie) 
 	
