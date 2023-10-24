@@ -5,6 +5,7 @@ import (
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
 	"net/http"	
+    "time"
     "fmt"
     "github.com/aws/aws-sdk-go/aws"
     "github.com/aws/aws-sdk-go/aws/credentials"
@@ -42,12 +43,28 @@ func NewUploader() *s3manager.Uploader {
     fmt.Println(err)
   }
 
+  func DashboardHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MySQLStore) {
+    session, _ := store.Get(r, "session.id")
 
+    // Check if the user is authenticated (you might use a different key for authentication)
+    authenticated, ok := session.Values["authenticated"].(bool)
+
+    if ok && authenticated {
+        w.Write([]byte(time.Now().String()))
+    } else {
+        http.Error(w, "Forbidden", http.StatusForbidden)
+    }
+}
 
 // InitRoutes initializes routes and handlers.
 func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
 	// Create a subrouter for the "/api" path.
 	apiRouter := r.PathPrefix("/api").Subrouter()
+
+    r.HandleFunc("/dashboard", func(w http.ResponseWriter, r *http.Request) {
+        DashboardHandler(w, r, store)
+    }).Methods("GET")
+
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "public/index.html") 
     }).Methods("GET")		

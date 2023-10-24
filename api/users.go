@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"net/http"	
 	"github.com/srinathgs/mysqlstore"
+	"github.com/google/uuid"
 )
 // User struct represents a user's data
 type User struct {
@@ -34,8 +35,6 @@ func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqls
 	}
 	username := r.FormValue( "username")
 	password := r.FormValue( "password")
-	// fmt.Printf("username: %s\n", username)
-	// fmt.Printf("password: %s\n", password)
 	var hashedPassword string
 	err = db.QueryRow("SELECT password FROM users WHERE username=?", username).Scan(&hashedPassword)
 	if err != nil {
@@ -47,18 +46,28 @@ func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqls
 	w.Write([]byte(container)) // Write the HTML structure to the response
 	return
 	}
-	userID := db.QueryRow("SELECT id FROM users WHERE username=?", username)
-	// fmt.Printf("hashedPassword: %s\n", hashedPassword)
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
 		http.Error(w, "Invalid Credentials",http.StatusUnauthorized)
-	// fmt.Printf("err: %s\n", err)
 	}
-	session, err := store.Get(r, username)
-	session.Values["authenticated"] = true
+
+	sessionToken := uuid.NewString()
+
+	session, err := store.Get(r, sessionToken)
 	session.Values["username"] = username
-	session.Values["userID"] = userID
-	err = session.Save(r, w)
+	if err := session.Save(r, w); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // Set a cookie with the session ID
+    cookie := http.Cookie{
+        Name:   "session_token",
+        Value:  sessionToken,
+        MaxAge: 86400, // Session duration (in seconds)
+    }
+    http.SetCookie(w, &cookie) 
+	
 	
 	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center max-h-full flex-col items-center \" >"
 			container += `<h1 class="text-m"> User logged in </h1> <h1 class="text-m">` + username + `</h1>`
