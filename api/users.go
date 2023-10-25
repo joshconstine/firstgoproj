@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 	"fmt"
+	"html/template"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"	
@@ -17,8 +18,60 @@ type User struct {
     Username string
 }
 
+type ProfilePageData struct {
+	PageTitle string
+	Username interface{}
+}
+func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
+		// We can obtain the session token from the requests cookies, which come with every request
+		c, err := r.Cookie("session_token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				// If the cookie is not set, return an unauthorized status
+				w.WriteHeader(http.StatusUnauthorized)
+				fmt.Printf("session_token not found")
+				return
+			}
+			// For any other type of error, return a bad request status
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		sessionToken := c.Value
+	
+		if sessionToken == "" {
+			http.Error(w, "Unauthorized, please sign in to view this page", http.StatusUnauthorized)
+			return
+		}
+	
+		// We then get the session from our session map
+		userSession, err := store.Get(r, sessionToken)
+		if err != nil {
+			switch {
+			case errors.Is(err, http.ErrNoCookie):
+				http.Error(w, "cookie not found", http.StatusBadRequest)
+			default:
+				log.Println(err)
+				http.Error(w, "server error", http.StatusInternalServerError)
+			}
+			return
+		}
+	
+		username := userSession.Values["username"]
+	
 
+	tmpl := template.Must(template.ParseFiles("public/profile.html"))
+	
+       
+  
+		
+		data := ProfilePageData{
+			PageTitle: "Profile",
+            Username: username,
+        }
 
+        tmpl.Execute(w, data)
+
+}
 // HashPassword hashes a plain text password
 func HashPassword(password string) (string, error) {
     hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
