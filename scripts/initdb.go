@@ -41,6 +41,20 @@ if err == nil {
         panic(err)
     }
 
+// Create the user_favorite_recipes TYPE table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS user_favorite_recipes (
+            user_id INT,
+            recipe_id INT,
+            PRIMARY KEY (user_id, recipe_id),
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
+
 
     // Create the ingredient TYPE table
     _, err = db.Exec(`
