@@ -217,7 +217,9 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
     r.HandleFunc("/profile", SessionMiddleware( func(w http.ResponseWriter, r *http.Request) {
        ProfileHandler(w, r, db, store)
     }, store)).Methods("GET")
-
+apiRouter.HandleFunc("/favorite", SessionMiddleware( func(w http.ResponseWriter, r *http.Request) {
+       ToggleUserFavoriteRecipe(w, r, db, store)
+    }, store)).Methods("POST")
     r.HandleFunc("/welcome", func(w http.ResponseWriter, r *http.Request) {
         Welcome(w, r, store)
     }).Methods("GET")
