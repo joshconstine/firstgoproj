@@ -98,7 +98,35 @@ func NewUploader() *s3manager.Uploader {
         fmt.Printf("Forbidden", session.Values["username"])
     }
 }
+func SessionMiddleware(h http.HandlerFunc, store *mysqlstore.MySQLStore) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        
 
+	// We can obtain the session token from the requests cookies, which come with every request
+	c, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			// If the cookie is not set, return an unauthorized status
+			w.WriteHeader(http.StatusUnauthorized)
+            fmt.Printf("session_token not found")
+			return
+		}
+		// For any other type of error, return a bad request status
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	sessionToken := c.Value
+
+        _, err = store.Get(r, sessionToken)
+        if err != nil {
+            log.Println("bad session")
+            http.SetCookie(w, &http.Cookie{Name: "session_token", MaxAge: -1, Path: "/"})
+            return
+        }
+
+        h(w, r)
+    }
+}
 // InitRoutes initializes routes and handlers.
 func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
 	// Create a subrouter for the "/api" path.
@@ -185,6 +213,10 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
     apiRouter.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
         LogoutHandler(w, r, store, db)
     }).Methods("GET")
+
+    r.HandleFunc("/profile", SessionMiddleware( func(w http.ResponseWriter, r *http.Request) {
+        http.ServeFile(w, r, "public/profile.html")
+    }, store)).Methods("GET")
 
     r.HandleFunc("/welcome", func(w http.ResponseWriter, r *http.Request) {
         Welcome(w, r, store)
