@@ -90,8 +90,10 @@ func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqls
 	}
 	username := r.FormValue( "username")
 	password := r.FormValue( "password")
+
 	var hashedPassword string
-	err = db.QueryRow("SELECT password FROM users WHERE username=?", username).Scan(&hashedPassword)
+	var userId int
+	err = db.QueryRow("SELECT password, id FROM users WHERE username=?", username).Scan(&hashedPassword, &userId)
 	if err != nil {
 		
 	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center max-h-full flex-col items-center \" >"
@@ -110,6 +112,8 @@ func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqls
 
 	session, err := store.Get(r, sessionToken)
 	session.Values["username"] = username
+	session.Values["user_id"] = userId
+
 	session.Values["authenticated"] = true
 	if err := session.Save(r, w); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
