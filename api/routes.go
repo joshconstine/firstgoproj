@@ -60,6 +60,10 @@ func NewUploader() *s3manager.Uploader {
 	}
 	sessionToken := c.Value
 
+    if sessionToken == "" {
+        http.Error(w, "Unauthorized, please sign in to view this page", http.StatusUnauthorized)
+        return
+    }
 
 	// We then get the session from our session map
 	userSession, err := store.Get(r, sessionToken)
@@ -179,7 +183,7 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
         HandleInsertUser(w, r, db)
     }).Methods("POST")
     apiRouter.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
-        LogoutHandler(w, r, store)
+        LogoutHandler(w, r, store, db)
     }).Methods("GET")
 
     r.HandleFunc("/welcome", func(w http.ResponseWriter, r *http.Request) {

@@ -4,6 +4,8 @@ package api
 import (
 	"database/sql"
 	"log"
+	"fmt"
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"	
 	"github.com/srinathgs/mysqlstore"
@@ -106,11 +108,49 @@ func HandleInsertUser(w http.ResponseWriter, r *http.Request, db *sql.DB)  {
     w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
     w.Write([]byte(container)) // Write the HTML structure to the response
 }
-func LogoutHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MySQLStore) {
+func LogoutHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MySQLStore, db *sql.DB) {
 	   //fix this session id
-    session, _ := store.Get(r, "session.id")
-    session.Values["authenticated"] = false
-    session.Save(r, w)
-log.Println("User logged out")
+    c, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			// If the cookie is not set, return an unauthorized status
+			w.WriteHeader(http.StatusUnauthorized)
+            fmt.Printf("session_token not found")
+			return
+		}
+		// For any other type of error, return a bad request status
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	sessionToken := c.Value
+
+
+	// We then get the session from our session map
+	session, err := store.Get(r, sessionToken)
+    if err != nil {
+        switch {
+        case errors.Is(err, http.ErrNoCookie):
+            http.Error(w, "cookie not found", http.StatusBadRequest)
+        default:
+            log.Println(err)
+            http.Error(w, "server error", http.StatusInternalServerError)
+        }
+        return
+    }
+ 
+   store.Delete(r, w, session)
+	http.SetCookie(w, &http.Cookie{
+	   Name:   "session_token",
+        Value:  "",
+        MaxAge: 86400, // Session duration (in seconds)
+		HttpOnly: true,
+		Path: "/",
+        Secure:   true,
+        SameSite: http.SameSiteLaxMode,
+	})
+	log.Println("reset cookie")
+
+
+	log.Println("User logged out")
     w.Write([]byte(""))
 }
