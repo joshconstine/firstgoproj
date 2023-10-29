@@ -21,9 +21,9 @@ type User struct {
 type ProfilePageData struct {
 	PageTitle string
 	Username interface{}
+	FavoritedRecipes []RecipeWithIngredientsAndPhotosAndTags
 }
 func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
-		// We can obtain the session token from the requests cookies, which come with every request
 		c, err := r.Cookie("session_token")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -43,7 +43,6 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *m
 			return
 		}
 	
-		// We then get the session from our session map
 		userSession, err := store.Get(r, sessionToken)
 		if err != nil {
 			switch {
@@ -57,16 +56,14 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *m
 		}
 	
 		username := userSession.Values["username"]
-	
 
-	tmpl := template.Must(template.ParseFiles("public/profile.html"))
-	
-       
-  
-		
+		var recipes []RecipeWithIngredientsAndPhotosAndTags
+
+		tmpl := template.Must(template.ParseFiles("public/profile.html"))
 		data := ProfilePageData{
 			PageTitle: "Profile",
             Username: username,
+			FavoritedRecipes: recipes,
         }
 
         tmpl.Execute(w, data)
