@@ -18,39 +18,101 @@
 
     <div class="hero min-h-screen bg-base-200">
         <div class="hero-content text-center">
-            <div class="max-w-md flex gap-4">
-                <form hx-post="api/user" method="post" class="flex flex-col gap-2" hx-post="true" hx-trigger="submit"
-                    hx-swap="innerHTML">
-                    <div class="card">
-                        <div class="card-body">
-                            <h1>sign-up</h1>
-                            <input class="input input-bordered" type="text" placeholder="Username" name="username">
-                            <input class="input input-bordered" type="password" placeholder="Password" name="password">
-                            <input type="submit" class="btn btn-primary" value="Sign In">
-                        </div>
+            <form hx-post="api/login" method="post" class="flex flex-col gap-2" hx-post="true" hx-trigger="submit"
+                hx-swap="innerHTML" id="login">
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm mx-auto max-w-sm" data-v0-t="card">
+                    <div class="flex flex-col p-6 space-y-1">
+                        <h3 class="tracking-tight text-2xl font-bold">Sign In</h3>
+                        <p class="text-sm text-muted-foreground">Please enter your username and password</p>
                     </div>
-                </form>
-                <form hx-post="api/login" class="flex flex-col gap-2" method="post" hx-post="true" hx-trigger="submit">
-                    <div class="card">
-                        <div class="card-body">
-                            <h1>Login</h1>
-                            <input class="input input-bordered" type="text" placeholder="Username" name="username">
-                            <input class="input input-bordered" type="password" placeholder="Password" name="password">
-                            <input type="submit" class="btn btn-primary" value="Sign In">
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label
+                                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    for="username">
+                                    Username
+                                </label>
+                                <input
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    id="username" placeholder="username" required="" type="text" />
+                            </div>
+                            <div class="space-y-2">
+                                <label
+                                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    for="password">
+                                    Password
+                                </label>
+                                <input
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    id="password" required="" type="password" />
+                            </div>
+                            <button
+                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+                                type="submit">
+                                Sign In
+                            </button>
+                            <button
+                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+                                type="button"
+                                onclick="document.getElementById('login').style.display='none';document.getElementById('sign-up').style.display='block';">
+                                Sign Up
+                            </button>
                         </div>
-                    </div>
-                </form>
-                <div class="card">
-                    <div class="card-body">
-                        <h1>Logout</h1>
-                        <form data-hx-get="api/logout" hx-trigger="submit">
-                            <input type="submit" class="btn btn-primary" value="Sign Out">
-                        </form>
                     </div>
                 </div>
-            </div>
+            </form>
+            <form hx-post="api/user" method="post" id="sign-up" class="flex flex-col gap-2" hx-post="true"
+                hx-trigger="submit" hx-swap="innerHTML">
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm mx-auto max-w-sm" data-v0-t="card">
+                    <div class="flex flex-col p-6 space-y-1">
+                        <h3 class="tracking-tight text-2xl font-bold">Sign-up</h3>
+                        <p class="text-sm text-muted-foreground">Create account with username and password</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label
+                                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    for="username">
+                                    Username
+                                </label>
+                                <input
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    id="username" placeholder="username" required="" type="text" />
+                            </div>
+                            <div class="space-y-2">
+                                <label
+                                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    for="password">
+                                    Password
+                                </label>
+                                <input
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    id="password" required="" type="password" />
+                            </div>
+                            <button
+                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+                                type="submit">
+                                Sign Up
+                            </button>
+                            <button
+                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+                                type="button"
+                                onclick="document.getElementById('login').style.display='block';document.getElementById('sign-up').style.display='none';">
+                                Sign In
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
 
 </body>
+<script>
+    const signUp = document.getElementById('sign-up');
+    signUp.style.display = 'none';
+
+</script>
 
 </html>
