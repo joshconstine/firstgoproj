@@ -7,6 +7,9 @@
     <title>Listify</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.8.3/dist/full.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.6"
+        integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+        crossorigin="anonymous"></script>
 
 </head>
 
@@ -37,7 +40,9 @@
 
             </label>
         </div>
-        <button class="btn btn-sm rounded-lg" href='/sign-out'>Sign out</button>
+        <form data-hx-get="api/logout" hx-trigger="submit">
+            <input type="submit" class="btn btn-primary" value="Sign Out">
+        </form>
     </div>
 
     profile page
@@ -71,5 +76,6 @@
     });
 
 </script>
+
 
 </html>
