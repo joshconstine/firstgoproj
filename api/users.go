@@ -52,24 +52,24 @@ func getFavoritedRecipes(db *sql.DB, userID int) []RecipeWithIngredientsAndPhoto
 
 }
 
-func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
-		c, err := r.Cookie("session_token")
+func GetUserFromRequest(w http.ResponseWriter,r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) (User, error) {
+	c, err := r.Cookie("session_token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				// If the cookie is not set, return an unauthorized status
 				w.WriteHeader(http.StatusUnauthorized)
 				fmt.Printf("session_token not found")
-				return
+				return User{}, err
 			}
 			// For any other type of error, return a bad request status
 			w.WriteHeader(http.StatusBadRequest)
-			return
+			return User{}, err
 		}
 		sessionToken := c.Value
 	
 		if sessionToken == "" {
 			http.Error(w, "Unauthorized, please sign in to view this page", http.StatusUnauthorized)
-			return
+			return User{}, err
 		}
 	
 		userSession, err := store.Get(r, sessionToken)
@@ -81,24 +81,31 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *m
 				log.Println(err)
 				http.Error(w, "server error", http.StatusInternalServerError)
 			}
-			return
+			return User{}, err
 		}
-	
-		username := userSession.Values["username"]
 		userID := userSession.Values["user_id"]
+		username := userSession.Values["username"]
 
-		favoritedRecipes := getFavoritedRecipes(db, userID.(int))
+		return User{
+			ID: userID.(int),
+			Username: username.(string),
+		}, nil
+	}
 
-
-		tmpl := template.Must(template.ParseFiles("public/profile.html"))
-		data := ProfilePageData{
-			PageTitle: "Profile",
-            Username: username,
-			FavoritedRecipes: favoritedRecipes,
-        }
-
-        tmpl.Execute(w, data)
-
+func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
+	user, err := GetUserFromRequest(w,r, db, store)	
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	favoritedRecipes := getFavoritedRecipes(db, user.ID)
+	tmpl := template.Must(template.ParseFiles("public/profile.html"))
+	data := ProfilePageData{
+		PageTitle: "Profile",
+        Username: user.Username,
+		FavoritedRecipes: favoritedRecipes,
+    }
+    tmpl.Execute(w, data)
 }
 // HashPassword hashes a plain text password
 func HashPassword(password string) (string, error) {
@@ -238,4 +245,24 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MyS
 
 	log.Println("User logged out")
     w.Write([]byte(""))
+}
+func UpdateUserPhoneNumber(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
+	phoneNumber := r.FormValue("phone")
+
+		user, err := GetUserFromRequest(w,r, db, store)
+
+		userId := user.ID
+
+
+
+
+	// Prepare and execute the SQL UPDATE statement
+	_, err = db.Exec("UPDATE users_info SET phone_number = ? WHERE id = ?", phoneNumber, userId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect back to the page or provide a response
+	fmt.Fprintf(w, `<script>window.location.href = "/profile";</script>`)
 }
