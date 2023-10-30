@@ -108,7 +108,7 @@ func SessionMiddleware(h http.HandlerFunc, store *mysqlstore.MySQLStore) http.Ha
 		if err == http.ErrNoCookie {
 			// If the cookie is not set, return an unauthorized status
 			w.WriteHeader(http.StatusUnauthorized)
-            fmt.Printf("session_token not found")
+            fmt.Fprintf(w, `<script>window.location.href = "/sign-in";</script>`)
 			return
 		}
 		// For any other type of error, return a bad request status
