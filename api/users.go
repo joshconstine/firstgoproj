@@ -23,6 +23,35 @@ type ProfilePageData struct {
 	Username interface{}
 	FavoritedRecipes []RecipeWithIngredientsAndPhotosAndTags
 }
+func getFavoritedRecipes(db *sql.DB, userID int) []RecipeWithIngredientsAndPhotosAndTags {
+	var recipes []RecipeWithIngredientsAndPhotosAndTags
+	rows, err := db.Query("SELECT recipe_id FROM user_favorite_recipes WHERE user_id = ? ", userID)
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var recipeId int
+		err := rows.Scan(&recipeId)
+		if err != nil {
+			log.Println(err)
+		}
+		recipeIdString := fmt.Sprintf("%d", recipeId)
+		
+		recipe, err := getSingleRecipeWithIngredientsAndPhotosAndTags(db,recipeIdString)
+		if err != nil {
+			log.Println(err)
+		}
+
+
+		recipes = append(recipes, recipe)
+
+	}
+	return recipes
+
+}
+
 func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
 		c, err := r.Cookie("session_token")
 		if err != nil {
@@ -56,14 +85,16 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *m
 		}
 	
 		username := userSession.Values["username"]
+		userID := userSession.Values["user_id"]
 
-		var recipes []RecipeWithIngredientsAndPhotosAndTags
+		favoritedRecipes := getFavoritedRecipes(db, userID.(int))
+
 
 		tmpl := template.Must(template.ParseFiles("public/profile.html"))
 		data := ProfilePageData{
 			PageTitle: "Profile",
             Username: username,
-			FavoritedRecipes: recipes,
+			FavoritedRecipes: favoritedRecipes,
         }
 
         tmpl.Execute(w, data)
