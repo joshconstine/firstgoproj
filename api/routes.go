@@ -224,4 +224,9 @@ apiRouter.HandleFunc("/favorite", SessionMiddleware( func(w http.ResponseWriter,
         Welcome(w, r, store)
     }).Methods("GET")
 
+    apiRouter.HandleFunc("/user/phone", SessionMiddleware( func(w http.ResponseWriter, r *http.Request) {
+         UpdateUserPhoneNumber(w, r, db, store)
+    }, store)).Methods("POST")
+
+
 }

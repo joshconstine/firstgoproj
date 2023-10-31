@@ -250,17 +250,26 @@ func UpdateUserPhoneNumber(w http.ResponseWriter, r *http.Request, db *sql.DB, s
 	phoneNumber := r.FormValue("phone")
 
 		user, err := GetUserFromRequest(w,r, db, store)
-
-		userId := user.ID
-
-
-
-
 	// Prepare and execute the SQL UPDATE statement
-	_, err = db.Exec("UPDATE users_info SET phone_number = ? WHERE id = ?", phoneNumber, userId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+
+	//check if a record of this user exists in the users_info table
+
+	var userExists bool
+	err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users_info WHERE user_id = ?)", user.ID).Scan(&userExists)
+	
+	//if user_info record does not exist, insert a row for this user
+	if userExists== true {
+		_, err = db.Exec("UPDATE user_info SET phone_number = ? WHERE id = ?", phoneNumber, user.ID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		_, err = db.Exec("INSERT INTO user_info (user_id, phone_number) VALUES (?, ?)", user.ID, phoneNumber)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	// Redirect back to the page or provide a response
