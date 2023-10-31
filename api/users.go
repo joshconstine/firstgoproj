@@ -16,12 +16,14 @@ import (
 type User struct {
     ID       int
     Username string
+	PhoneNumber string
 }
 
 type ProfilePageData struct {
 	PageTitle string
 	Username interface{}
 	FavoritedRecipes []RecipeWithIngredientsAndPhotosAndTags
+	PhoneNumber string
 }
 func getFavoritedRecipes(db *sql.DB, userID int) []RecipeWithIngredientsAndPhotosAndTags {
 	var recipes []RecipeWithIngredientsAndPhotosAndTags
@@ -86,9 +88,19 @@ func GetUserFromRequest(w http.ResponseWriter,r *http.Request, db *sql.DB, store
 		userID := userSession.Values["user_id"]
 		username := userSession.Values["username"]
 
+		var phoneNumber string
+
+		err = db.QueryRow("SELECT phone_number FROM user_info WHERE user_id=?", userID).Scan(&phoneNumber)
+		if err != nil {
+			log.Println(err)
+		}
+
+
+
 		return User{
 			ID: userID.(int),
 			Username: username.(string),
+			PhoneNumber: phoneNumber,
 		}, nil
 	}
 
@@ -104,6 +116,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *m
 		PageTitle: "Profile",
         Username: user.Username,
 		FavoritedRecipes: favoritedRecipes,
+		PhoneNumber: user.PhoneNumber,
     }
     tmpl.Execute(w, data)
 }

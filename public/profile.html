@@ -52,7 +52,7 @@
         <form hx-post="/api/user/phone" method="post" class="flex gap-2 items-center" hx-post="true" hx-trigger="submit"
             hx-swap="innerHTML">
             <label for="phone">Phone Number</label>
-            <input type="text" name="phone" id="phone" class="input input-bordered">
+            <input type="text" name="phone" id="phone" class="input input-bordered" value="{{.PhoneNumber}}">
             <input type="submit" class="btn btn-primary" value="Update Phone Number">
         </form>
 
