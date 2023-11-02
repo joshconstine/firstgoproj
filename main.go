@@ -5,7 +5,7 @@ import (
 	
 
 	"strconv"
-
+	"testing"
 	"os"
 	"net/http"
     "github.com/gorilla/mux"
@@ -54,4 +54,10 @@ func main() {
 	fmt.Printf("Server is listening on port %d...\n", port)
 
 	http.ListenAndServe(":"+portStr, r)
+
+	//TESTS
+	// Run the test
+	testing.Main(func(pat, str string) (bool, error) { return true, nil }, []testing.InternalTest{
+		{Name: "TestDatabaseConnection", F: TestDatabaseConnection},
+	}, nil, nil)
 }
