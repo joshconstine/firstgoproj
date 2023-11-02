@@ -2,10 +2,7 @@ package main
 
 import (
 	"fmt"
-	
-
 	"strconv"
-	"testing"
 	"os"
 	"net/http"
     "github.com/gorilla/mux"
@@ -14,11 +11,16 @@ import (
     _ "github.com/go-sql-driver/mysql"
     _ "github.com/joho/godotenv/autoload"
 	"github.com/srinathgs/mysqlstore"
-
-
-
 )
 var store *mysqlstore.MySQLStore
+
+func establishdbConnection(user string, password string, host string, port string, database string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", user+":"+password+"@("+host+":"+port+")/"+database+"?parseTime=true")
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
 
 
 func main() {
@@ -36,8 +38,8 @@ func main() {
 	
 
 	r := mux.NewRouter()
-
-	db, err := sql.Open("mysql", "root:daddy@(db:3306)/food?parseTime=true")
+	
+	db, err := establishdbConnection("root", "daddy", "db", "3306", "food")
 	
     if err != nil {
 		// log.Fatal(err)
@@ -54,10 +56,4 @@ func main() {
 	fmt.Printf("Server is listening on port %d...\n", port)
 
 	http.ListenAndServe(":"+portStr, r)
-
-	//TESTS
-	// Run the test
-	testing.Main(func(pat, str string) (bool, error) { return true, nil }, []testing.InternalTest{
-		{Name: "TestDatabaseConnection", F: TestDatabaseConnection},
-	}, nil, nil)
 }
