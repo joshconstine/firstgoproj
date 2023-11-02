@@ -42,11 +42,11 @@ if err == nil {
     } 
        _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS user_info (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL,
-                phone_number VARCHAR(20),
-
-                FOREIGN KEY (user_id) REFERENCES users(id)
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            phone_number VARCHAR(20),
+            UNIQUE (user_id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
         );
     `)
     if err != nil {
