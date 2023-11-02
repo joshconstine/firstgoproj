@@ -261,30 +261,23 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MyS
 }
 func UpdateUserPhoneNumber(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
 	phoneNumber := r.FormValue("phone")
-
-		user, err := GetUserFromRequest(w,r, db, store)
-	// Prepare and execute the SQL UPDATE statement
-
-	//check if a record of this user exists in the users_info table
-
+	user, err := GetUserFromRequest(w,r, db, store)
 	var userExists bool
 	err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users_info WHERE user_id = ?)", user.ID).Scan(&userExists)
-	
-	//if user_info record does not exist, insert a row for this user
-	if userExists== true {
-		_, err = db.Exec("UPDATE user_info SET phone_number = ? WHERE id = ?", phoneNumber, user.ID)
-		if err != nil {
+	if userExists && err != nil {
+		if  _, err = db.Exec("UPDATE user_info SET phone_number = ? WHERE id = ?", phoneNumber, user.ID); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	} else {
-		_, err = db.Exec("INSERT INTO user_info (user_id, phone_number) VALUES (?, ?)", user.ID, phoneNumber)
-		if err != nil {
+		} else if !userExists {
+		if  _, err = db.Exec("INSERT INTO user_info (user_id, phone_number) VALUES (?, ?)", user.ID, phoneNumber); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
+	}	else {
+		log.Println(userExists)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
 	// Redirect back to the page or provide a response
 	fmt.Fprintf(w, `<script>window.location.href = "/profile";</script>`)
 }
