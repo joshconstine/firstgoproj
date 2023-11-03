@@ -13,7 +13,8 @@ import (
 )
 type CreateListPageData struct {
 	PageTitle string
-    Recipes []RecipeWithPhotos
+    Recipes []RecipeWithPhotosAndTags
+	Tags []Tag
 }
 type ListPageData struct {
 	PageTitle string
@@ -32,11 +33,13 @@ type IngredientQuantityData struct {
 func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
   	tmpl := template.Must(template.ParseFiles("public/makeList.html"))
 	
-		recipes,_ := getAllRecipesWithPhotos(db)
+		recipes,_ := getAllRecipesWithPhotosAndTags(db)
+		tags := getAllTags(db)
 	
 		data := CreateListPageData{
 			PageTitle: "Make a List",
             Recipes: recipes,
+			Tags: tags,
         }
 
         tmpl.Execute(w, data)
