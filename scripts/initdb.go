@@ -29,7 +29,43 @@ if err == nil {
     if err != nil {
      panic(err)
     }
+// Create the users TYPE table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL
+        );
+    `)
+    if err != nil {
+        panic(err)
+    } 
+       _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS user_info (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            phone_number VARCHAR(20),
+            UNIQUE (user_id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
 
+// Create the user_favorite_recipes TYPE table
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS user_favorite_recipes (
+            user_id INT,
+            recipe_id INT,
+            PRIMARY KEY (user_id, recipe_id),
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
+        );
+    `)
+    if err != nil {
+        panic(err)
+    }
 
 
     // Create the ingredient TYPE table
@@ -143,6 +179,7 @@ if err == nil {
         ('Spice'),
         ('Dairy'),
         ('Meet'),
+        ('Alcohol'),
         ('Grain'),
         ('Snack'),
         ('Baking');

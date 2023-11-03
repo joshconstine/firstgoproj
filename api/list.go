@@ -3,6 +3,7 @@ package api
 import (
 	"os"
 	"fmt"
+	"github.com/srinathgs/mysqlstore"
 	"strconv"
     "net/http"
     "database/sql"
@@ -13,11 +14,9 @@ import (
 )
 type CreateListPageData struct {
 	PageTitle string
-    Recipes []RecipeWithPhotos
-}
-type ListPageData struct {
-	PageTitle string
-    Ingredients []Ingredient
+    Recipes []RecipeWithPhotosAndTags
+	Tags []Tag
+	User User
 }
 
 type IngredientQuantityData struct {
@@ -29,45 +28,27 @@ type IngredientQuantityData struct {
 
 //HTML TEMPLATES
 
-func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-  	tmpl := template.Must(template.ParseFiles("public/makeList.html"))
+func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
+  	tmpl := template.Must(template.ParseFiles("public/list.html"))
 	
-		recipes,_ := getAllRecipesWithPhotos(db)
-	
+		recipes,_ := getAllRecipesWithPhotosAndTags(db)
+		tags := getAllTags(db)
+		user, err := GetUserFromRequest(w, r, db, store)
+		if err != nil {
+			fmt.Println(err)
+		}		
+
+
 		data := CreateListPageData{
 			PageTitle: "Make a List",
             Recipes: recipes,
+			Tags: tags,
+			User: user,
         }
 
-        tmpl.Execute(w, data)
+     tmpl.Execute(w, data)
+
 }
-
-
-
-func GetGenerateListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	// REcipe ids only reads if there is another form value? am i an idot
-	recipeName := r.FormValue("recipeName")
-	recipeIds := r.Form["recipes"]
-	// Define a slice to hold all ingredients
-	var ingredients []Ingredient
-	
-		fmt.Println("", recipeName)
-	ingredientData := GetIngredientQuantityDataFromRecipeIds(recipeIds, db)
-
-	for _, data := range ingredientData {
-		ingredients = append(ingredients, Ingredient{
-			Name: data,
-		})
-	}
-		tmpl := template.Must(template.ParseFiles("public/list.html"))	
-		data := ListPageData{
-			PageTitle: "Your List",
-            Ingredients: ingredients,
-		}
-        tmpl.Execute(w, data)
-}
-	
-
 	//DB transactions
 
 func SendList(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +84,7 @@ func SendList(w http.ResponseWriter, r *http.Request) {
 		// Redirect back to the home page
 	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center max-h-full flex-col items-center \" >"
 			container += `<h1 class="text-m"> list send to </h1> <h1 class="text-m">` + formattedPhoneNumber + `</h1>`
-			container += "<button class='btn btn-ghost'> <a href='/recipes'> Return to Recipes </a> </button>"
+			container += "<button class='btn btn-ghost'> <a href='/list'> Return to Home</a> </button>"
 		container += "</div>"
 
     // Send the updated HTML ingredient list as a response

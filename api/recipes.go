@@ -5,6 +5,7 @@ import (
     "fmt"
     "database/sql"
 	"strings"
+	"errors"
 	"html/template"
     _ "github.com/go-sql-driver/mysql"
     "github.com/gorilla/mux" 
@@ -17,6 +18,7 @@ import (
 	"bytes"
 	"github.com/google/uuid"
 	"context"
+	"github.com/srinathgs/mysqlstore"
     "mime/multipart"
 )
 
@@ -30,6 +32,8 @@ type CreateRecipePageData struct {
     Ingredients []Ingredient
 	MappedIngredients map[string][]IngredientAndType
 	Tags []Tag
+	User User
+	IngredientTypes []IngredientType
 }
 type RecipeWithIngredients struct {
 	Recipe_id int
@@ -68,19 +72,16 @@ type RecipeWithPhotosAndTags struct {
 	Ingredients []IngredientWithQuantity
 }
 
-type RecipesPageData struct {
-	PageTitle string
-	Recipes []RecipeWithPhotosAndTags
-	Tags []Tag
-}
+
 type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredientsAndPhotosAndTags
     QuantityTypes []QuantityType
+	User User
 }
 
 //HTML TEMPLATES
-func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
 		vars := mux.Vars(r)
         id := vars["id"]
 	
@@ -91,12 +92,16 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		if err != nil {
 			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
 		}		
-
+		user, err := GetUserFromRequest(w, r, db, store)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		data := SingleRecipePageData{
 			PageTitle: recipe.Name,
             Recipe: recipe,
 			QuantityTypes: quantitiy_types,
+			User: user,
             
         }
 
@@ -104,32 +109,24 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 
-func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-   		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		recipes, _ := getAllRecipesWithPhotosAndTags(db)
-		tags := getAllTags(db)
-		data := RecipesPageData{
-			PageTitle: "Recipes",
-            Recipes: recipes,
-			Tags: tags,
-        }
-
-        tmpl.Execute(w, data)
-}
-
-
-func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
  		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
 	
         ingredients := getAllIngredients(db)
 		ingredientTypeMap := getAllIngredientsWithTypes(db)
         tags := getAllTags(db)
-		
+		user, err := GetUserFromRequest(w, r, db, store)
+		if err != nil {
+			fmt.Println(err)
+		}
+		ingredientTypes := getAllIngredientTypes(db)
 		data := CreateRecipePageData{
 			PageTitle: "Create Recipe",
             Ingredients: ingredients,
 			MappedIngredients: ingredientTypeMap,
 			Tags: tags,
+			User: user,
+			IngredientTypes: ingredientTypes,
         }
 
         tmpl.Execute(w, data)
@@ -553,7 +550,7 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
         // return err
     }
 
-		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/list";</script>`)
 }
 
 func UpdateRecipeIngredients(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -658,4 +655,76 @@ func UpdateDescription(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	
 		http.ListenAndServe(":8080", nil)
 	}
-	
+	func ToggleUserFavoriteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
+		// Get the recipe ID from the form data
+		recipeID := r.FormValue("id")
+		// Get the user ID from the session
+	c, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			// If the cookie is not set, return an unauthorized status
+			w.WriteHeader(http.StatusUnauthorized)
+            fmt.Printf("session_token not found")
+			return
+		}
+		// For any other type of error, return a bad request status
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	sessionToken := c.Value
+
+    if sessionToken == "" {
+        http.Error(w, "Unauthorized, please sign in to view this page", http.StatusUnauthorized)
+        return
+    }
+
+	// We then get the session from our session map
+	session, err := store.Get(r, sessionToken)
+    if err != nil {
+        switch {
+        case errors.Is(err, http.ErrNoCookie):
+            http.Error(w, "cookie not found", http.StatusBadRequest)
+        default:
+            log.Println(err)
+            http.Error(w, "server error", http.StatusInternalServerError)
+        }
+        return
+    }
+
+
+
+		
+		userID := session.Values["user_id"]
+		// Check if the user has already favorited the recipe
+// Perform a query to check if the user has favorited the recipe
+row := db.QueryRow("SELECT user_id FROM user_favorite_recipes WHERE user_id = ? AND recipe_id = ?", userID, recipeID)
+var userExists int
+err = row.Scan(&userExists)
+if err == sql.ErrNoRows {
+	// User has not favorited the recipe yet, so add it to the database
+	_, err = db.Exec("INSERT INTO user_favorite_recipes (user_id, recipe_id) VALUES (?, ?)", userID, recipeID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+} else if err != nil {
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+	return
+} else {
+	// User has already favorited the recipe, so remove it from the database
+	_, err = db.Exec("DELETE FROM user_favorite_recipes WHERE user_id = ? AND recipe_id = ?", userID, recipeID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+	container := "<div  id=\"FavoritedContainer\" >"
+			container += `<h1 class="text-m"> Favorited </h1>`
+			container += "<button class='btn btn-ghost'> <a href='/profile'> Show My Favorites </a> </button>"
+		container += "</div>"
+
+    // Send the updated HTML ingredient list as a response
+    w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
+    w.Write([]byte(container)) // Write the HTML structure to the response
+	}
