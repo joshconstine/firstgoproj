@@ -42,6 +42,17 @@
             </svg>
 
         </label>
+        <div class="flex gap-2">
+            {{if .User.ID}}
+
+            <a class="btn btn-sm rounded-lg" href='/profile'>Profile</a>
+            <form data-hx-get="api/logout" hx-trigger="submit">
+                <input type="submit" class="btn btn-sm rounded-lg" value="Sign Out">
+            </form>
+            {{else}}
+            <a class="btn btn-sm rounded-lg" href='/sign-in'>Sign in</a>
+            {{end}}
+        </div>
     </div>
 
 

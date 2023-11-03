@@ -156,7 +156,7 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
     }).Methods("GET")	
 
 	r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
-        GetListTemplate(w, r, db)
+        GetListTemplate(w, r, db, store)
     }).Methods("GET")	
 	r.HandleFunc("/generate-list", func(w http.ResponseWriter, r *http.Request) {
         GetGenerateListTemplate(w, r, db)

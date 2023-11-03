@@ -3,6 +3,7 @@ package api
 import (
 	"os"
 	"fmt"
+	"github.com/srinathgs/mysqlstore"
 	"strconv"
     "net/http"
     "database/sql"
@@ -15,6 +16,7 @@ type CreateListPageData struct {
 	PageTitle string
     Recipes []RecipeWithPhotosAndTags
 	Tags []Tag
+	User User
 }
 type ListPageData struct {
 	PageTitle string
@@ -30,19 +32,26 @@ type IngredientQuantityData struct {
 
 //HTML TEMPLATES
 
-func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
   	tmpl := template.Must(template.ParseFiles("public/makeList.html"))
 	
 		recipes,_ := getAllRecipesWithPhotosAndTags(db)
 		tags := getAllTags(db)
-	
+		user, err := GetUserFromRequest(w, r, db, store)
+		if err != nil {
+			fmt.Println(err)
+		}		
+
+
 		data := CreateListPageData{
 			PageTitle: "Make a List",
             Recipes: recipes,
 			Tags: tags,
+			User: user,
         }
 
-        tmpl.Execute(w, data)
+     tmpl.Execute(w, data)
+
 }
 
 
