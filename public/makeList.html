@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/htmx.org@1.9.6"
         integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
         crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 </head>
 
@@ -42,109 +44,138 @@
         </label>
     </div>
 
-    <div class="flex w-full px-12 gap-2">
-        <div class="flex flex-col items-center  max-h-full" data-hx-target="sideContainer" id="sideContainer">
 
-            <h1 class=" whitespace-nowrap font-bold text-xl">
-                Ingredient list
-            </h1>
-            <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true"
-                data-hx-target="#sideContainer" data-hx-swap="innerHTML" hx-trigger="submit">
-                <div class="flex flex-col w-full h-full">
-                    <div class="flex gap-4 items-end">
-                        <div class="flex flex-col gap-1">
-                            <label for="phone" class="text-xs">Text me the List</label>
-                            <input type="phone" placeholder="222-222-2222" name="phone" id="phone"
-                                class=" input input-bordered w-32 input-sm " />
+
+    <div class="drawer">
+        <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content">
+            <!-- Page content here -->
+            <div class="flex w-full px-12 gap-2">
+                <div class="flex flex-col gap-4  items-center w-full">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class=" flex gap-8 items-center">
+                            <label for="my-drawer"
+                                class="btn btn-primary drawer-button btn-outline btn-sm flex items-center "><span>
+
+                                    View
+                                    List
+                                </span>
+                                <div>
+
+                                    <span class="material-symbols-outlined  border-primary">
+                                        list
+                                    </span>
+                                </div>
+                            </label>
+                            <input class="input input-bordered " type="text" id="searchbar"
+                                placeholder="Search by Name / Ingredient" />
+                            <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
                         </div>
-                        <button type="submit " class="btn btn-sm ">send </button>
+                        <div class="flex  flex-wrap  items-center">
+                            {{range .Tags}}
+                            <button href="javascript:void(0);"
+                                class="btn btn-sm tag btn-ghost no-animation">{{.Name}}</button>
+                            {{end}}
+                        </div>
+                    </div>
+                    <form data-hx-get="/update-ingredients" data-hx-target="#ingredientList" data-hx-swap="innerHTML"
+                        hx-trigger="load delay:100ms, change " class="flex flex-col  items-center w-full"
+                        action="/generate-list" method="post">
 
-                    </div>
-                    <span class="loading loading-dots loading-lg htmx-indicator"></span>
-                    <div id="ingredientList" data-hx-target="ingredientList">
-                        <textarea name="list" id="ingredientList" data-hx-target="ingredientList"
-                            class="block w-full rounded-lg p-3 textarea resize-none textarea-bordered" rows="20">
-                        </textarea>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="divider divider-horizontal "></div>
-        <div class="flex flex-col  items-center w-full">
-            <div class="flex flex-col items-center gap-4">
-                <div class=" flex gap-8 items-center">
-                    <input class="input input-bordered " type="text" id="searchbar"
-                        placeholder="Search by Name / Ingredient" />
-                    <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
-                </div>
-                <div class="flex  flex-wrap  items-center">
-                    {{range .Tags}}
-                    <button href="javascript:void(0);" class="btn btn-sm tag btn-ghost no-animation">{{.Name}}</button>
-                    {{end}}
+
+                        <div class="flex gap-4 flex-wrap px-12">
+                            {{range .Recipes}}
+                            <div>
+
+                                <div class="card bg-base-300 shadow-sm" data-tags="{{.TagString}}">
+                                    {{if .Photos}}
+                                    {{range $i, $v := .Photos}}
+                                    {{if eq $i 0}}
+                                    <img src="{{$v}}" alt="photo " class="rounded-lg" />
+                                    {{end}}
+                                    {{end}}
+                                    {{else}}
+                                    <div>No photos</div>
+                                    {{end}}
+                                    <div class="card-body px-4 py-2">
+
+                                        <p class="card-title">
+                                            {{.Name}}
+                                        </p>
+                                        <div class="flex items-center gap-2  ">
+                                            <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
+                                                list</label>
+                                            <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
+                                                value="{{.Recipe_id}}" />
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <ul>
+                                                {{range .Tags}}
+                                                <li class="recipe_tag">{{.Name}}</li>
+                                                {{end}}
+                                            </ul>
+                                            <div class="card-actions  justify-end self-end">
+                                                <a href="/recipes/{{.Recipe_id}}">
+                                                    <button class="btn  btn-sm " type="button">View</button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="collapse collapse-arrow">
+                                            <input type="checkbox" />
+                                            <div class="collapse-title text-sm  font-medium">
+                                                View Ingredients
+                                            </div>
+                                            <div class="collapse-content">
+                                                <ul>
+                                                    {{range .Ingredients}}
+                                                    <li class="ingredient">{{.Name}}</li>
+                                                    {{end}}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+
+                    </form>
                 </div>
             </div>
-            <form data-hx-get="/update-ingredients" data-hx-target="#ingredientList" data-hx-swap="innerHTML"
-                hx-trigger="load delay:100ms, change " class="flex flex-col  items-center w-full"
-                action="/generate-list" method="post">
+        </div>
+        <div class="drawer-side">
+            <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+            <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+                <div class="flex flex-col items-center  max-h-full" data-hx-target="sideContainer" id="sideContainer">
 
-
-                <div class="flex gap-4 flex-wrap px-12">
-                    {{range .Recipes}}
-                    <div>
-
-                        <div class="card bg-base-300 shadow-sm" data-tags="{{.TagString}}">
-                            {{if .Photos}}
-                            {{range $i, $v := .Photos}}
-                            {{if eq $i 0}}
-                            <img src="{{$v}}" alt="photo " class="rounded-lg" />
-                            {{end}}
-                            {{end}}
-                            {{else}}
-                            <div>No photos</div>
-                            {{end}}
-                            <div class="card-body px-4 py-2">
-
-                                <p class="card-title">
-                                    {{.Name}}
-                                </p>
-                                <div class="flex items-center gap-2  ">
-                                    <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to list</label>
-                                    <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
-                                        value="{{.Recipe_id}}" />
+                    <h1 class=" whitespace-nowrap font-bold text-xl">
+                        Ingredient list
+                    </h1>
+                    <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true"
+                        data-hx-target="#sideContainer" data-hx-swap="innerHTML" hx-trigger="submit">
+                        <div class="flex flex-col w-full h-full">
+                            <div class="flex gap-4 items-end">
+                                <div class="flex flex-col gap-1">
+                                    <label for="phone" class="text-xs">Text me the List</label>
+                                    <input type="phone" placeholder="222-222-2222" name="phone" id="phone"
+                                        class=" input input-bordered w-32 input-sm " />
                                 </div>
-                                <div class="flex justify-between">
-                                    <ul>
-                                        {{range .Tags}}
-                                        <li class="recipe_tag">{{.Name}}</li>
-                                        {{end}}
-                                    </ul>
-                                    <div class="card-actions  justify-end self-end">
-                                        <a href="/recipes/{{.Recipe_id}}">
-                                            <button class="btn  btn-sm " type="button">View</button>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="collapse collapse-arrow">
-                                    <input type="checkbox" />
-                                    <div class="collapse-title text-sm  font-medium">
-                                        View Ingredients
-                                    </div>
-                                    <div class="collapse-content">
-                                        <ul>
-                                            {{range .Ingredients}}
-                                            <li class="ingredient">{{.Name}}</li>
-                                            {{end}}
-                                        </ul>
-                                    </div>
-                                </div>
+                                <button type="submit " class="btn btn-sm ">send </button>
 
                             </div>
+                            <span class="loading loading-dots loading-lg htmx-indicator"></span>
+                            <div id="ingredientList" data-hx-target="ingredientList">
+                                <textarea name="list" id="ingredientList" data-hx-target="ingredientList"
+                                    class="block w-full rounded-lg p-3 textarea resize-none textarea-bordered"
+                                    rows="20">
+                        </textarea>
+                            </div>
                         </div>
-                    </div>
-                    {{end}}
+                    </form>
                 </div>
 
-            </form>
+            </ul>
         </div>
     </div>
 </body>
