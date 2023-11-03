@@ -209,6 +209,13 @@
         }
         const phoneNumberInput = document.getElementById('phone');
         const sendButton = document.getElementById('sendButton');
+        const searchInput = document.getElementById('searchbar');
+        const recipeCards = document.querySelectorAll('.card');
+        const clearButton = document.getElementById('clear');
+        const tags = document.querySelectorAll('.tag'); // Select all tag elements
+        const recipeQuantites = document.querySelectorAll('.recipeQuantity')
+        const recipeCheckboxes = document.querySelectorAll('input[type=checkbox]')
+
         phoneNumberInput.addEventListener('input', validatePhoneNumber);
         function validatePhoneNumber() {
             // Get the input element by its id
@@ -236,35 +243,53 @@
                 localStorage.setItem('theme', 'dark'); // Store user's preference
             }
         });
-        const recipes = document.querySelectorAll('input[type=checkbox]')
-        recipes.forEach(recipe => {
+        recipeCheckboxes.forEach(recipe => {
             recipe.addEventListener('change', function () {
                 const list = JSON.parse(localStorage.getItem('list')) || []
                 if (this.checked) {
-                    list.push(this.value)
-                } else {
-                    const index = list.indexOf(this.value)
-                    if (index > -1) {
-                        list.splice(index, 1)
+                    if (!list.some(el => el.id === recipe.id)) {
+                        list.push({ id: recipe.id, quantity: recipe.parentElement.querySelector('input[type=number]').value })
                     }
+                    else {
+                        list.forEach(item => {
+                            if (item.id === recipe.id) {
+                                item.quantity = recipe.parentElement.querySelector('input[type=number]').value
+                            }
+                        })
+                    }
+                } else {
+                    list.forEach((item, index) => {
+                        if (item.id === recipe.id) {
+                            list.splice(index, 1)
+                        }
+                    })
                 }
                 localStorage.setItem('list', JSON.stringify(list))
             })
         })
-
+        recipeQuantites.forEach(quantity => {
+            quantity.addEventListener('change', function () {
+                const list = JSON.parse(localStorage.getItem('list')) || []
+                if (list.some(el => el.id === quantity.id.split('_')[0])) {
+                    list.forEach(item => {
+                        if (item.id === quantity.id.split('_')[0]) {
+                            item.quantity = quantity.value
+                        }
+                    })
+                }
+                localStorage.setItem('list', JSON.stringify(list))
+            })
+        })
         const list = JSON.parse(localStorage.getItem('list')) || []
-        const checkboxes = document.querySelectorAll('input[type=checkbox]')
-        checkboxes.forEach(checkbox => {
-            if (list.includes(checkbox.value)) {
+        recipeCheckboxes.forEach(checkbox => {
+            matchingItem = list.find(el => el.id === checkbox.id)
+            if (matchingItem) {
                 checkbox.checked = true
+                checkbox.parentElement.querySelector('input[type=number]').value = matchingItem.quantity
             }
         })
 
-        const searchInput = document.getElementById('searchbar');
-        const recipeCards = document.querySelectorAll('.card');
-        const clearButton = document.getElementById('clear');
 
-        const tags = document.querySelectorAll('.tag'); // Select all tag elements
         tags.forEach(tag => {
             tag.addEventListener('click', () => {
                 // Remove the 'selected' class from all tags
@@ -388,9 +413,7 @@
             });
         });
 
-        const recipeQuantites = document.querySelectorAll('.recipeQuantity')
-        const recipeCheckboxes = document.querySelectorAll('input[type=checkbox]')
-
+        //if the matching checkbo is checked, it will show the number component, otherwise it will hide it
         recipeQuantites.forEach(quantity => {
             recipeCheckboxes.forEach(checkbox => {
                 if (checkbox.value === quantity.id.split('_')[0]) {
@@ -402,7 +425,7 @@
                 }
             })
         })
-
+        //if the checkbox is checked, it will show the number component, otherwise it will hide it
         recipeCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function () {
                 const quantityInput = document.getElementById(`${this.value}_quantity`)
