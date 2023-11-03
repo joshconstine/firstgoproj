@@ -75,40 +75,63 @@
                 hx-trigger="load delay:100ms, change " class="flex flex-col  items-center w-full"
                 action="/generate-list" method="post">
 
-                <div class="flex flex-col items-center gap-4">
-                    <ul class="flex flex-wrap gap-4 ">
-                        {{range .Recipes}}
 
+                <div class="flex gap-4 flex-wrap px-12">
+                    {{range .Recipes}}
+                    <div>
 
-                        <div
-                            class="flex gap-4 flex-grow items-center bg-base-300 rounded-lg whitespace-nowrap shadow-md ">
+                        <div class="card bg-base-300 shadow-sm" data-tags="{{.TagString}}">
                             {{if .Photos}}
                             {{range $i, $v := .Photos}}
                             {{if eq $i 0}}
-                            <div class="w-42 rounded">
-                                <img src="{{$v}}" alt="photo" />
-                            </div>
+                            <img src="{{$v}}" alt="photo " class="rounded-lg" />
                             {{end}}
                             {{end}}
                             {{else}}
                             <div>No photos</div>
                             {{end}}
-                            <div class="flex-grow flex flex-col items-center">
+                            <div class="card-body px-4 py-2">
 
-                                <a href=" /recipes/{{.Recipe_id}}">
-                                    <h2 class="text-xl ">{{.Name}}</button>
-                                </a>
+                                <p class="card-title">
+                                    {{.Name}}
+                                </p>
                                 <div class="flex items-center gap-2  ">
                                     <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to list</label>
                                     <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
                                         value="{{.Recipe_id}}" />
                                 </div>
+                                <div class="flex justify-between">
+                                    <ul>
+                                        {{range .Tags}}
+                                        <li class="recipe_tag">{{.Name}}</li>
+                                        {{end}}
+                                    </ul>
+                                    <div class="card-actions  justify-end self-end">
+                                        <a href="/recipes/{{.Recipe_id}}">
+                                            <button class="btn  btn-sm ">View</button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="collapse collapse-arrow">
+                                    <input type="checkbox" />
+                                    <div class="collapse-title text-sm  font-medium">
+                                        View Ingredients
+                                    </div>
+                                    <div class="collapse-content">
+                                        <ul>
+                                            {{range .Ingredients}}
+                                            <li class="ingredient">{{.Name}}</li>
+                                            {{end}}
+                                        </ul>
+                                    </div>
+                                </div>
+
                             </div>
-
-
                         </div>
-                        {{end}}
-                    </ul>
+                    </div>
+                    {{end}}
+                </div>
+
             </form>
         </div>
 </body>
