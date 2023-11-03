@@ -3,10 +3,8 @@ package api
 import (
 	"database/sql"
 	"log"	
-	"github.com/srinathgs/mysqlstore"
 	"fmt"	
     "net/http"
-	"html/template"
 )
 type Ingredient struct {
 
@@ -46,31 +44,6 @@ type IngredientPageData struct {
 }
 
 
-
-//HTML TEMPLATES
-
-func GetIngredientsTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
-   	tmpl := template.Must(template.ParseFiles("public/ingredients.html"))
-	ingredients := getAllIngredients(db)
-    ingredientTypes := getAllIngredientTypes(db)
-	ingredientTypeMap := getAllIngredientsWithTypes(db)
-
-	user, err := GetUserFromRequest(w, r, db, store)
-	if err != nil {
-		fmt.Println(err)
-	}
-	
-	data := IngredientPageData{
-		PageTitle: "Ingredients list",
-        Ingredients: ingredients,
-		IngredientTypes: ingredientTypes,
-		MappedIngredients: ingredientTypeMap,
-		User: user,
-		
-    }
-
-        tmpl.Execute(w, data)
-}
 
 
 
@@ -163,7 +136,7 @@ func CreateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	
 		// Redirect back to the home page
-		fmt.Fprintf(w, `<script>window.location.href = "/ingredients";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/create-recipe";</script>`)
 }
 func UpdateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		ingredientID := r.FormValue("id")
@@ -176,8 +149,7 @@ func UpdateIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			return
 		}
 	
-		// Redirect back to the page or provide a response
-		fmt.Fprintf(w, `<script>window.location.href = "/ingredients";</script>`)
+		return
 }
 func DeleteIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		id := r.FormValue("id")
@@ -227,7 +199,7 @@ func DeleteIngredient(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	
 		// Redirect back to the home page
-		fmt.Fprintf(w, `<script>window.location.href = "/ingredients";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 }
 func getIngredientsForRecipe( db *sql.DB, recipeId string) []IngredientWithQuantity {
 	rows, err := db.Query(`

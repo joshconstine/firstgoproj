@@ -142,10 +142,7 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
     r.HandleFunc("/sign-in", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "public/auth.html") 
     }).Methods("GET")	
-    r.HandleFunc("/ingredients", SessionMiddleware( func(w http.ResponseWriter, r *http.Request) {
-        GetIngredientsTemplate(w, r, db, store)
-     }, store)).Methods("GET")
-	
+
 	r.HandleFunc("/recipes/{id}", func(w http.ResponseWriter, r *http.Request) {
         GetRecipeById(w, r, db, store)
     }).Methods("GET")	
