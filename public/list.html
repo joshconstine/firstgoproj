@@ -113,6 +113,9 @@
                                                 list</label>
                                             <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
                                                 value="{{.Recipe_id}}" />
+                                            <input type="number" id="{{.Recipe_id}}_quantity"
+                                                name="{{.Recipe_id}}_quantity" min="1" max="20" value="1" hidden
+                                                class="input input-bordered input-sm w-16 recipeQuantity" />
                                         </div>
                                         <div class="flex justify-between">
                                             <ul>
@@ -385,6 +388,31 @@
             });
         });
 
+        const recipeQuantites = document.querySelectorAll('.recipeQuantity')
+        const recipeCheckboxes = document.querySelectorAll('input[type=checkbox]')
+
+        recipeQuantites.forEach(quantity => {
+            recipeCheckboxes.forEach(checkbox => {
+                if (checkbox.value === quantity.id.split('_')[0]) {
+                    if (checkbox.checked) {
+                        quantity.hidden = false
+                    } else {
+                        quantity.hidden = true
+                    }
+                }
+            })
+        })
+
+        recipeCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const quantityInput = document.getElementById(`${this.value}_quantity`)
+                if (this.checked) {
+                    quantityInput.hidden = false
+                } else {
+                    quantityInput.hidden = true
+                }
+            })
+        })
     });
 
 
