@@ -76,10 +76,11 @@ type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredientsAndPhotosAndTags
     QuantityTypes []QuantityType
+	User User
 }
 
 //HTML TEMPLATES
-func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
 		vars := mux.Vars(r)
         id := vars["id"]
 	
@@ -90,12 +91,16 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		if err != nil {
 			http.Error(w, "Unable to read from db", http.StatusInternalServerError)
 		}		
-
+		user, err := GetUserFromRequest(w, r, db, store)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		data := SingleRecipePageData{
 			PageTitle: recipe.Name,
             Recipe: recipe,
 			QuantityTypes: quantitiy_types,
+			User: user,
             
         }
 

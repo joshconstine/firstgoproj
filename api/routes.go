@@ -147,7 +147,7 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
      }, store)).Methods("GET")
 	
 	r.HandleFunc("/recipes/{id}", func(w http.ResponseWriter, r *http.Request) {
-        GetRecipeById(w, r, db)
+        GetRecipeById(w, r, db, store)
     }).Methods("GET")	
 	r.HandleFunc("/create-recipe", SessionMiddleware( func(w http.ResponseWriter, r *http.Request) {
         GetCreateRecipeTemplate(w, r, db, store)
