@@ -74,14 +74,14 @@
                                     </span>
                                 </div>
                             </label>
-                            <input class="input input-bordered " type="text" id="searchbar"
+                            <input class="input input-bordered input-sm " type="text" id="searchbar"
                                 placeholder="Search by Name / Ingredient" />
                             <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
                         </div>
                         <div class="flex  flex-wrap  items-center">
                             {{range .Tags}}
                             <button href="javascript:void(0);"
-                                class="btn btn-sm tag btn-ghost no-animation">{{.Name}}</button>
+                                class="btn btn-sm tag btn-ghost no-animation text-xs">{{.Name}}</button>
                             {{end}}
                         </div>
                     </div>
