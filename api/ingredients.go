@@ -49,18 +49,16 @@ type IngredientPageData struct {
 
 func GetIngredientsTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
    	tmpl := template.Must(template.ParseFiles("public/ingredients.html"))
-	
-        ingredients := getAllIngredients(db)
-        ingredientTypes := getAllIngredientTypes(db)
-		ingredientTypeMap := getAllIngredientsWithTypes(db)
-  
-		
-		data := IngredientPageData{
-			PageTitle: "Ingredients list",
-            Ingredients: ingredients,
-			IngredientTypes: ingredientTypes,
-			MappedIngredients: ingredientTypeMap,
-        }
+	ingredients := getAllIngredients(db)
+    ingredientTypes := getAllIngredientTypes(db)
+	ingredientTypeMap := getAllIngredientsWithTypes(db)
+ 
+	data := IngredientPageData{
+		PageTitle: "Ingredients list",
+        Ingredients: ingredients,
+		IngredientTypes: ingredientTypes,
+		MappedIngredients: ingredientTypeMap,
+    }
 
         tmpl.Execute(w, data)
 }

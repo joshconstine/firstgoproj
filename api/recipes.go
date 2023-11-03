@@ -70,11 +70,7 @@ type RecipeWithPhotosAndTags struct {
 	Ingredients []IngredientWithQuantity
 }
 
-type RecipesPageData struct {
-	PageTitle string
-	Recipes []RecipeWithPhotosAndTags
-	Tags []Tag
-}
+
 type SingleRecipePageData struct {
 	PageTitle string
     Recipe RecipeWithIngredientsAndPhotosAndTags
@@ -100,20 +96,6 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
             Recipe: recipe,
 			QuantityTypes: quantitiy_types,
             
-        }
-
-        tmpl.Execute(w, data)
-}
-
-
-func GetRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-   		tmpl := template.Must(template.ParseFiles("public/recipes.html"))
-		recipes, _ := getAllRecipesWithPhotosAndTags(db)
-		tags := getAllTags(db)
-		data := RecipesPageData{
-			PageTitle: "Recipes",
-            Recipes: recipes,
-			Tags: tags,
         }
 
         tmpl.Execute(w, data)
@@ -555,7 +537,7 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request, db *sql.DB) {
         // return err
     }
 
-		fmt.Fprintf(w, `<script>window.location.href = "/recipes";</script>`)
+		fmt.Fprintf(w, `<script>window.location.href = "/list";</script>`)
 }
 
 func UpdateRecipeIngredients(w http.ResponseWriter, r *http.Request, db *sql.DB) {
