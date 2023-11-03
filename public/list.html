@@ -53,9 +53,6 @@
             </div>
         </div>
     </div>
-
-
-
     <div class="drawer">
         <input id="my-drawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content">
@@ -156,8 +153,7 @@
         <div class="drawer-side">
             <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
             <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-                <div class="flex flex-col items-center  max-h-full" data-hx-target="sideContainer" id="sideContainer">
-
+                <div class="flex flex-col   max-h-full" data-hx-target="sideContainer" id="sideContainer">
                     <h1 class=" whitespace-nowrap font-bold text-xl">
                         Ingredient list
                     </h1>
@@ -167,7 +163,7 @@
                             <div class="flex gap-4 items-end">
                                 <div class="flex flex-col gap-1">
                                     <label for="phone" class="text-xs">Text me the List</label>
-                                    <input type="phone" placeholder="222-222-2222" name="phone" id="phone"
+                                    <input type="phone" placeholder="8654447272" name="phone" id="phone"
                                         class=" input input-bordered w-32 input-sm " value="{{.User.PhoneNumber}}" />
                                 </div>
                                 <button type="submit " class="btn btn-sm ">send </button>
@@ -208,7 +204,21 @@
         } else {
             html.setAttribute('data-theme', 'light');
         }
+        var phoneNumberInput = document.getElementById('phone');
+        phoneNumberInput.addEventListener('blur', validatePhoneNumber);
+        function validatePhoneNumber() {
+            // Get the input element by its id
+            var phoneNumber = phoneNumberInput.value;
 
+            // Define a regular expression for the phone number pattern
+            var phonePattern = /^\d{10}$/;
+
+            if (phonePattern.test(phoneNumber)) {
+                phoneNumberInput.classList.remove('border-red-500');
+            } else {
+                phoneNumberInput.classList.add('border-red-500');
+            }
+        }
         // Add an event listener to toggle the theme when the button is clicked
         themeToggle.addEventListener('click', function () {
             if (html.getAttribute('data-theme') === 'dark') {
