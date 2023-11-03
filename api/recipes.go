@@ -33,6 +33,7 @@ type CreateRecipePageData struct {
 	MappedIngredients map[string][]IngredientAndType
 	Tags []Tag
 	User User
+	IngredientTypes []IngredientType
 }
 type RecipeWithIngredients struct {
 	Recipe_id int
@@ -118,13 +119,14 @@ func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB,
 		if err != nil {
 			fmt.Println(err)
 		}
-
+		ingredientTypes := getAllIngredientTypes(db)
 		data := CreateRecipePageData{
 			PageTitle: "Create Recipe",
             Ingredients: ingredients,
 			MappedIngredients: ingredientTypeMap,
 			Tags: tags,
 			User: user,
+			IngredientTypes: ingredientTypes,
         }
 
         tmpl.Execute(w, data)

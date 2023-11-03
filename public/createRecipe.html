@@ -58,6 +58,20 @@
             </div>
         </div>
     </div>
+    <form hx-post="api/ingredients" method="post" class="flex flex-col gap-2" hx-post="true" hx-trigger="submit"
+        hx-swap="innerHTML" id="ingredient-form">
+        <div class=" join">
+            <input type="text" id="ingredient" name="ingredient" placeholder="Add Ingredient" required
+                class="input input-sm input-bordered join-item" />
+            <select id="ingredient_type select " name="ingredient_type" required
+                class="join-item select select-bordered select-sm">
+                {{range .IngredientTypes}}
+                <option value="{{.Ingredient_type_id}}" class="option" label="{{.Name}}"></option>
+                {{end}}
+            </select>
+            <button type="submit" class="btn join-item  btn-sm btn-outline">+</button>
+        </div>
+    </form>
     <form action="api/recipes" method="post" class="flex flex-col gap-4" enctype="multipart/form-data">
         <div class="flex gap-4">
             <div class="w-full flex items-center justify-center">
@@ -136,6 +150,11 @@
     <div>
 </body>
 <script defer>
+    htmx.logger = function (elt, event, data) {
+        if (console) {
+            console.log(event, elt, data);
+        }
+    }
     var imgInp = document.getElementById("photo")
     var imgCtr = document.getElementById("image-container")
     var ingPkr = document.getElementById("ingredient-picker")
