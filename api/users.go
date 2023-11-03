@@ -70,7 +70,7 @@ func GetUserFromRequest(w http.ResponseWriter,r *http.Request, db *sql.DB, store
 		sessionToken := c.Value
 	
 		if sessionToken == "" {
-			http.Error(w, "Unauthorized, please sign in to view this page", http.StatusUnauthorized)
+			// http.Error(w, "Unauthorized, please sign in to view this page", http.StatusUnauthorized)
 			return User{}, err
 		}
 	
