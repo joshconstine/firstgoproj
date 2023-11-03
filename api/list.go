@@ -49,9 +49,6 @@ func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *
      tmpl.Execute(w, data)
 
 }
-
-
-
 	//DB transactions
 
 func SendList(w http.ResponseWriter, r *http.Request) {

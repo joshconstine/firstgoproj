@@ -32,6 +32,7 @@ type CreateRecipePageData struct {
     Ingredients []Ingredient
 	MappedIngredients map[string][]IngredientAndType
 	Tags []Tag
+	User User
 }
 type RecipeWithIngredients struct {
 	Recipe_id int
@@ -102,18 +103,23 @@ func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 
-func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetCreateRecipeTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
  		tmpl := template.Must(template.ParseFiles("public/createRecipe.html"))
 	
         ingredients := getAllIngredients(db)
 		ingredientTypeMap := getAllIngredientsWithTypes(db)
         tags := getAllTags(db)
-		
+		user, err := GetUserFromRequest(w, r, db, store)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		data := CreateRecipePageData{
 			PageTitle: "Create Recipe",
             Ingredients: ingredients,
 			MappedIngredients: ingredientTypeMap,
 			Tags: tags,
+			User: user,
         }
 
         tmpl.Execute(w, data)
