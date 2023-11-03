@@ -70,7 +70,6 @@ func GetUserFromRequest(w http.ResponseWriter,r *http.Request, db *sql.DB, store
 		sessionToken := c.Value
 	
 		if sessionToken == "" {
-			// http.Error(w, "Unauthorized, please sign in to view this page", http.StatusUnauthorized)
 			return User{}, err
 		}
 	
@@ -179,13 +178,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqls
         SameSite: http.SameSiteLaxMode,
     }
     http.SetCookie(w, &cookie) 
-	
-	
-	container := "<div  id=\"successContainer\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 flex h-full justify-center max-h-full flex-col items-center \" >"
-			container += `<h1 class="text-m"> User logged in </h1> <h1 class="text-m">` + username + `</h1>`
-		container += "</div>"
-	w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
-	w.Write([]byte(container)) // Write the HTML structure to the response
+	fmt.Fprintf(w, `<script>window.location.href = "/list";</script>`)
 }
 
 func HandleInsertUser(w http.ResponseWriter, r *http.Request, db *sql.DB)  {
