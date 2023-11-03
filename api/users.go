@@ -250,7 +250,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request, store *mysqlstore.MyS
 
 
 	log.Println("User logged out")
-    w.Write([]byte(""))
+	fmt.Fprintf(w, `<script>window.location.href = "/sign-in";</script>`)
 }
 func UpdateUserPhoneNumber(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
 	phoneNumber := r.FormValue("phone")
