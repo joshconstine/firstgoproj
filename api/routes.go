@@ -156,9 +156,7 @@ func InitRoutes(r *mux.Router, db *sql.DB, store *mysqlstore.MySQLStore ) {
 	r.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
         GetListTemplate(w, r, db, store)
     }).Methods("GET")	
-	r.HandleFunc("/generate-list", func(w http.ResponseWriter, r *http.Request) {
-        GetGenerateListTemplate(w, r, db)
-    }).Methods("POST")		
+
     r.HandleFunc("/update-ingredients", func(w http.ResponseWriter, r *http.Request) {
         UpdateIngredientsHandler(w, r, db)
     }).Methods("GET")	

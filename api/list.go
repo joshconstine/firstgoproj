@@ -18,10 +18,6 @@ type CreateListPageData struct {
 	Tags []Tag
 	User User
 }
-type ListPageData struct {
-	PageTitle string
-    Ingredients []Ingredient
-}
 
 type IngredientQuantityData struct {
 	IngredientName string
@@ -33,7 +29,7 @@ type IngredientQuantityData struct {
 //HTML TEMPLATES
 
 func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
-  	tmpl := template.Must(template.ParseFiles("public/makeList.html"))
+  	tmpl := template.Must(template.ParseFiles("public/list.html"))
 	
 		recipes,_ := getAllRecipesWithPhotosAndTags(db)
 		tags := getAllTags(db)
@@ -55,30 +51,6 @@ func GetListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *
 }
 
 
-
-func GetGenerateListTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	// REcipe ids only reads if there is another form value? am i an idot
-	recipeName := r.FormValue("recipeName")
-	recipeIds := r.Form["recipes"]
-	// Define a slice to hold all ingredients
-	var ingredients []Ingredient
-	
-		fmt.Println("", recipeName)
-	ingredientData := GetIngredientQuantityDataFromRecipeIds(recipeIds, db)
-
-	for _, data := range ingredientData {
-		ingredients = append(ingredients, Ingredient{
-			Name: data,
-		})
-	}
-		tmpl := template.Must(template.ParseFiles("public/list.html"))	
-		data := ListPageData{
-			PageTitle: "Your List",
-            Ingredients: ingredients,
-		}
-        tmpl.Execute(w, data)
-}
-	
 
 	//DB transactions
 

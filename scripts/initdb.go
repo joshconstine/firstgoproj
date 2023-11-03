@@ -179,6 +179,7 @@ if err == nil {
         ('Spice'),
         ('Dairy'),
         ('Meet'),
+        ('Alcohol'),
         ('Grain'),
         ('Snack'),
         ('Baking');
