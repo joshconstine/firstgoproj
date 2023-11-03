@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"log"	
+	"github.com/srinathgs/mysqlstore"
 	"fmt"	
     "net/http"
 	"html/template"
@@ -41,23 +42,31 @@ type IngredientPageData struct {
     Ingredients []Ingredient
 	IngredientTypes []IngredientType
 	MappedIngredients map[string][]IngredientAndType
+	User User
 }
 
 
 
 //HTML TEMPLATES
 
-func GetIngredientsTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetIngredientsTemplate(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
    	tmpl := template.Must(template.ParseFiles("public/ingredients.html"))
 	ingredients := getAllIngredients(db)
     ingredientTypes := getAllIngredientTypes(db)
 	ingredientTypeMap := getAllIngredientsWithTypes(db)
- 
+
+	user, err := GetUserFromRequest(w, r, db, store)
+	if err != nil {
+		fmt.Println(err)
+	}
+	
 	data := IngredientPageData{
 		PageTitle: "Ingredients list",
         Ingredients: ingredients,
 		IngredientTypes: ingredientTypes,
 		MappedIngredients: ingredientTypeMap,
+		User: user,
+		
     }
 
         tmpl.Execute(w, data)

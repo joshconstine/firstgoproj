@@ -15,7 +15,7 @@
 
 <body class="  flex items-center w-3xl flex-col gap-2">
     <div class="navbar flex justify-between gap-2 w-full  px-12">
-        <div class="flex gap-2">
+        <div class="flex gap-16 items-center">
 
             <label class="swap swap-rotate">
 
@@ -35,22 +35,23 @@
                 </svg>
 
             </label>
-            <div class="flex gap-2">
-                <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
-                <!-- <a href="/list" class=" btn btn-sm  rounded-lg">Make a List</a> -->
+            <div>
+                <a href="/list" class="text-2xl font-bold">Home</a>
             </div>
+
         </div>
 
         <div class="flex gap-2">
 
-            <a href="/ingredients" class=" btn btn-sm btn-success btn-outline text-red-500 rounded-lg">Ingredients</a>
+            <a href="/ingredients" class=" btn btn-sm btn-success btn-outline text-red-500 rounded-lg">Add
+                Ingredient</a>
             <div class="flex gap-2">
                 {{if .User.ID}}
 
                 <a class="btn btn-sm rounded-lg" href='/profile'>Profile</a>
-                <form data-hx-get="api/logout" hx-trigger="submit">
+                <!-- <form data-hx-get="api/logout" hx-trigger="submit">
                     <input type="submit" class="btn btn-sm rounded-lg" value="Sign Out">
-                </form>
+                </form> -->
                 {{else}}
                 <a class="btn btn-sm rounded-lg" href='/sign-in'>Sign in</a>
                 {{end}}

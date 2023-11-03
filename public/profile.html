@@ -14,13 +14,9 @@
 </head>
 
 <body class="  flex  w-3xl flex-col gap-8">
-    <div class="navbar bg-gray-400 flex gap-2 w-full justify-around px-12">
-        <div class="flex gap-2">
-            <h1 class="text-4xl font-bold">{{.PageTitle}}</h1>
-            <a href="/ingredients" class=" btn btn-sm  rounded-lg">Ingredients</a>
-            <a href="/recipes" class=" btn btn-sm  rounded-lg">Recipes</a>
-            <a href="/create-recipe" class=" btn btn-sm  rounded-lg">Create Recipe</a>
-            <a href="/list" class=" btn btn-sm  rounded-lg">Make a List</a>
+    <div class="navbar flex justify-between gap-2 w-full  px-12">
+        <div class="flex gap-16 items-center">
+
             <label class="swap swap-rotate">
 
                 <!-- this hidden checkbox controls the state -->
@@ -39,20 +35,38 @@
                 </svg>
 
             </label>
+            <a href="/list" class="text-2xl font-bold">Home</a>
         </div>
-        <form data-hx-get="api/logout" hx-trigger="submit">
-            <input type="submit" class="btn btn-sm rounded-lg" value="Sign Out">
-        </form>
+
+
+        <div class="flex gap-2">
+
+            <a href="/create-recipe" class=" btn btn-sm btn-success btn-outline text-red-500 rounded-lg">Create
+                Recipe</a>
+            <a href="/ingredients" class=" btn btn-sm btn-success btn-outline text-red-500 rounded-lg">Add
+                Ingredients</a>
+            <div class="flex gap-2">
+                {{if .User.ID}}
+
+                <!-- <a class="btn btn-sm rounded-lg" href='/profile'>Profile</a> -->
+                <form data-hx-get="api/logout" hx-trigger="submit">
+                    <input type="submit" class="btn btn-sm rounded-lg" value="Sign Out">
+                </form>
+                {{else}}
+                <a class="btn btn-sm rounded-lg" href='/sign-in'>Sign in</a>
+                {{end}}
+            </div>
+        </div>
     </div>
     <div class="flex w-3xl flex-col gap-4 px-12 ">
 
-        <h1>{{.Username}}</h1>
+        <h1>{{.User.Username}}</h1>
 
 
         <form hx-post="/api/user/phone" method="post" class="flex gap-2 items-center" hx-post="true" hx-trigger="submit"
             hx-swap="innerHTML">
             <label for="phone">Phone Number</label>
-            <input type="text" name="phone" id="phone" class="input input-bordered" value="{{.PhoneNumber}}">
+            <input type="text" name="phone" id="phone" class="input input-bordered" value="{{.User.PhoneNumber}}">
             <input type="submit" class="btn btn-primary" value="Update Phone Number">
         </form>
 

@@ -21,9 +21,8 @@ type User struct {
 
 type ProfilePageData struct {
 	PageTitle string
-	Username interface{}
 	FavoritedRecipes []RecipeWithIngredientsAndPhotosAndTags
-	PhoneNumber string
+	User User
 }
 func getFavoritedRecipes(db *sql.DB, userID int) []RecipeWithIngredientsAndPhotosAndTags {
 	var recipes []RecipeWithIngredientsAndPhotosAndTags
@@ -106,16 +105,16 @@ func GetUserFromRequest(w http.ResponseWriter,r *http.Request, db *sql.DB, store
 func ProfileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
 	user, err := GetUserFromRequest(w,r, db, store)	
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
+
 		return
 	}
 	favoritedRecipes := getFavoritedRecipes(db, user.ID)
 	tmpl := template.Must(template.ParseFiles("public/profile.html"))
 	data := ProfilePageData{
 		PageTitle: "Profile",
-        Username: user.Username,
 		FavoritedRecipes: favoritedRecipes,
-		PhoneNumber: user.PhoneNumber,
+		User: user,
     }
     tmpl.Execute(w, data)
 }
