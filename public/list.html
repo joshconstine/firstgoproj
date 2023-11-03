@@ -166,7 +166,7 @@
                                     <input type="phone" placeholder="8654447272" name="phone" id="phone"
                                         class=" input input-bordered w-32 input-sm " value="{{.User.PhoneNumber}}" />
                                 </div>
-                                <button type="submit " class="btn btn-sm ">send </button>
+                                <button type="submit " class="btn btn-sm btn-primary" id="sendButton">send </button>
 
                             </div>
                             <span class="loading loading-dots loading-lg htmx-indicator"></span>
@@ -204,8 +204,9 @@
         } else {
             html.setAttribute('data-theme', 'light');
         }
-        var phoneNumberInput = document.getElementById('phone');
-        phoneNumberInput.addEventListener('blur', validatePhoneNumber);
+        const phoneNumberInput = document.getElementById('phone');
+        const sendButton = document.getElementById('sendButton');
+        phoneNumberInput.addEventListener('input', validatePhoneNumber);
         function validatePhoneNumber() {
             // Get the input element by its id
             var phoneNumber = phoneNumberInput.value;
@@ -215,8 +216,11 @@
 
             if (phonePattern.test(phoneNumber)) {
                 phoneNumberInput.classList.remove('border-red-500');
+                sendButton.disabled = false;
+
             } else {
                 phoneNumberInput.classList.add('border-red-500');
+                sendButton.disabled = true;
             }
         }
         // Add an event listener to toggle the theme when the button is clicked
