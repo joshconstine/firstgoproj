@@ -346,7 +346,7 @@
 
                         elem.innerHTML = ingredientName
 
-                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        const collapseElem = elem.parentElement.parentElement
                         collapseElem?.classList?.remove('collapse-open')
 
                     })
@@ -369,7 +369,7 @@
                         });
                         elem.innerHTML = highlightedTxt
 
-                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        const collapseElem = elem.parentElement.parentElement
                         collapseElem?.classList?.add('collapse-open')
 
                     })
@@ -402,7 +402,7 @@
                 cardIngredients.forEach(elem => {
                     const ingredientName = elem.textContent
                     elem.innerHTML = ingredientName
-                    const collapseElem = elem.parentElement.parentElement.parentElement
+                    const collapseElem = elem.parentElement.parentElement
                     collapseElem?.classList?.remove('collapse-open')
 
                 })
