@@ -92,11 +92,12 @@
                         <div class="flex gap-4 flex-wrap px-12">
                             {{range .Recipes}}
 
-                            <div class="card lg:card-side bg-base-300 shadow-sm" data-tags="{{.TagString}}">
+                            <div class="card lg:card-side bg-base-100  border-gray-500 border-2 p-1 gap-2 shadow-sm items-center"
+                                data-tags="{{.TagString}}">
                                 {{if .Photos}}
                                 {{range $i, $v := .Photos}}
                                 {{if eq $i 0}}
-                                <div class="w-32">
+                                <div class="w-42">
 
                                     <img src="{{$v}}" alt="photo " class="rounded-lg" />
                                 </div>
@@ -105,14 +106,14 @@
                                 {{else}}
                                 <div>No photos</div>
                                 {{end}}
-                                <div class=" px-4 py-2">
+                                <div class="px-1">
 
                                     <a href="/recipes/{{.Recipe_id}}">
                                         <p class="card-title text-sm">
                                             {{.Name}}
                                         </p>
                                     </a>
-                                    <div class="flex items-center gap-2  ">
+                                    <div class="flex items-center gap-2 h-8  ">
                                         <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
                                             list</label>
                                         <input id="{{.Recipe_id}}" name="recipes" type="checkbox"
@@ -128,19 +129,21 @@
                                             {{end}}
                                         </ul>
                                     </div>
+
+
                                     <div class="collapse collapse-arrow">
                                         <input type="checkbox" />
-                                        <div class="collapse-title text-sm  font-medium">
-                                        </div>
+                                        <div class="collapse-title text-sm">Ingredients</div>
+
+
                                         <div class="collapse-content">
-                                            <ul>
-                                                {{range .Ingredients}}
-                                                <li class="ingredient">{{.Name}}</li>
-                                                {{end}}
-                                            </ul>
+
+                                            {{range .Ingredients}}
+                                            <li class="ingredient text-xs">{{.Name}}</li>
+                                            {{end}}
+
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                             {{end}}
