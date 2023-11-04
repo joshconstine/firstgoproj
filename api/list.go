@@ -101,7 +101,7 @@ func UpdateIngredientsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB
     // You should generate an HTML list structure here
 	// ingredients:= getIngredientsForRecipe(db, recipeID)
 
-	ingredientData := GetIngredientQuantityDataFromRecipeIds(recipeIds, db)
+	ingredientData := GetIngredientQuantityDataFromRecipeIds(r,recipeIds, db)
 
 
     // Generate an HTML ul and li structure
@@ -115,7 +115,6 @@ func UpdateIngredientsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB
 
 
 //                     </textarea>=
-
 		textarea := "<textarea name=\"list\" id=\"ingredientList\" data-hx-target=\"ingredientList\" class=\"block w-full rounded-lg p-3 textarea  resize-none textarea-bordered\" rows=\"20\">"
 		for _, ingredient := range ingredientData {
 			textarea += ingredient + "\n"
@@ -128,14 +127,13 @@ func UpdateIngredientsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB
 }
 
 
-func GetIngredientQuantityDataFromRecipeIds( recipeIds []string, db *sql.DB) []string {
+func GetIngredientQuantityDataFromRecipeIds(r *http.Request, recipeIds []string, db *sql.DB) []string {
 	var response []string
-var ingredientQuantityData []IngredientQuantityData
+	var ingredientQuantityData []IngredientQuantityData
 		// Retrieve the selected ingredients
 
-// Log the selected ingredient IDs
-		// Iterate through the selected recipe IDs
-		for _, recipeID := range recipeIds {
+	// Iterate through the selected recipe IDs
+	for _, recipeID := range recipeIds {
 			// Convert the recipeID string to an integer
 			recipeIDInt, err := strconv.Atoi(recipeID)
 			if err != nil {
@@ -170,26 +168,36 @@ for rows.Next() {
         // http.Error(w, err.Error(), http.StatusInternalServerError)
         return response
     }
-// Create a flag to track if the ingredient with the same ingredientID exists
-ingredientExists := false
+	// Create a flag to track if the ingredient with the same ingredientID exists
+	ingredientExists := false
+	// Iterate through ingredientQuantityData to find a match
 
-// Iterate through ingredientQuantityData to find a match
-for i, data := range ingredientQuantityData {
-    if data.IngredientId == ingredientId {
-        // Ingredient with the same ID exists, update the quantity
+    // Check if there's a corresponding form value for quantity and parse it
+    mealQuantityId := fmt.Sprintf("%s_quantity", recipeID)
+    mealQuantity := r.FormValue(mealQuantityId)
+    mealQuantityFloat, err := strconv.ParseFloat(mealQuantity, 64) // Use 64 for more precision
 
-        ingredientQuantityData[i].Quantity =  quantity + ingredientQuantityData[i].Quantity
-        ingredientExists = true
-    }
-}
-if ingredientExists == false {
-    ingredientQuantityData = append(ingredientQuantityData, IngredientQuantityData{
-        IngredientName:    ingredientName,
-        Quantity:          quantity,
-        QuantityTypeName:  quantityTypeName,
-        IngredientId:      ingredientId,
-    })
-}
+	 // Multiply the quantity from the database with the form value
+    quantity *= float32(mealQuantityFloat)
+
+	for i, data := range ingredientQuantityData {
+		if data.IngredientId == ingredientId {
+			 if err != nil {
+				 fmt.Println(err)
+			 }
+   			// Ingredient with the same ID exists, update the quantity
+			 ingredientQuantityData[i].Quantity =  quantity + ingredientQuantityData[i].Quantity
+			 ingredientExists = true
+		 }
+	}
+	if ingredientExists == false {
+   		 ingredientQuantityData = append(ingredientQuantityData, IngredientQuantityData{
+     		   IngredientName:    ingredientName,
+     		   Quantity:          quantity ,
+      		   QuantityTypeName:  quantityTypeName,
+       		   IngredientId:      ingredientId,
+   		 })
+	}
 }
 
 }

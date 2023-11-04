@@ -53,9 +53,6 @@
             </div>
         </div>
     </div>
-
-
-
     <div class="drawer">
         <input id="my-drawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content">
@@ -77,14 +74,14 @@
                                     </span>
                                 </div>
                             </label>
-                            <input class="input input-bordered " type="text" id="searchbar"
+                            <input class="input input-bordered input-sm " type="text" id="searchbar"
                                 placeholder="Search by Name / Ingredient" />
                             <button class="btn btn-sm  btn-outline" id="clear">Clear Filters</button>
                         </div>
                         <div class="flex  flex-wrap  items-center">
                             {{range .Tags}}
                             <button href="javascript:void(0);"
-                                class="btn btn-sm tag btn-ghost no-animation">{{.Name}}</button>
+                                class="btn btn-sm tag btn-ghost no-animation text-xs">{{.Name}}</button>
                             {{end}}
                         </div>
                     </div>
@@ -94,55 +91,58 @@
 
                         <div class="flex gap-4 flex-wrap px-12">
                             {{range .Recipes}}
-                            <div>
 
-                                <div class="card bg-base-300 shadow-sm" data-tags="{{.TagString}}">
-                                    {{if .Photos}}
-                                    {{range $i, $v := .Photos}}
-                                    {{if eq $i 0}}
+                            <div class="card lg:card-side bg-base-100  border-gray-500 border-2 p-1 gap-2 shadow-sm items-center"
+                                data-tags="{{.TagString}}">
+                                {{if .Photos}}
+                                {{range $i, $v := .Photos}}
+                                {{if eq $i 0}}
+                                <div class="w-42">
+
                                     <img src="{{$v}}" alt="photo " class="rounded-lg" />
-                                    {{end}}
-                                    {{end}}
-                                    {{else}}
-                                    <div>No photos</div>
-                                    {{end}}
-                                    <div class="card-body px-4 py-2">
+                                </div>
+                                {{end}}
+                                {{end}}
+                                {{else}}
+                                <div>No photos</div>
+                                {{end}}
+                                <div class="px-1">
 
-                                        <p class="card-title">
+                                    <a href="/recipes/{{.Recipe_id}}">
+                                        <p class="card-title text-sm">
                                             {{.Name}}
                                         </p>
-                                        <div class="flex items-center gap-2  ">
-                                            <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
-                                                list</label>
-                                            <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
-                                                value="{{.Recipe_id}}" />
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <ul>
-                                                {{range .Tags}}
-                                                <li class="recipe_tag">{{.Name}}</li>
-                                                {{end}}
-                                            </ul>
-                                            <div class="card-actions  justify-end self-end">
-                                                <a href="/recipes/{{.Recipe_id}}">
-                                                    <button class="btn  btn-sm " type="button">View</button>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div class="collapse collapse-arrow">
-                                            <input type="checkbox" />
-                                            <div class="collapse-title text-sm  font-medium">
-                                                View Ingredients
-                                            </div>
-                                            <div class="collapse-content">
-                                                <ul>
-                                                    {{range .Ingredients}}
-                                                    <li class="ingredient">{{.Name}}</li>
-                                                    {{end}}
-                                                </ul>
-                                            </div>
-                                        </div>
+                                    </a>
+                                    <div class="flex items-center gap-2 h-8  ">
+                                        <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
+                                            list</label>
+                                        <input id="{{.Recipe_id}}" name="recipes" type="checkbox"
+                                            class="checkbox checkbox-xs" value="{{.Recipe_id}}" />
+                                        <input type="number" id="{{.Recipe_id}}_quantity" name="{{.Recipe_id}}_quantity"
+                                            min="1" max="20" value="1" hidden
+                                            class="input input-bordered input-xs w-16 recipeQuantity" />
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <ul>
+                                            {{range .Tags}}
+                                            <li class="recipe_tag text-xs">{{.Name}}</li>
+                                            {{end}}
+                                        </ul>
+                                    </div>
 
+
+                                    <div class="collapse collapse-arrow">
+                                        <input type="checkbox" />
+                                        <div class="collapse-title text-sm">Ingredients</div>
+
+
+                                        <div class="collapse-content">
+
+                                            {{range .Ingredients}}
+                                            <li class="ingredient text-xs">{{.Name}}</li>
+                                            {{end}}
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -156,21 +156,17 @@
         <div class="drawer-side">
             <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
             <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-                <div class="flex flex-col items-center  max-h-full" data-hx-target="sideContainer" id="sideContainer">
+                <div class="flex flex-col   max-h-full" data-hx-target="sideContainer" id="sideContainer">
 
-                    <h1 class=" whitespace-nowrap font-bold text-xl">
-                        Ingredient list
-                    </h1>
                     <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true"
                         data-hx-target="#sideContainer" data-hx-swap="innerHTML" hx-trigger="submit">
                         <div class="flex flex-col w-full h-full">
                             <div class="flex gap-4 items-end">
                                 <div class="flex flex-col gap-1">
-                                    <label for="phone" class="text-xs">Text me the List</label>
-                                    <input type="phone" placeholder="222-222-2222" name="phone" id="phone"
+                                    <input type="phone" placeholder="8654447272" name="phone" id="phone"
                                         class=" input input-bordered w-32 input-sm " value="{{.User.PhoneNumber}}" />
                                 </div>
-                                <button type="submit " class="btn btn-sm ">send </button>
+                                <button type="submit " class="btn btn-sm btn-primary" id="sendButton">send </button>
 
                             </div>
                             <span class="loading loading-dots loading-lg htmx-indicator"></span>
@@ -208,7 +204,32 @@
         } else {
             html.setAttribute('data-theme', 'light');
         }
+        const phoneNumberInput = document.getElementById('phone');
+        const sendButton = document.getElementById('sendButton');
+        const searchInput = document.getElementById('searchbar');
+        const recipeCards = document.querySelectorAll('.card');
+        const clearButton = document.getElementById('clear');
+        const tags = document.querySelectorAll('.tag'); // Select all tag elements
+        const recipeQuantites = document.querySelectorAll('.recipeQuantity')
+        const recipeCheckboxes = document.querySelectorAll('input[type=checkbox]')
 
+        phoneNumberInput.addEventListener('input', validatePhoneNumber);
+        function validatePhoneNumber() {
+            // Get the input element by its id
+            var phoneNumber = phoneNumberInput.value;
+
+            // Define a regular expression for the phone number pattern
+            var phonePattern = /^\d{10}$/;
+
+            if (phonePattern.test(phoneNumber)) {
+                phoneNumberInput.classList.remove('border-red-500');
+                sendButton.disabled = false;
+
+            } else {
+                phoneNumberInput.classList.add('border-red-500');
+                sendButton.disabled = true;
+            }
+        }
         // Add an event listener to toggle the theme when the button is clicked
         themeToggle.addEventListener('click', function () {
             if (html.getAttribute('data-theme') === 'dark') {
@@ -219,35 +240,53 @@
                 localStorage.setItem('theme', 'dark'); // Store user's preference
             }
         });
-        const recipes = document.querySelectorAll('input[type=checkbox]')
-        recipes.forEach(recipe => {
+        recipeCheckboxes.forEach(recipe => {
             recipe.addEventListener('change', function () {
                 const list = JSON.parse(localStorage.getItem('list')) || []
                 if (this.checked) {
-                    list.push(this.value)
-                } else {
-                    const index = list.indexOf(this.value)
-                    if (index > -1) {
-                        list.splice(index, 1)
+                    if (!list.some(el => el.id === recipe.id)) {
+                        list.push({ id: recipe.id, quantity: recipe.parentElement.querySelector('input[type=number]').value })
                     }
+                    else {
+                        list.forEach(item => {
+                            if (item.id === recipe.id) {
+                                item.quantity = recipe.parentElement.querySelector('input[type=number]').value
+                            }
+                        })
+                    }
+                } else {
+                    list.forEach((item, index) => {
+                        if (item.id === recipe.id) {
+                            list.splice(index, 1)
+                        }
+                    })
                 }
                 localStorage.setItem('list', JSON.stringify(list))
             })
         })
-
+        recipeQuantites.forEach(quantity => {
+            quantity.addEventListener('change', function () {
+                const list = JSON.parse(localStorage.getItem('list')) || []
+                if (list.some(el => el.id === quantity.id.split('_')[0])) {
+                    list.forEach(item => {
+                        if (item.id === quantity.id.split('_')[0]) {
+                            item.quantity = quantity.value
+                        }
+                    })
+                }
+                localStorage.setItem('list', JSON.stringify(list))
+            })
+        })
         const list = JSON.parse(localStorage.getItem('list')) || []
-        const checkboxes = document.querySelectorAll('input[type=checkbox]')
-        checkboxes.forEach(checkbox => {
-            if (list.includes(checkbox.value)) {
+        recipeCheckboxes.forEach(checkbox => {
+            matchingItem = list.find(el => el.id === checkbox.id)
+            if (matchingItem) {
                 checkbox.checked = true
+                checkbox.parentElement.querySelector('input[type=number]').value = matchingItem.quantity
             }
         })
 
-        const searchInput = document.getElementById('searchbar');
-        const recipeCards = document.querySelectorAll('.card');
-        const clearButton = document.getElementById('clear');
 
-        const tags = document.querySelectorAll('.tag'); // Select all tag elements
         tags.forEach(tag => {
             tag.addEventListener('click', () => {
                 // Remove the 'selected' class from all tags
@@ -307,7 +346,7 @@
 
                         elem.innerHTML = ingredientName
 
-                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        const collapseElem = elem.parentElement.parentElement
                         collapseElem?.classList?.remove('collapse-open')
 
                     })
@@ -330,7 +369,7 @@
                         });
                         elem.innerHTML = highlightedTxt
 
-                        const collapseElem = elem.parentElement.parentElement.parentElement
+                        const collapseElem = elem.parentElement.parentElement
                         collapseElem?.classList?.add('collapse-open')
 
                     })
@@ -363,7 +402,7 @@
                 cardIngredients.forEach(elem => {
                     const ingredientName = elem.textContent
                     elem.innerHTML = ingredientName
-                    const collapseElem = elem.parentElement.parentElement.parentElement
+                    const collapseElem = elem.parentElement.parentElement
                     collapseElem?.classList?.remove('collapse-open')
 
                 })
@@ -371,6 +410,29 @@
             });
         });
 
+        //if the matching checkbo is checked, it will show the number component, otherwise it will hide it
+        recipeQuantites.forEach(quantity => {
+            recipeCheckboxes.forEach(checkbox => {
+                if (checkbox.value === quantity.id.split('_')[0]) {
+                    if (checkbox.checked) {
+                        quantity.hidden = false
+                    } else {
+                        quantity.hidden = true
+                    }
+                }
+            })
+        })
+        //if the checkbox is checked, it will show the number component, otherwise it will hide it
+        recipeCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const quantityInput = document.getElementById(`${this.value}_quantity`)
+                if (this.checked) {
+                    quantityInput.hidden = false
+                } else {
+                    quantityInput.hidden = true
+                }
+            })
+        })
     });
 
 
