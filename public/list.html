@@ -91,59 +91,56 @@
 
                         <div class="flex gap-4 flex-wrap px-12">
                             {{range .Recipes}}
-                            <div>
 
-                                <div class="card bg-base-300 shadow-sm" data-tags="{{.TagString}}">
-                                    {{if .Photos}}
-                                    {{range $i, $v := .Photos}}
-                                    {{if eq $i 0}}
+                            <div class="card lg:card-side bg-base-300 shadow-sm" data-tags="{{.TagString}}">
+                                {{if .Photos}}
+                                {{range $i, $v := .Photos}}
+                                {{if eq $i 0}}
+                                <div class="w-32">
+
                                     <img src="{{$v}}" alt="photo " class="rounded-lg" />
-                                    {{end}}
-                                    {{end}}
-                                    {{else}}
-                                    <div>No photos</div>
-                                    {{end}}
-                                    <div class="card-body px-4 py-2">
+                                </div>
+                                {{end}}
+                                {{end}}
+                                {{else}}
+                                <div>No photos</div>
+                                {{end}}
+                                <div class=" px-4 py-2">
 
-                                        <p class="card-title">
+                                    <a href="/recipes/{{.Recipe_id}}">
+                                        <p class="card-title text-sm">
                                             {{.Name}}
                                         </p>
-                                        <div class="flex items-center gap-2  ">
-                                            <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
-                                                list</label>
-                                            <input id="{{.Recipe_id}}" name="recipes" type="checkbox" class="checkbox "
-                                                value="{{.Recipe_id}}" />
-                                            <input type="number" id="{{.Recipe_id}}_quantity"
-                                                name="{{.Recipe_id}}_quantity" min="1" max="20" value="1" hidden
-                                                class="input input-bordered input-sm w-16 recipeQuantity" />
+                                    </a>
+                                    <div class="flex items-center gap-2  ">
+                                        <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
+                                            list</label>
+                                        <input id="{{.Recipe_id}}" name="recipes" type="checkbox"
+                                            class="checkbox checkbox-xs" value="{{.Recipe_id}}" />
+                                        <input type="number" id="{{.Recipe_id}}_quantity" name="{{.Recipe_id}}_quantity"
+                                            min="1" max="20" value="1" hidden
+                                            class="input input-bordered input-xs w-16 recipeQuantity" />
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <ul>
+                                            {{range .Tags}}
+                                            <li class="recipe_tag text-xs">{{.Name}}</li>
+                                            {{end}}
+                                        </ul>
+                                    </div>
+                                    <div class="collapse collapse-arrow">
+                                        <input type="checkbox" />
+                                        <div class="collapse-title text-sm  font-medium">
                                         </div>
-                                        <div class="flex justify-between">
+                                        <div class="collapse-content">
                                             <ul>
-                                                {{range .Tags}}
-                                                <li class="recipe_tag">{{.Name}}</li>
+                                                {{range .Ingredients}}
+                                                <li class="ingredient">{{.Name}}</li>
                                                 {{end}}
                                             </ul>
-                                            <div class="card-actions  justify-end self-end">
-                                                <a href="/recipes/{{.Recipe_id}}">
-                                                    <button class="btn  btn-sm " type="button">View</button>
-                                                </a>
-                                            </div>
                                         </div>
-                                        <div class="collapse collapse-arrow">
-                                            <input type="checkbox" />
-                                            <div class="collapse-title text-sm  font-medium">
-                                                View Ingredients
-                                            </div>
-                                            <div class="collapse-content">
-                                                <ul>
-                                                    {{range .Ingredients}}
-                                                    <li class="ingredient">{{.Name}}</li>
-                                                    {{end}}
-                                                </ul>
-                                            </div>
-                                        </div>
-
                                     </div>
+
                                 </div>
                             </div>
                             {{end}}
@@ -157,15 +154,12 @@
             <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
             <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
                 <div class="flex flex-col   max-h-full" data-hx-target="sideContainer" id="sideContainer">
-                    <h1 class=" whitespace-nowrap font-bold text-xl">
-                        Ingredient list
-                    </h1>
+
                     <form hx-post="api/list" method="post" class="w-50" id="sendForm" hx-post="true"
                         data-hx-target="#sideContainer" data-hx-swap="innerHTML" hx-trigger="submit">
                         <div class="flex flex-col w-full h-full">
                             <div class="flex gap-4 items-end">
                                 <div class="flex flex-col gap-1">
-                                    <label for="phone" class="text-xs">Text me the List</label>
                                     <input type="phone" placeholder="8654447272" name="phone" id="phone"
                                         class=" input input-bordered w-32 input-sm " value="{{.User.PhoneNumber}}" />
                                 </div>
