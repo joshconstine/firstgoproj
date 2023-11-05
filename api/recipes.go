@@ -749,4 +749,20 @@ if err == sql.ErrNoRows {
 		w.Write(json)
 	}
 
-	
+	func GetSingleRecipeJSON(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+		id := mux.Vars(r)["id"]
+		recipe, err := getSingleRecipeWithIngredientsAndPhotosAndTags(db, id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Convert the recipe to JSON
+		json, err := json.Marshal(recipe)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(json)
+	}
