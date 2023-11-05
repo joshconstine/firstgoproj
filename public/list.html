@@ -91,57 +91,59 @@
 
                         <div class="flex gap-4 flex-wrap px-12">
                             {{range .Recipes}}
+                            <div>
 
-                            <div class="card lg:card-side bg-base-100  border-gray-500 border-2 p-1 gap-2 shadow-sm items-center"
-                                data-tags="{{.TagString}}">
-                                {{if .Photos}}
-                                {{range $i, $v := .Photos}}
-                                {{if eq $i 0}}
-                                <div class="w-42">
+                                <div class="card lg:card-side bg-base-100  border-gray-500 border-2 p-1 gap-2 shadow-sm "
+                                    data-tags="{{.TagString}}">
+                                    {{if .Photos}}
+                                    {{range $i, $v := .Photos}}
+                                    {{if eq $i 0}}
+                                    <div class="w-42">
 
-                                    <img src="{{$v}}" alt="photo " class="rounded-lg" />
-                                </div>
-                                {{end}}
-                                {{end}}
-                                {{else}}
-                                <div>No photos</div>
-                                {{end}}
-                                <div class="px-1">
-
-                                    <a href="/recipes/{{.Recipe_id}}">
-                                        <p class="card-title text-sm">
-                                            {{.Name}}
-                                        </p>
-                                    </a>
-                                    <div class="flex items-center gap-2 h-8  ">
-                                        <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
-                                            list</label>
-                                        <input id="{{.Recipe_id}}" name="recipes" type="checkbox"
-                                            class="checkbox checkbox-xs" value="{{.Recipe_id}}" />
-                                        <input type="number" id="{{.Recipe_id}}_quantity" name="{{.Recipe_id}}_quantity"
-                                            min="1" max="20" value="1" hidden
-                                            class="input input-bordered input-xs w-16 recipeQuantity" />
+                                        <img src="{{$v}}" alt="photo " class="rounded-lg" />
                                     </div>
-                                    <div class="flex justify-between">
-                                        <ul>
-                                            {{range .Tags}}
-                                            <li class="recipe_tag text-xs">{{.Name}}</li>
-                                            {{end}}
-                                        </ul>
-                                    </div>
+                                    {{end}}
+                                    {{end}}
+                                    {{else}}
+                                    <div>No photos</div>
+                                    {{end}}
+                                    <div class="px-1">
+
+                                        <a href="/recipes/{{.Recipe_id}}">
+                                            <p class="card-title text-sm">
+                                                {{.Name}}
+                                            </p>
+                                        </a>
+                                        <div class="flex items-center gap-2 h-8  ">
+                                            <label for="{{.Recipe_id}}" class="checkbox-label text-xs">Add to
+                                                list</label>
+                                            <input id="{{.Recipe_id}}" name="recipes" type="checkbox"
+                                                class="checkbox checkbox-xs" value="{{.Recipe_id}}" />
+                                            <input type="number" id="{{.Recipe_id}}_quantity"
+                                                name="{{.Recipe_id}}_quantity" min="1" max="20" value="1" hidden
+                                                class="input input-bordered input-xs w-16 recipeQuantity" />
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <ul>
+                                                {{range .Tags}}
+                                                <li class="recipe_tag text-xs">{{.Name}}</li>
+                                                {{end}}
+                                            </ul>
+                                        </div>
 
 
-                                    <div class="collapse collapse-arrow">
-                                        <input type="checkbox" />
-                                        <div class="collapse-title text-sm">Ingredients</div>
+                                        <div class="collapse collapse-arrow">
+                                            <input type="checkbox" />
+                                            <div class="collapse-title text-sm">Ingredients</div>
 
 
-                                        <div class="collapse-content">
+                                            <div class="collapse-content">
 
-                                            {{range .Ingredients}}
-                                            <li class="ingredient text-xs">{{.Name}}</li>
-                                            {{end}}
+                                                {{range .Ingredients}}
+                                                <li class="ingredient text-xs">{{.Name}}</li>
+                                                {{end}}
 
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

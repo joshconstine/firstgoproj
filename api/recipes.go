@@ -12,6 +12,7 @@ import (
 	 "github.com/aws/aws-sdk-go/aws"
 	"strconv"
     "github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"encoding/json"
 	"log"
 	"io/ioutil"
 	"path/filepath"
@@ -728,3 +729,24 @@ if err == sql.ErrNoRows {
     w.Header().Set("Content-Type", "text/html") // Set the content type to HTML
     w.Write([]byte(container)) // Write the HTML structure to the response
 	}
+	func GetRecipesJSON(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+		// Get all recipes from the database
+		recipes, err := getAllRecipesWithPhotosAndTags(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	
+		// Convert the recipes to JSON
+		json, err := json.Marshal(recipes)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	
+		// Send the JSON response
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(json)
+	}
+
+	

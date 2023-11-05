@@ -222,4 +222,9 @@ apiRouter.HandleFunc("/favorite", SessionMiddleware( func(w http.ResponseWriter,
     }, store)).Methods("POST")
 
 
+    apiRouter.HandleFunc("/mobile/v1/recipes",  func(w http.ResponseWriter, r *http.Request) {
+        GetRecipesJSON(w, r, db )
+    }).Methods("GET")
+
+
 }
