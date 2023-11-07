@@ -178,7 +178,7 @@ if err == nil {
         ('Fruit'),
         ('Spice'),
         ('Dairy'),
-        ('Meet'),
+        ('Meat'),
         ('Alcohol'),
         ('Grain'),
         ('Snack'),
