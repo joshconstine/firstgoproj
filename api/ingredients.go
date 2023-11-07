@@ -34,6 +34,17 @@ type IngredientWithQuantity struct {
 	Quantity_type string
 	Quantity_type_id int
 }
+type IngredientWithQuantityAndType struct {
+	Ingredient_id int
+	Name  string
+	Quantity float32
+	Quantity_type string
+	Quantity_type_id int
+	Ingredient_Type_id int	
+	Ingredient_Type_Name string
+}
+
+
 
 type IngredientPageData struct {
 	PageTitle string
@@ -220,6 +231,34 @@ func getIngredientsForRecipe( db *sql.DB, recipeId string) []IngredientWithQuant
 		var ingredient IngredientWithQuantity
 
 		err := rows.Scan(&ingredient.Ingredient_id, &ingredient.Name, &ingredient.Quantity, &ingredient.Quantity_type, &ingredient.Quantity_type_id)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		ingredients = append(ingredients, ingredient)
+	}
+	return ingredients
+}
+func getIngredientsForRecipeWithType( db *sql.DB, recipeId string) []IngredientWithQuantityAndType {
+	rows, err := db.Query(`
+		SELECT i.ingredient_id, i.name, ri.quantity, qt.name AS quantity_type, qt.quantity_type_id, i.ingredient_type_id, it.name AS ingredient_type_name
+		FROM ingredients i
+		JOIN recipe_ingredients ri ON ri.ingredient_id = i.ingredient_id
+		JOIN quantity_type qt ON qt.quantity_type_id = ri.quantity_type_id
+		JOIN ingredient_type it ON it.ingredient_type_id = i.ingredient_type_id
+		WHERE ri.recipe_id = ?
+	`, recipeId)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	var ingredients []IngredientWithQuantityAndType
+
+	for rows.Next() {
+		var ingredient IngredientWithQuantityAndType
+
+		err := rows.Scan(&ingredient.Ingredient_id, &ingredient.Name, &ingredient.Quantity, &ingredient.Quantity_type, &ingredient.Quantity_type_id, &ingredient.Ingredient_Type_id, &ingredient.Ingredient_Type_Name)
 		if err != nil {
 			panic(err.Error())
 		}

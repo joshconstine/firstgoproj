@@ -72,7 +72,15 @@ type RecipeWithPhotosAndTags struct {
 	TagString string
 	Ingredients []IngredientWithQuantity
 }
-
+type RecipeWithPhotosAndTagsWithTypes struct {
+	Recipe_id int
+	Name  string
+	Description string
+	Photos []string
+	Tags []Tag
+	TagString string
+	Ingredients []IngredientWithQuantityAndType
+}
 
 type SingleRecipePageData struct {
 	PageTitle string
@@ -376,6 +384,59 @@ recipeWithPhotos.TagString =  tagString
 ingredientWithQuantity := getIngredientsForRecipe(db, recipeID)
 
 recipeWithPhotos.Ingredients = ingredientWithQuantity
+
+
+
+    // Query the associated photos for the current recipe
+    rows, err := db.Query("SELECT photo_url FROM recipe_photos WHERE recipe_id = ?", recipe.Recipe_id)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    // Loop through the rows of photos and add them to the result for the current recipe
+    for rows.Next() {
+        var photoUrl string
+        if err := rows.Scan(&photoUrl); err != nil {
+            return nil, err
+        }
+        recipeWithPhotos.Photos = append(recipeWithPhotos.Photos, photoUrl)
+    }
+
+    // Check for errors during rows iteration
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    // Append the current recipe with its photos to the final result
+    result = append(result, recipeWithPhotos)
+}
+	return result, nil
+}
+func getAllRecipesWithPhotosAndTagsWithTypes(db *sql.DB) ([]RecipeWithPhotosAndTagsWithTypes, error) {
+	// Define a variable to hold the result
+	 recipes := getAllRecipes(db)
+	var result []RecipeWithPhotosAndTagsWithTypes
+
+for _, recipe := range recipes {
+    // Create a RecipeWithPhotos instance for the current recipe
+    recipeWithPhotos := RecipeWithPhotosAndTagsWithTypes{
+        Recipe_id: recipe.Recipe_id,
+	Name:recipe.Name,
+	Description:recipe.Description,
+    }
+
+
+recipeID := strconv.Itoa(recipe.Recipe_id) // Convert int to string
+
+tags := getTagsforRecipeId(db,recipeID) // Now, you can pass the string value
+recipeWithPhotos.Tags = tags
+tagString := getJoinedTags(tags)
+recipeWithPhotos.TagString =  tagString
+
+ingredientsWithQuantitiesAndTypes := getIngredientsForRecipeWithType(db, recipeID)
+
+recipeWithPhotos.Ingredients = ingredientsWithQuantitiesAndTypes
 
 
 
@@ -731,7 +792,7 @@ if err == sql.ErrNoRows {
 	}
 	func GetRecipesJSON(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		// Get all recipes from the database
-		recipes, err := getAllRecipesWithPhotosAndTags(db)
+		recipes, err := getAllRecipesWithPhotosAndTagsWithTypes(db)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
