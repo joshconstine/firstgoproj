@@ -228,6 +228,10 @@ apiRouter.HandleFunc("/favorite", SessionMiddleware( func(w http.ResponseWriter,
     apiRouter.HandleFunc("/mobile/v1/ingredients",  func(w http.ResponseWriter, r *http.Request) {
         GetIngredientsJSON(w, r, db )
     }).Methods("GET")
+    apiRouter.HandleFunc("/mobile/v1/tags",  func(w http.ResponseWriter, r *http.Request) {
+        GetTagsJSON(w, r, db )
+    }).Methods("GET")
+
     apiRouter.HandleFunc("/mobile/v1/recipes/{id}",  func(w http.ResponseWriter, r *http.Request) {
         GetSingleRecipeJSON(w, r, db )
     }).Methods("GET")
