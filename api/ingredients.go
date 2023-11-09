@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"	
 	"fmt"	
+	"encoding/json"
     "net/http"
 )
 type Ingredient struct {
@@ -266,4 +267,20 @@ func getIngredientsForRecipeWithType( db *sql.DB, recipeId string) []IngredientW
 		ingredients = append(ingredients, ingredient)
 	}
 	return ingredients
+}
+func GetIngredientsJSON(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	// Retrieve the ingredients from the database
+	ingredients := getAllIngredientsWithTypes(db)
+
+
+	// Convert the ingredients to JSON
+	ingredientsJSON, err := json.Marshal(ingredients)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+
+	// Write the JSON as the response
+	w.Write(ingredientsJSON)
 }
