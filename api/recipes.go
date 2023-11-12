@@ -88,7 +88,12 @@ type SingleRecipePageData struct {
     QuantityTypes []QuantityType
 	User User
 }
-
+type RequestBody struct {
+    Name        string   `json:"Name"`
+    Description string   `json:"Description"`
+    Ingredients []Ingredient `json:"Ingredients"`
+    Tags        []Tag `json:"Tags"`
+}
 //HTML TEMPLATES
 func GetRecipeById(w http.ResponseWriter, r *http.Request, db *sql.DB, store *mysqlstore.MySQLStore) {
 		vars := mux.Vars(r)
@@ -827,3 +832,130 @@ if err == sql.ErrNoRows {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(json)
 	}
+	func CreateRecipeJSON(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+		reqBody, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		var recipe RequestBody
+		err = json.Unmarshal(reqBody, &recipe)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}	
+		// Perform the SQL INSERT query to add the recipe to the database
+		
+			quantityValue := 1
+			quantityTypeValue := 1
+
+		_, err = db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipe.Name, recipe.Description )
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		var recipeID int
+		err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&recipeID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	
+ 		for _, ingredient := range recipe.Ingredients {
+			_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, quantity_type_id) VALUES (?, ?, ?, ?)", recipeID, ingredient.Ingredient_id, quantityValue, quantityTypeValue)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+ 		for _, tag := range  recipe.Tags {
+			_, err = db.Exec("INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)", recipeID, tag.Tag_id)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}	
+		createdRecipeId, err := json.Marshal(recipeID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		uploader := NewUploader()
+		newPhotoLocation, err := UploadHandler(w, r, uploader)
+		if err == nil {
+			_, err = db.Exec("INSERT INTO recipe_photos (recipe_id, photo_url) VALUES (?, ?)", recipeID, newPhotoLocation)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte(createdRecipeId))
+			
+		}
+	func CreateRecipeFormData(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+			recipeName := r.FormValue("Name")
+			recipeDescription := r.FormValue("Description")
+			ingredientVAL := r.FormValue("Ingredients")
+			tagVAL := r.FormValue("Tags")
+
+			var ingredients []Ingredient
+			var tags []Tag
+
+			var ingredientJSON = []byte(ingredientVAL)
+			var tagJSON = []byte(tagVAL)
+
+		err := json.Unmarshal(ingredientJSON, &ingredients)
+		err = json.Unmarshal(tagJSON, &tags)
+
+		// Perform the SQL INSERT query to add the recipe to the database
+		
+			quantityValue := 1
+			quantityTypeValue := 1
+
+		_, err = db.Exec("INSERT INTO recipes (name, description) VALUES (?, ?)", recipeName, recipeDescription )
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		var recipeID int
+		err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&recipeID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	
+ 		for _, ingredient := range ingredients {
+			_, err = db.Exec("INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, quantity_type_id) VALUES (?, ?, ?, ?)", recipeID, ingredient.Ingredient_id, quantityValue, quantityTypeValue)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+ 		for _, tag := range  tags {
+			_, err = db.Exec("INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)", recipeID, tag.Tag_id)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}	
+		createdRecipeId, err := json.Marshal(recipeID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		uploader := NewUploader()
+		newPhotoLocation, err := UploadHandler(w, r, uploader)
+		if err == nil {
+			_, err = db.Exec("INSERT INTO recipe_photos (recipe_id, photo_url) VALUES (?, ?)", recipeID, newPhotoLocation)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte(createdRecipeId))
+			
+		}
