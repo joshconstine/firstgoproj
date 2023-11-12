@@ -103,7 +103,9 @@ if err == nil {
         CREATE TABLE IF NOT EXISTS recipes (
             recipe_id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
+            author_id VARCHAR(255),
             description TEXT
+            FOREIGN KEY (author_id) REFERENCES mobile_users(clerk_id)
         );
     `)
     if err != nil {
