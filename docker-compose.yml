@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   app:
     image: first-go-project:latest
@@ -8,10 +8,11 @@ services:
       - ./:/app
     depends_on:
       - db
-    entrypoint: /app/entrypoint.sh  # Specify the entry point script
+    entrypoint: /app/entrypoint.sh # Specify the entry point script
     environment:
-      TWILIO_AUTH_TOKEN: 66cd4e3b178108f486e8a558aa4d49cf
+      TWILIO_AUTH_TOKEN: 3a7babdaaf631435e1d21b6b0d9cd284
       TWILIO_ACCOUNT_SID: AC729653ba85434ab1e60023fb3d38d604
+      SESSION_KEY: AC729653ba85434ab1e60023fb3d38d604
   db:
     image: mysql:5.7.43
     environment:

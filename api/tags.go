@@ -3,6 +3,8 @@ package api
 import (
 	"database/sql"
 	"log"	
+    "encoding/json"
+    "net/http"
 )
 type Tag struct {
 	Tag_id int
@@ -56,4 +58,17 @@ func getTagsforRecipeId(db *sql.DB, recipeId string) []Tag {
 			log.Fatal(err)
         }
 		return tags
+}
+func GetTagsJSON(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+    tags := getAllTags(db)
+    
+    tagsJSON, err := json.Marshal(tags)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    w.Write(tagsJSON)
+
 }

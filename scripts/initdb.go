@@ -47,12 +47,21 @@ if err == nil {
             phone_number VARCHAR(20),
             UNIQUE (user_id),
             FOREIGN KEY (user_id) REFERENCES users(id)
+            );
+        `)
+        if err != nil {
+            panic(err)
+        }
+   _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS mobile_users (
+            clerk_id VARCHAR(255) PRIMARY KEY,
+            photo_url VARCHAR(255),
+            username VARCHAR(20)
         );
     `)
     if err != nil {
         panic(err)
     }
-
     // Create the ingredient TYPE table
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS ingredient_type (
@@ -94,7 +103,9 @@ if err == nil {
         CREATE TABLE IF NOT EXISTS recipes (
             recipe_id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
+            author_id VARCHAR(255),
             description TEXT
+            FOREIGN KEY (author_id) REFERENCES mobile_users(clerk_id)
         );
     `)
     if err != nil {
@@ -178,7 +189,7 @@ if err == nil {
         ('Fruit'),
         ('Spice'),
         ('Dairy'),
-        ('Meet'),
+        ('Meat'),
         ('Alcohol'),
         ('Grain'),
         ('Snack'),
